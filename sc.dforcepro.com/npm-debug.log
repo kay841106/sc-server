@@ -1,0 +1,304 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/bin/nodejs', '/usr/bin/npm', 'install', 'node' ]
+2 info using npm@3.5.2
+3 info using node@v4.2.6
+4 silly loadCurrentTree Starting
+5 silly install loadCurrentTree
+6 silly install readLocalPackageData
+7 silly fetchPackageMetaData node
+8 silly fetchNamedPackageData node
+9 silly mapToRegistry name node
+10 silly mapToRegistry using default registry
+11 silly mapToRegistry registry https://registry.npmjs.org/
+12 silly mapToRegistry uri https://registry.npmjs.org/node
+13 verbose request uri https://registry.npmjs.org/node
+14 verbose request no auth needed
+15 info attempt registry request try #1 at 5:26:01 PM
+16 verbose request id f2c525fa8007802a
+17 verbose etag "5aa9621d-56c7f"
+18 verbose lastModified Wed, 14 Mar 2018 17:55:41 GMT
+19 http request GET https://registry.npmjs.org/node
+20 http 304 https://registry.npmjs.org/node
+21 verbose headers { date: 'Tue, 20 Mar 2018 09:26:02 GMT',
+21 verbose headers   via: '1.1 varnish',
+21 verbose headers   'cache-control': 'max-age=300',
+21 verbose headers   etag: '"5aa9621d-56c7f"',
+21 verbose headers   age: '0',
+21 verbose headers   connection: 'keep-alive',
+21 verbose headers   'x-served-by': 'cache-dca17743-DCA',
+21 verbose headers   'x-cache': 'MISS',
+21 verbose headers   'x-cache-hits': '0',
+21 verbose headers   'x-timer': 'S1521537963.863251,VS0,VE141',
+21 verbose headers   vary: 'Accept-Encoding, Accept' }
+22 silly get cb [ 304,
+22 silly get   { date: 'Tue, 20 Mar 2018 09:26:02 GMT',
+22 silly get     via: '1.1 varnish',
+22 silly get     'cache-control': 'max-age=300',
+22 silly get     etag: '"5aa9621d-56c7f"',
+22 silly get     age: '0',
+22 silly get     connection: 'keep-alive',
+22 silly get     'x-served-by': 'cache-dca17743-DCA',
+22 silly get     'x-cache': 'MISS',
+22 silly get     'x-cache-hits': '0',
+22 silly get     'x-timer': 'S1521537963.863251,VS0,VE141',
+22 silly get     vary: 'Accept-Encoding, Accept' } ]
+23 verbose etag https://registry.npmjs.org/node from cache
+24 verbose get saving node to /home/baby/.npm/registry.npmjs.org/node/.cache.json
+25 silly install normalizeTree
+26 silly loadCurrentTree Finishing
+27 silly loadIdealTree Starting
+28 silly install loadIdealTree
+29 silly cloneCurrentTree Starting
+30 silly install cloneCurrentTreeToIdealTree
+31 silly cloneCurrentTree Finishing
+32 silly loadShrinkwrap Starting
+33 silly install loadShrinkwrap
+34 silly loadShrinkwrap Finishing
+35 silly loadAllDepsIntoIdealTree Starting
+36 silly install loadAllDepsIntoIdealTree
+37 silly resolveWithNewModule node@9.8.0 checking installable status
+38 silly cache add args [ 'node', null ]
+39 verbose cache add spec node
+40 silly cache add parsed spec Result {
+40 silly cache add   raw: 'node',
+40 silly cache add   scope: null,
+40 silly cache add   name: 'node',
+40 silly cache add   rawSpec: '',
+40 silly cache add   spec: 'latest',
+40 silly cache add   type: 'tag' }
+41 silly addNamed node@latest
+42 verbose addNamed "latest" is being treated as a dist-tag for node
+43 info addNameTag [ 'node', 'latest' ]
+44 silly mapToRegistry name node
+45 silly mapToRegistry using default registry
+46 silly mapToRegistry registry https://registry.npmjs.org/
+47 silly mapToRegistry uri https://registry.npmjs.org/node
+48 verbose addNameTag registry:https://registry.npmjs.org/node not in flight; fetching
+49 verbose get https://registry.npmjs.org/node not expired, no request
+50 silly addNameTag next cb for node with tag latest
+51 silly addNamed node@9.8.0
+52 verbose addNamed "9.8.0" is a plain semver version for node
+53 silly cache afterAdd node@9.8.0
+54 verbose afterAdd /home/baby/.npm/node/9.8.0/package/package.json not in flight; writing
+55 verbose afterAdd /home/baby/.npm/node/9.8.0/package/package.json written
+56 silly fetchNamedPackageData node-bin-setup
+57 silly mapToRegistry name node-bin-setup
+58 silly mapToRegistry using default registry
+59 silly mapToRegistry registry https://registry.npmjs.org/
+60 silly mapToRegistry uri https://registry.npmjs.org/node-bin-setup
+61 verbose request uri https://registry.npmjs.org/node-bin-setup
+62 verbose request no auth needed
+63 info attempt registry request try #1 at 5:26:03 PM
+64 verbose etag "5976bbea-1511"
+65 verbose lastModified Tue, 25 Jul 2017 3:32:58 GMT
+66 http request GET https://registry.npmjs.org/node-bin-setup
+67 http 304 https://registry.npmjs.org/node-bin-setup
+68 verbose headers { date: 'Tue, 20 Mar 2018 09:26:03 GMT',
+68 verbose headers   via: '1.1 varnish',
+68 verbose headers   'cache-control': 'max-age=300',
+68 verbose headers   etag: '"5976bbea-1511"',
+68 verbose headers   age: '0',
+68 verbose headers   connection: 'keep-alive',
+68 verbose headers   'x-served-by': 'cache-dca17725-DCA',
+68 verbose headers   'x-cache': 'MISS',
+68 verbose headers   'x-cache-hits': '0',
+68 verbose headers   'x-timer': 'S1521537964.735033,VS0,VE154',
+68 verbose headers   vary: 'Accept-Encoding, Accept' }
+69 silly get cb [ 304,
+69 silly get   { date: 'Tue, 20 Mar 2018 09:26:03 GMT',
+69 silly get     via: '1.1 varnish',
+69 silly get     'cache-control': 'max-age=300',
+69 silly get     etag: '"5976bbea-1511"',
+69 silly get     age: '0',
+69 silly get     connection: 'keep-alive',
+69 silly get     'x-served-by': 'cache-dca17725-DCA',
+69 silly get     'x-cache': 'MISS',
+69 silly get     'x-cache-hits': '0',
+69 silly get     'x-timer': 'S1521537964.735033,VS0,VE154',
+69 silly get     vary: 'Accept-Encoding, Accept' } ]
+70 verbose etag https://registry.npmjs.org/node-bin-setup from cache
+71 verbose get saving node-bin-setup to /home/baby/.npm/registry.npmjs.org/node-bin-setup/.cache.json
+72 silly resolveWithNewModule node-bin-setup@1.0.6 checking installable status
+73 silly cache add args [ 'node-bin-setup@^1.0.0', null ]
+74 verbose cache add spec node-bin-setup@^1.0.0
+75 silly cache add parsed spec Result {
+75 silly cache add   raw: 'node-bin-setup@^1.0.0',
+75 silly cache add   scope: null,
+75 silly cache add   name: 'node-bin-setup',
+75 silly cache add   rawSpec: '^1.0.0',
+75 silly cache add   spec: '>=1.0.0 <2.0.0',
+75 silly cache add   type: 'range' }
+76 silly addNamed node-bin-setup@>=1.0.0 <2.0.0
+77 verbose addNamed ">=1.0.0 <2.0.0" is a valid semver range for node-bin-setup
+78 silly addNameRange { name: 'node-bin-setup',
+78 silly addNameRange   range: '>=1.0.0 <2.0.0',
+78 silly addNameRange   hasData: false }
+79 silly mapToRegistry name node-bin-setup
+80 silly mapToRegistry using default registry
+81 silly mapToRegistry registry https://registry.npmjs.org/
+82 silly mapToRegistry uri https://registry.npmjs.org/node-bin-setup
+83 verbose addNameRange registry:https://registry.npmjs.org/node-bin-setup not in flight; fetching
+84 verbose get https://registry.npmjs.org/node-bin-setup not expired, no request
+85 silly addNameRange number 2 { name: 'node-bin-setup',
+85 silly addNameRange   range: '>=1.0.0 <2.0.0',
+85 silly addNameRange   hasData: true }
+86 silly addNameRange versions [ 'node-bin-setup',
+86 silly addNameRange   [ '1.0.0', '1.0.1', '1.0.2', '1.0.3', '1.0.4', '1.0.6' ] ]
+87 silly addNamed node-bin-setup@1.0.6
+88 verbose addNamed "1.0.6" is a plain semver version for node-bin-setup
+89 silly cache afterAdd node-bin-setup@1.0.6
+90 verbose afterAdd /home/baby/.npm/node-bin-setup/1.0.6/package/package.json not in flight; writing
+91 verbose afterAdd /home/baby/.npm/node-bin-setup/1.0.6/package/package.json written
+92 silly loadAllDepsIntoIdealTree Finishing
+93 silly idealTree:prePrune sc.dforcepro.com
+93 silly idealTree:prePrune ├── node-bin-setup@1.0.6
+93 silly idealTree:prePrune ├── node@9.8.0
+93 silly idealTree:prePrune └── nodejs@0.0.0
+94 silly loadIdealTree Finishing
+95 silly currentTree sc.dforcepro.com
+95 silly currentTree └── nodejs@0.0.0
+96 silly idealTree sc.dforcepro.com
+96 silly idealTree ├── node-bin-setup@1.0.6
+96 silly idealTree ├── node@9.8.0
+96 silly idealTree └── nodejs@0.0.0
+97 silly generateActionsToTake Starting
+98 silly install generateActionsToTake
+99 silly generateActionsToTake Finishing
+100 silly diffTrees action count 3
+101 silly diffTrees add node-bin-setup@1.0.6
+102 silly diffTrees add node@9.8.0
+103 silly diffTrees update nodejs@0.0.0
+104 silly decomposeActions action count 24
+105 silly decomposeActions fetch node-bin-setup@1.0.6
+106 silly decomposeActions extract node-bin-setup@1.0.6
+107 silly decomposeActions test node-bin-setup@1.0.6
+108 silly decomposeActions preinstall node-bin-setup@1.0.6
+109 silly decomposeActions build node-bin-setup@1.0.6
+110 silly decomposeActions install node-bin-setup@1.0.6
+111 silly decomposeActions postinstall node-bin-setup@1.0.6
+112 silly decomposeActions finalize node-bin-setup@1.0.6
+113 silly decomposeActions fetch node@9.8.0
+114 silly decomposeActions extract node@9.8.0
+115 silly decomposeActions test node@9.8.0
+116 silly decomposeActions preinstall node@9.8.0
+117 silly decomposeActions build node@9.8.0
+118 silly decomposeActions install node@9.8.0
+119 silly decomposeActions postinstall node@9.8.0
+120 silly decomposeActions finalize node@9.8.0
+121 silly decomposeActions fetch nodejs@0.0.0
+122 silly decomposeActions extract nodejs@0.0.0
+123 silly decomposeActions test nodejs@0.0.0
+124 silly decomposeActions preinstall nodejs@0.0.0
+125 silly decomposeActions build nodejs@0.0.0
+126 silly decomposeActions install nodejs@0.0.0
+127 silly decomposeActions postinstall nodejs@0.0.0
+128 silly decomposeActions finalize nodejs@0.0.0
+129 silly executeActions Starting
+130 silly install executeActions
+131 silly doSerial global-install 0
+132 silly doParallel fetch 3
+133 verbose lock using /home/baby/.npm/_locks/staging-5c28d579c210344f.lock for /home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules/.staging
+134 silly doParallel extract 3
+135 silly extract node-bin-setup@1.0.6
+136 silly extract node@9.8.0
+137 silly extract nodejs@0.0.0
+138 verbose unbuild node_modules/.staging/node-bin-setup-acad2335
+139 verbose unbuild node_modules/.staging/nodejs-cb204209
+140 verbose unbuild node_modules/.staging/node-10bfa1eb
+141 silly gentlyRm /home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules/.staging/node-bin-setup-acad2335 is being purged from base /home/baby/Documents/project/go/src/sc.dforcepro.com
+142 verbose gentlyRm don't care about contents; nuking /home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules/.staging/node-bin-setup-acad2335
+143 silly gentlyRm /home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules/.staging/nodejs-cb204209 is being purged from base /home/baby/Documents/project/go/src/sc.dforcepro.com
+144 verbose gentlyRm don't care about contents; nuking /home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules/.staging/nodejs-cb204209
+145 verbose tar unpack /home/baby/.npm/node-bin-setup/1.0.6/package.tgz
+146 verbose tar unpacking to /home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules/.staging/node-bin-setup-acad2335
+147 silly gentlyRm /home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules/.staging/node-bin-setup-acad2335 is being purged
+148 verbose gentlyRm don't care about contents; nuking /home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules/.staging/node-bin-setup-acad2335
+149 silly gentlyRm /home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules/.staging/node-10bfa1eb is being purged from base /home/baby/Documents/project/go/src/sc.dforcepro.com
+150 verbose gentlyRm don't care about contents; nuking /home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules/.staging/node-10bfa1eb
+151 verbose tar unpack /home/baby/.npm/nodejs/0.0.0/package.tgz
+152 verbose tar unpacking to /home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules/.staging/nodejs-cb204209
+153 silly gentlyRm /home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules/.staging/nodejs-cb204209 is being purged
+154 verbose gentlyRm don't care about contents; nuking /home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules/.staging/nodejs-cb204209
+155 silly gunzTarPerm modes [ '755', '644' ]
+156 verbose tar unpack /home/baby/.npm/node/9.8.0/package.tgz
+157 verbose tar unpacking to /home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules/.staging/node-10bfa1eb
+158 silly gentlyRm /home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules/.staging/node-10bfa1eb is being purged
+159 verbose gentlyRm don't care about contents; nuking /home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules/.staging/node-10bfa1eb
+160 silly gunzTarPerm modes [ '755', '644' ]
+161 silly gunzTarPerm modes [ '755', '644' ]
+162 silly gunzTarPerm extractEntry package.json
+163 silly gunzTarPerm extractEntry package.json
+164 silly gunzTarPerm modified mode [ 'package.json', 438, 420 ]
+165 silly gunzTarPerm extractEntry package.json
+166 silly gunzTarPerm extractEntry index.js
+167 silly gunzTarPerm extractEntry 1/getmodule.js
+168 silly gunzTarPerm modified mode [ '1/getmodule.js', 438, 420 ]
+169 silly gunzTarPerm extractEntry 1/module.js
+170 silly gunzTarPerm modified mode [ '1/module.js', 438, 420 ]
+171 silly gunzTarPerm extractEntry installArchSpecificPackage.js
+172 silly gunzTarPerm extractEntry README.md
+173 silly gunzTarPerm extractEntry 1/singleobject.js
+174 silly gunzTarPerm modified mode [ '1/singleobject.js', 438, 420 ]
+175 silly gentlyRm /home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules/.staging/node-bin-setup-acad2335/node_modules is being purged
+176 verbose gentlyRm don't care about contents; nuking /home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules/.staging/node-bin-setup-acad2335/node_modules
+177 silly gentlyRm /home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules/.staging/node-10bfa1eb/node_modules is being purged
+178 verbose gentlyRm don't care about contents; nuking /home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules/.staging/node-10bfa1eb/node_modules
+179 silly gentlyRm /home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules/.staging/nodejs-cb204209/node_modules is being purged
+180 verbose gentlyRm don't care about contents; nuking /home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules/.staging/nodejs-cb204209/node_modules
+181 silly doParallel preinstall 3
+182 silly preinstall node-bin-setup@1.0.6 /home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules/.staging/node-bin-setup-acad2335
+183 info lifecycle node-bin-setup@1.0.6~preinstall: node-bin-setup@1.0.6
+184 silly preinstall node@9.8.0 /home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules/.staging/node-10bfa1eb
+185 info lifecycle node@9.8.0~preinstall: node@9.8.0
+186 silly preinstall nodejs@0.0.0 /home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules/.staging/nodejs-cb204209
+187 info lifecycle nodejs@0.0.0~preinstall: nodejs@0.0.0
+188 silly lifecycle node-bin-setup@1.0.6~preinstall: no script for preinstall, continuing
+189 warn lifecycle node@9.8.0~preinstall: cannot run in wd %s %s (wd=%s) node@9.8.0 node installArchSpecificPackage /home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules/.staging/node-10bfa1eb
+190 silly lifecycle nodejs@0.0.0~preinstall: no script for preinstall, continuing
+191 silly doReverseSerial remove 0
+192 silly doSerial move 0
+193 silly doSerial finalize 3
+194 silly finalize /home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules/node-bin-setup
+195 silly finalize /home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules/node
+196 silly finalize /home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules/nodejs
+197 silly doSerial build 3
+198 silly build node-bin-setup@1.0.6
+199 info linkStuff node-bin-setup@1.0.6
+200 silly linkStuff node-bin-setup@1.0.6 has /home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules as its parent node_modules
+201 verbose linkBins node-bin-setup@1.0.6
+202 verbose linkMans node-bin-setup@1.0.6
+203 silly build node@9.8.0
+204 info linkStuff node@9.8.0
+205 silly linkStuff node@9.8.0 has /home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules as its parent node_modules
+206 verbose linkBins node@9.8.0
+207 verbose link bins [ { node: 'bin/node' },
+207 verbose link bins   '/home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules/.bin',
+207 verbose link bins   false ]
+208 verbose linkMans node@9.8.0
+209 verbose unlock done using /home/baby/.npm/_locks/staging-5c28d579c210344f.lock for /home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules/.staging
+210 silly rollbackFailedOptional Starting
+211 silly rollbackFailedOptional Finishing
+212 silly runTopLevelLifecycles Starting
+213 silly runTopLevelLifecycles Finishing
+214 silly install printInstalled
+215 warn enoent ENOENT: no such file or directory, open '/home/baby/Documents/project/go/src/sc.dforcepro.com/package.json'
+216 warn sc.dforcepro.com No description
+217 warn sc.dforcepro.com No repository field.
+218 warn sc.dforcepro.com No README data
+219 warn sc.dforcepro.com No license field.
+220 verbose stack Error: ENOENT: no such file or directory, chmod '/home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules/node/bin/node'
+220 verbose stack     at Error (native)
+221 verbose cwd /home/baby/Documents/project/go/src/sc.dforcepro.com
+222 error Linux 4.10.0-28-generic
+223 error argv "/usr/bin/nodejs" "/usr/bin/npm" "install" "node"
+224 error node v4.2.6
+225 error npm  v3.5.2
+226 error path /home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules/node/bin/node
+227 error code ENOENT
+228 error errno -2
+229 error syscall chmod
+230 error enoent ENOENT: no such file or directory, chmod '/home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules/node/bin/node'
+231 error enoent ENOENT: no such file or directory, chmod '/home/baby/Documents/project/go/src/sc.dforcepro.com/node_modules/node/bin/node'
+231 error enoent This is most likely not a problem with npm itself
+231 error enoent and is related to npm not being able to find a file.
+232 verbose exit [ -2, true ]

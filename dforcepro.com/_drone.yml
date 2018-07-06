@@ -1,0 +1,11 @@
+workspace:
+  base: /go/src/dforcepro.com
+  path: ./ 
+
+pipeline:
+  build:
+    image: golang:dforcepro
+    commands:
+      - go build ./util
+      - go test -covermode=count -coverprofile=count.out ./util
+      - go tool cover -func=count.out

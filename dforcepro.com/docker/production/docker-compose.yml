@@ -1,0 +1,164 @@
+version: '2'
+
+services:
+  web-service:
+    image: nginx:${WEB_TAG}
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 8081:8081
+      - 8082:8082
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/include/:/etc/nginx/conf.d/
+      - ./log/nginx/:/var/log/nginx
+      - /html:/html
+    links:
+      - ytz-api-service1
+      - ytz-api-service2
+ #     - zbt-api-service1
+ #     - zbt-api-service2
+
+  # zbt-api-service1:
+  #   image: zbt:latest
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./log/zbt/service1:/var/log/
+  #   extra_hosts:
+  #     - "dforcepro-db:10.1.1.2"
+  #   entrypoint:
+  #     - /go/bin/zbt.dforcepro.com
+  #     - api
+  #     - /go/config.yml
+
+  # zbt-api-service2:
+  #   image: zbt:latest
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./log/zbt/service2:/var/log/
+  #   extra_hosts:
+  #     - "dforcepro-db:10.1.1.2"
+  #   entrypoint:
+  #     - /go/bin/zbt.dforcepro.com
+  #     - api
+  #     - /go/config.yml
+
+  ytz-api-service1:
+    image: ytz:${YTZ_TAG}
+    restart: unless-stopped
+    volumes:
+      - ./log/ytz/service1:/var/log/
+    environment:
+      - ENV=${ENV}
+    extra_hosts:
+      - "dforcepro-db:10.1.1.2"
+    links:
+      - rabbitmq-service
+      - redis-service
+      - mongodb
+      - sql
+    entrypoint:
+      - /go/bin/ytz.dforcepro.com
+      - api
+      - /go/src/ytz.dforcepro.com/conf/
+
+  ytz-api-service2:
+    image: ytz:${YTZ_TAG}
+    restart: unless-stopped
+    volumes:
+      - ./log/ytz/service2:/var/log/
+    environment:
+      - ENV=${ENV}
+    extra_hosts:
+      - "dforcepro-db:10.1.1.2"
+    links:
+      - rabbitmq-service
+      - redis-service
+      - mongodb
+      - sql
+    entrypoint:
+      - /go/bin/ytz.dforcepro.com
+      - api
+      - /go/src/ytz.dforcepro.com/conf/
+
+  ytz-worker-service1:
+    image: ytz:${YTZ_TAG}
+    restart: unless-stopped
+    volumes:
+      - ./log/ytz/worker1:/var/log/
+    environment:
+      - ENV=${ENV}
+    extra_hosts:
+      - "dforcepro-db:10.1.1.2"
+    links:
+      - rabbitmq-service
+      - redis-service
+      - mongodb
+      - sql
+    entrypoint:
+      - /go/bin/ytz.dforcepro.com
+      - worker
+      - /go/src/ytz.dforcepro.com/conf/
+
+  ytz-worker-service2:
+    image: ytz:${YTZ_TAG}
+    restart: unless-stopped
+    volumes:
+      - ./log/ytz/worker2:/var/log/
+    environment:
+      - ENV=${ENV}
+    extra_hosts:
+      - "dforcepro-db:10.1.1.2"
+    links:
+      - rabbitmq-service
+      - redis-service
+      - mongodb
+      - sql
+    entrypoint:
+      - /go/bin/ytz.dforcepro.com
+      - worker
+      - /go/src/ytz.dforcepro.com/conf/
+
+  rabbitmq-service:
+    image: rabbitmq:${RABIT_TAG}
+    restart: unless-stopped
+    hostname: rabbitmq-service
+    environment:
+      - RABBITMQ_DEFAULT_USER=rd
+      - RABBITMQ_DEFAULT_PASS=1234
+    links:
+      - redis-service
+
+  redis-service:
+     image: redis:${REDIS_TAG}
+     restart: unless-stopped
+
+  sql:
+    image: mariadb:${SQL_TAG}
+    restart: unless-stopped
+    environment:
+      - MYSQL_RANDOM_ROOT_PASSWORD=yes
+      - MYSQL_USER=dforcepro
+      - MYSQL_PASSWORD=1234
+    ports:
+      - 57092:3306
+    volumes:
+      - ./mariadb/data:/var/lib/mysql
+  
+  mongodb:
+    image: mongo:${MONGO_TAG}
+    restart: unless-stopped
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+    ports:
+      - 57091:27017
+    volumes:
+      - ./mongodb/data:/data/db
+    command: mongod --smallfiles --logpath=/dev/null --auth # --quiet
+
+  search:
+      image: elasticsearch:${SEARCH_TAG}
+      restart: unless-stopped
+      volumes:
+        - ./elastic/data:/usr/share/elasticsearch/data

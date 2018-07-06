@@ -1,0 +1,36 @@
+version: '3.3'
+services:
+  influxdb:
+    image: "influxdb:latest"
+    ports:
+      - 8086:8086
+    networks:
+      tik_net:
+      
+  telegraf:
+    image: "telegraf:latest"
+    networks:
+      tik_net:
+    volumes:
+      - ./etc/telegraf:/etc/telegraf
+  kapacitor:
+    image: "kapacitor:latest"
+    networks:
+      tik_net:
+    volumes:
+      - ./etc/kapacitor:/etc/kapacitor
+      - ./var/log/kapacitor:/var/log/kapacitor
+      - ./home/kapacitor:/home/kapacitor
+  chronograf:
+    image: chronograf
+    ports:
+      - "8888:8888"
+    environment:
+      INFLUXDB_URL: http://localhost:8086
+      KAPACITOR_URL: http://localhost:9092
+    networks:
+      tik_net:
+
+networks:
+  tik_net:
+    driver: bridge

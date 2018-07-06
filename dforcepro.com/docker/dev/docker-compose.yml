@@ -1,0 +1,53 @@
+mongodb:
+    image: mongo:latest
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+    volumes:
+      - ./mongodb/data:/data/db
+    ports:
+      - 27017:27017
+    command: mongod --smallfiles --logpath=/dev/null # --quiet
+
+sqldb:
+    image: mariadb:10.3.2
+    environment:
+      - MYSQL_RANDOM_ROOT_PASSWORD=yes
+      - MYSQL_USER=dforcepro
+      - MYSQL_PASSWORD=1234
+    volumes:
+      - ./mariadb/data:/var/lib/mysql
+    ports:
+      - 3306:3306
+
+search:
+    image: elasticsearch:latest
+    volumes:
+      - ./elastic/data:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+      - 9300:9300
+
+gorush:
+  image: appleboy/gorush:latest
+  ports: 
+    - 8089:8089
+  environment: 
+    - GORUSH_CORE_PORT=8089
+    - GORUSH_CORE_ENABLED=true
+    - GORUSH_CORE_MODE=release
+    - GORUSH_CORE_SYNC=true
+    - GORUSH_ANDROID_APIKEY=AAAAsC2HlCw:APA91bGou7AQCPq_8PrwH7mqoYVErohksz9cwBcAyIx1hc_86cFHUR379Ug7LTr2S1OfzIkmv9fxYJZK52MxjqupA-ZFRTbJ0drOnQDXimo7C7xUwyCAI3sJX-FKVuE7OvqcpQwnnmWRf-gBGpjx43WN0OZLNg9rTA
+rabbitmq:
+  image: rabbitmq:latest
+  hostname: dforcepro-db
+  environment:
+    - RABBITMQ_DEFAULT_USER=rd
+    - RABBITMQ_DEFAULT_PASS=1234
+  ports:
+    - 5672:5672
+
+redis:
+   image: redis:latest
+   ports:
+     - 6379:6379

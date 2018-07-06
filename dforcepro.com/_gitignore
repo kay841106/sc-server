@@ -1,0 +1,9 @@
+docker/dev/elastic/data/nodes
+docker/dev/mongodb/data/*
+docker/dev/mariadb/*
+docker/beta/elastic/*
+docker/beta/mongodb/*
+!docker/dev/mongodb/data/README.md
+*.test
+*.DS_Store
+*.pem

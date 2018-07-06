@@ -1,0 +1,277 @@
+# jupyter:
+#   #image: jupyter/datascience-notebook
+#   build: jupy
+# #proxy:
+# #  build: proxy
+#   #environment:
+#   #  - PASSWORD=${PASSWORD}
+
+# nginx:  
+#   image: nginx
+#   links: 
+#     - jupyter
+#   volumes:
+#     - ./proxy/jupynote.conf:/etc/nginx/nginx.conf
+#     - ./encryptme/mycert.crt:/data/mycert.crt
+#     - ./encryptme/mycert.key:/data/mycert.key
+#   ports:
+#     - 80:80
+#     - 7000:60
+
+# docker-compose.yml file version
+version: '3'
+ 
+# # Data volume for Mongo
+# volumes:
+#   mongostorage:
+ 
+# Services (Docker containers)
+services:
+  # Mongo Database
+  mongodb-primary:
+   
+    # Give it a name 
+    container_name: mongodb_primary_container
+    # https://hub.docker.com/r/alexpunct/mongo/
+    image: mongo
+    command: mongod --smallfiles --replSet bigdaddy
+    hostname: "127.0.0.1"
+    volumes:
+     - ./p:/data
+    ports:
+      - "27017:27017"
+    # We use mongostorage data volume and we will use the /data/db path for the database inside the container
+    # volumes: 
+    #   - mongodbdata:/data/db
+    # Expose a MongoDB port to connect to, defined by the MONGODB_EXPOSED_PORT environment variable
+    # and map this port to the 27017 internal port which is what MongoDB uses
+    # ports:
+    #   - "${MONGODB_EXPOSED_PORT}:27017"
+    # Passing environment variables from the host to the container. 
+    # Our container expects the following variables (as explained here: https://hub.docker.com/r/alexpunct/mongo/)
+    environment:
+      MONGODB_ADMIN_USER: $MONGODB_ADMIN_USER
+      MONGODB_ADMIN_PASS: $MONGODB_ADMIN_PASS
+      MONGODB_APPLICATION_DATABASE: $MONGODB_APPLICATION_DATABASE
+      MONGODB_APPLICATION_USER: $MONGODB_APPLICATION_USER
+      MONGODB_APPLICATION_PASS: $MONGODB_APPLICATION_PASS
+
+
+  # mongodb-secondary-1:
+  #   # Give it a name 
+  #   container_name: mongodb_secondary_1_container
+  #   # https://hub.docker.com/r/alexpunct/mongo/
+  #   image: mongo
+  #   command: mongod --smallfiles --replSet bigdaddy
+  #   hostname: "127.0.0.1"
+  #   ports:
+  #     - "27018:27017"
+  #   # We use mongostorage data volume and we will use the /data/db path for the database inside the container
+  #   # volumes: 
+  #   #   - mongodbdata:/data/db
+  #   # Expose a MongoDB port to connect to, defined by the MONGODB_EXPOSED_PORT environment variable
+  #   # and map this port to the 27017 internal port which is what MongoDB uses
+  #   # ports:
+  #   #   - "${MONGODB_EXPOSED_PORT}:27017"
+  #   # Passing environment variables from the host to the container. 
+  #   # Our container expects the following variables (as explained here: https://hub.docker.com/r/alexpunct/mongo/)
+  #   environment:
+  #     MONGODB_ADMIN_USER: $MONGODB_ADMIN_USER
+  #     MONGODB_ADMIN_PASS: $MONGODB_ADMIN_PASS
+  #     MONGODB_APPLICATION_DATABASE: $MONGODB_APPLICATION_DATABASE
+  #     MONGODB_APPLICATION_USER: $MONGODB_APPLICATION_USER
+  #     MONGODB_APPLICATION_PASS: $MONGODB_APPLICATION_PASS
+
+  # mongodb-secondary-2:
+  #   container_name: mongodb_secondary_2_container
+  #   # https://hub.docker.com/r/alexpunct/mongo/
+  #   image: mongo
+  #   command: mongod --smallfiles --replSet bigdaddy
+  #   hostname: "127.0.0.1"
+  #   volumes:
+  #     - ./s1:/data
+  #   ports:
+  #     - "27018:27017"
+  #   # We use mongostorage data volume and we will use the /data/db path for the database inside the container
+  #   # volumes: 
+  #   #   - mongodbdata:/data/db
+  #   # Expose a MongoDB port to connect to, defined by the MONGODB_EXPOSED_PORT environment variable
+  #   # and map this port to the 27017 internal port which is what MongoDB uses
+  #   # ports:
+  #   #   - "${MONGODB_EXPOSED_PORT}:27017"
+  #   # Passing environment variables from the host to the container. 
+  #   # Our container expects the following variables (as explained here: https://hub.docker.com/r/alexpunct/mongo/)
+  #   environment:
+  #     MONGODB_ADMIN_USER: $MONGODB_ADMIN_USER
+  #     MONGODB_ADMIN_PASS: $MONGODB_ADMIN_PASS
+  #     MONGODB_APPLICATION_DATABASE: $MONGODB_APPLICATION_DATABASE
+  #     MONGODB_APPLICATION_USER: $MONGODB_APPLICATION_USER
+  #     MONGODB_APPLICATION_PASS: $MONGODB_APPLICATION_PASS
+
+
+  #   image: mongo
+  #   volumes:
+  #     - ./s2:/data
+  #   ports:
+  #     - "27019:27017"
+  #   # See note above on extra_hosts
+  #   # extra_hosts:
+  #   #   - primary
+  #   #   - secondary1
+  #   hostname: "192.168.59.103"
+  #   command: mongod --smallfiles --replSet bigdaddy
+
+  # transporter:
+   
+  #   # Give it a name 
+  #   container_name: transporter
+  #   # https://hub.docker.com/r/alexpunct/mongo/
+  #   image: starefossen/transporter
+  #   command: transporter init mongodb elasticseach 
+  #   # hostname: "127.0.0.1"
+  #   # volumes:
+  #   #  - ./p:/data
+  #   # ports:
+  #   #   - "27017:27017"
+  #   # We use mongostorage data volume and we will use the /data/db path for the database inside the container
+  #   # volumes: 
+  #   #   - mongodbdata:/data/db
+  #   # Expose a MongoDB port to connect to, defined by the MONGODB_EXPOSED_PORT environment variable
+  #   # and map this port to the 27017 internal port which is what MongoDB uses
+  #   # ports:
+  #   #   - "${MONGODB_EXPOSED_PORT}:27017"
+  #   # Passing environment variables from the host to the container. 
+  #   # Our container expects the following variables (as explained here: https://hub.docker.com/r/alexpunct/mongo/)
+  #   environment:
+  #     MONGODB_ADMIN_USER: $MONGODB_ADMIN_USER
+  #     MONGODB_ADMIN_PASS: $MONGODB_ADMIN_PASS
+  #     MONGODB_APPLICATION_DATABASE: $MONGODB_APPLICATION_DATABASE
+  #     MONGODB_APPLICATION_USER: $MONGODB_APPLICATION_USER
+  #     MONGODB_APPLICATION_PASS: $MONGODB_APPLICATION_PASS
+
+  # elasticsearch:
+
+  #   image: blacktop/elastic-stack
+  #   container_name: elasticstack
+  #   environment:
+  #     - cluster.name=docker-cluster
+  #     - bootstrap.memory_lock=true
+  #     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    
+
+  #   ulimits:
+  #     memlock:
+  #       soft: -1
+  #       hard: -1
+
+  #   volumes:
+  #     - ./esdata1:/usr/share/elasticsearch/data
+
+  #   ports:
+  #     - 9200:9200
+  #     - 80:80
+
+    # Define a Telegraf service
+  telegraf:
+    image: telegraf
+    container_name: telegraf
+    # volumes:
+    #   - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    links:
+      - influxdb
+    ports:
+      - "8092:8092/udp"
+      - "8094:8094"
+      - "8125:8125/udp"
+  # Define an InfluxDB service
+  influxdb:
+    image: influxdb
+    command: -config /etc/influxdb/influxdb.conf
+    ports:
+      - "8083:8083"
+      - "8086:8086"
+    
+    # volumes:
+    #   - "./influxdb/influxdb.conf:/etc/influxdb/influxdb.conf:ro"
+    #   - "./influxdb/influxdb:/var/lib/influxdb"
+    # links:
+    #   - influxdb
+    # hostname: influxdb
+    # privileged: true
+
+# influxdb:
+#     # Full tag list: https://hub.docker.com/r/library/influxdb/tags/
+#     image: influxdb
+#     deploy:
+#       replicas: 1
+#       placement:
+#         constraints:
+#           - node.role == manager
+#       restart_policy:
+#         condition: on-failure
+#     volumes:
+#       # Mount for influxdb data directory
+#       # - influxdb-data:/var/lib/influxdb
+#       # Mount for influxdb configuration
+#       - /etc/influxdb/config:/etc/influxdb
+#     ports:
+#       # The API for InfluxDB is served on port 8086
+#       - "8086:8086"
+#     networks:
+#       - influx
+  # Define a Chronograf service
+  chronograf:
+    image: chronograf
+    environment:
+      INFLUXDB_URL: http://localhost:8086
+      KAPACITOR_URL: http://localhost:9092
+    ports:
+      - "8888:8888"
+    links:
+      - influxdb
+      - kapacitor
+  # Define a Kapacitor service
+  kapacitor:
+    image: kapacitor
+    environment:
+      KAPACITOR_HOSTNAME: kapacitor
+      KAPACITOR_INFLUXDB_0_URLS_0: http://localhost:8086
+    links:
+      - influxdb
+    ports:
+      - "9092:9092"
+  # Define a service for using the influx CLI tool.
+  # docker-compose run influxdb-cli
+  influxdb-cli:
+    image: influxdb
+    entrypoint:
+      - influx
+      - -host
+      - influxdb
+    links:
+      - influxdb
+  # Define a service for using the kapacitor CLI tool.
+  # docker-compose run kapacitor-cli
+  # kapacitor-cli:
+  #   image: kapacitor
+  #   entrypoint: bash
+  #   environment:
+  #     KAPACITOR_URL: http://localhost:9092
+  #   links:
+  #     - kapacitor
+  # kibana:
+  #   image: khezen/kibana:latest 
+  #   container_name: kibanasearch
+  #   environment:
+  #       ELASTICSEARCH_URL: http://localhost:9200
+
+  #   volumes:
+  #     - ./kibana.yml:/usr/share/kibana/config/kibana.yml
+ 
+
+    # path:
+    #   data: /var/lib/elasticsearch
+    #   logs: /var/log/elasticsearch
+      
+    # node:
+    #   name: elastest

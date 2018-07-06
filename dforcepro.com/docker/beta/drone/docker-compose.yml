@@ -1,0 +1,33 @@
+version: '2'
+
+services:
+  drone-server:
+    image: drone/drone:0.8
+
+    ports:
+      - 6080:8000
+      - 9000
+    volumes:
+      - ./lib:/var/lib/drone/
+    restart: always
+    environment:
+      - DRONE_OPEN=false
+      - DRONE_ADMIN=peter
+      - DRONE_HOST=http://118.163.154.140:6080
+      - DRONE_BITBUCKET=true
+      - DRONE_BITBUCKET_CLIENT=s4nW4ZJA8fRhdnBY3C
+      - DRONE_BITBUCKET_SECRET=QLA9wHM3jPhrKf36PV4v2Um6anpa86qX
+      - DRONE_SECRET=dforce-drone
+
+  drone-agent:
+    image: drone/agent:0.8
+
+    command: agent
+    restart: always
+    depends_on:
+      - drone-server
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DRONE_SERVER=drone-server:9000
+      - DRONE_SECRET=dforce-drone
