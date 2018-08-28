@@ -21,6 +21,18 @@ const (
 
 var session *mgo.Session
 
+func init() {
+
+	dbInfo := &mgo.DialInfo{
+		Addrs:    strings.SplitN("140.118.70.136:10003", ",", -1),
+		Database: "admin",
+		Username: "dontask",
+		Password: "idontknow",
+		Timeout:  time.Second * 2,
+	}
+	session, _ = mgo.DialWithInfo(dbInfo)
+}
+
 type CPMSnd struct {
 	ID            bson.ObjectId `json:"_id" bson:"_id"`
 	Timestamp     time.Time     `json:"Timestamp" bson:"Timestamp"`
@@ -60,24 +72,7 @@ type CPMSnd struct {
 	GET129        float64       `json:"pfb" bson:"pfb"`
 }
 
-func init() {
-	dbInfo := &mgo.DialInfo{
-		Addrs:    strings.SplitN("140.118.122.103:10003", ",", -1),
-		Database: "admin",
-		Username: "dontask",
-		Password: "idontknow",
-		Timeout:  time.Second * 2,
-	}
-	session, _ = mgo.DialWithInfo(dbInfo)
-}
-
 func goget(w http.ResponseWriter, r *http.Request) {
-	// pipeline := []bson.M{}
-	// pipeline = append(pipeline, bson.M{
-	// 	"$match": bson.M{
-	// 		"MAC_Address": "aa:bb:02:05:01:27",
-	// 	}},
-	// )
 
 	container := []CPMSnd{}
 	sess := session.Clone()
@@ -103,12 +98,6 @@ type devices struct {
 }
 
 func gogetDevices(w http.ResponseWriter, r *http.Request) {
-	// pipeline := []bson.M{}
-	// pipeline = append(pipeline, bson.M{
-	// 	"$match": bson.M{
-	// 		"MAC_Address": "aa:bb:02:05:01:27",
-	// 	}},
-	// )
 
 	container := []devices{}
 	sess := session.Clone()
@@ -129,7 +118,3 @@ func main() {
 	log.Println(http.ListenAndServe(":8081", router))
 
 }
-
-// func main() {
-// 	changeStream()
-// }

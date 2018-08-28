@@ -18,6 +18,18 @@ import (
 	"github.com/gorilla/mux"
 )
 
+func init() {
+
+	dbInfo := &mgo.DialInfo{
+		Addrs:    strings.SplitN("140.118.70.136:10003", ",", -1),
+		Database: "admin",
+		Username: "dontask",
+		Password: "idontknow",
+		Timeout:  time.Second * 2,
+	}
+	session, _ = mgo.DialWithInfo(dbInfo)
+}
+
 const (
 	db           = "sc"
 	c            = "testing"
@@ -230,7 +242,15 @@ type GWStatus struct {
 	Timestamp     time.Time `json:"Timestamp" bson:"Timestamp"`
 	TimestampUnix int64     `json:"Timestamp_Unix" bson:"Timestamp_Unix"`
 	GWID          string    `json:"GW_ID" bson:"GW_ID"`
-	Status        bool      `json:"Status" bson:"Status"`
+	// Status        bool      `json:"Status" bson:"Status"`
+}
+
+type lastreport struct {
+	Timestamp     time.Time `json:"Timestamp" bson:"Timestamp"`
+	TimestampUnix int64     `json:"Timestamp_Unix" bson:"Timestamp_Unix"`
+	GWID          string    `json:"GW_ID" bson:"GW_ID"`
+	// Status        bool      `json:"Status" bson:"Status"`
+	MACAddress string `json:"MAC_Address" bson:"MAC_Address"`
 }
 
 func GWAuth(gwid string) bool {
@@ -363,9 +383,10 @@ func getObjectIDTwoArg(GWID string, macID string, timestamp int64) bson.ObjectId
 
 }
 
-func recalcUnix(unixtime int64) int64 {
-	return unixtime - (8 * time.Hour.Nanoseconds() / int64(time.Second))
-}
+// func recalcUnix(unixtime int64) int64 {
+// 	return unixtime - (8 * time.Hour.Nanoseconds() / int64(time.Second))
+// }
+
 func aemdraPost(w http.ResponseWriter, r *http.Request) {
 
 	sess := session.Clone()
@@ -390,13 +411,13 @@ func aemdraPost(w http.ResponseWriter, r *http.Request) {
 	containerSnd := &AEMDRASnd{
 
 		ID:            getObjectIDTwoArg(container.GWID, container.MACAddress, container.TimestampUnix),
-		TimestampUnix: recalcUnix(container.TimestampUnix),
+		TimestampUnix: container.TimestampUnix,
+		Timestamp:     time.Unix(container.TimestampUnix, 0).UTC(),
 		//
 		MACAddress: container.MACAddress,
 		GWID:       container.GWID,
 
 		//
-		Timestamp:   time.Unix(recalcUnix(container.TimestampUnix), 0).UTC(),
 		CPURate:     container.CPURate,
 		StorageRate: container.StorageRate,
 		GET11:       container.GET11,
@@ -455,21 +476,30 @@ func aemdraPost(w http.ResponseWriter, r *http.Request) {
 
 			json.NewEncoder(w).Encode(containerSnd)
 
-			containerSnd.ID = bson.NewObjectId()
+			// containerSnd.ID = bson.NewObjectId()
 			// update lastreport
-			inf, err := Mongo.C(c_lastreport).Upsert(bson.M{"MAC_Address": containerSnd.MACAddress}, containerSnd)
+
+			Lastreportcontainer := lastreport{
+				Timestamp:     time.Unix(containerSnd.TimestampUnix, 0).UTC(),
+				TimestampUnix: containerSnd.TimestampUnix,
+				GWID:          containerSnd.GWID[0:8],
+				// Status:        statuscheck(containerSnd.TimestampUnix),
+				MACAddress: containerSnd.MACAddress,
+			}
+
+			inf, err := Mongo.C(c_lastreport).Upsert(bson.M{"MAC_Address": Lastreportcontainer.MACAddress}, Lastreportcontainer)
 			if err != nil {
-				// fmt.Println(err, inf)
+				fmt.Println(err, inf)
 			}
 
 			GWStatuscontainer := GWStatus{
 				Timestamp:     time.Now().UTC(),
 				TimestampUnix: time.Now().Unix(),
-				GWID:          containerSnd.GWID[0:7],
-				Status:        statuscheck(containerSnd.TimestampUnix),
+				GWID:          containerSnd.GWID[0:8],
+				// Status:        statuscheck(containerSnd.TimestampUnix),
 			}
 			// update gwstatus
-			inf, err = Mongo.C(c_gw_status).Upsert(bson.M{"GW_ID": containerSnd.GWID}, GWStatuscontainer)
+			inf, err = Mongo.C(c_gw_status).Upsert(bson.M{"GW_ID": containerSnd.GWID[0:8]}, GWStatuscontainer)
 			if err != nil {
 				fmt.Println(err, inf)
 			}
@@ -493,8 +523,8 @@ func cpmPost(w http.ResponseWriter, r *http.Request) {
 	containerSnd := &CPMSnd{
 
 		ID:            getObjectIDTwoArg(container.GWID, container.MACAddress, container.TimestampUnix),
-		TimestampUnix: recalcUnix(container.TimestampUnix),
-		Timestamp:     time.Unix(recalcUnix(container.TimestampUnix), 0).UTC(),
+		TimestampUnix: container.TimestampUnix,
+		Timestamp:     time.Unix(container.TimestampUnix, 0).UTC(),
 		//
 		MACAddress: container.MACAddress,
 		GWID:       container.GWID,
@@ -543,45 +573,45 @@ func cpmPost(w http.ResponseWriter, r *http.Request) {
 			// update cpm rawdata
 			err := Mongo.C(c_cpm).Insert(containerSnd)
 			if err != nil {
-				// fmt.Println("false")
+				fmt.Println(err)
 				json.NewEncoder(w).Encode(err)
 			}
 
 			json.NewEncoder(w).Encode(containerSnd)
 
 			// update lastreport
-			inf, err := Mongo.C(c_lastreport).Upsert(bson.M{"MAC_Address": containerSnd.MACAddress}, containerSnd)
+			Lastreportcontainer := lastreport{
+				Timestamp:     time.Unix(containerSnd.TimestampUnix, 0).UTC(),
+				TimestampUnix: containerSnd.TimestampUnix,
+				GWID:          containerSnd.GWID[0:8],
+				// Status:        statuscheck(containerSnd.TimestampUnix),
+				MACAddress: containerSnd.MACAddress,
+			}
+
+			inf, err := Mongo.C(c_lastreport).Upsert(bson.M{"MAC_Address": Lastreportcontainer.MACAddress}, Lastreportcontainer)
+
 			if err != nil {
 				fmt.Println(err, inf)
 			}
-			fmt.Println("last ok")
+			// fmt.Println("last ok")
 			GWStatuscontainer := GWStatus{
 				Timestamp:     time.Now().UTC(),
 				TimestampUnix: time.Now().Unix(),
-				GWID:          containerSnd.GWID[0:7],
-				Status:        statuscheck(containerSnd.TimestampUnix),
+				GWID:          containerSnd.GWID[0:8],
+				// Status:        statuscheck(containerSnd.TimestampUnix),
 			}
 			// update gwstatus
 			// containerSnd.ID = bson.NewObjectId()
-			inf, err = Mongo.C(c_gw_status).Upsert(bson.M{"GW_ID": containerSnd.GWID}, GWStatuscontainer)
-			fmt.Println("gw ok")
+
+			inf, err = Mongo.C(c_gw_status).Upsert(bson.M{"GW_ID": containerSnd.GWID[0:8]}, GWStatuscontainer)
+			// fmt.Println("gw ok")
 			if err != nil {
+				fmt.Println(err)
 				// fmt.Println(err, inf)
 			}
 		}
 	}
 
-}
-
-func init() {
-	dbInfo := &mgo.DialInfo{
-		Addrs:    strings.SplitN("140.118.122.103:10003", ",", -1),
-		Database: "admin",
-		Username: "dontask",
-		Password: "idontknow",
-		Timeout:  time.Second * 2,
-	}
-	session, _ = mgo.DialWithInfo(dbInfo)
 }
 
 func main() {
