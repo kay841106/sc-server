@@ -1,0 +1,94 @@
+version: '3'
+services:
+  jupyter:
+    image: avbee/jupynote-spark-pytorch
+    environment:
+       - "JUPYTER_LAB_ENABLE=yes" 
+   # host_command: export UID
+    volumes:
+       - /home/ubuntu/jupyter:/home/jovyan
+    ports:
+       - 8888:8888
+
+  jenkins:
+    image: jenkins
+    user: root
+    volumes:
+       - /opt/jenkins:/var/jenkins_home
+    ports:
+       - 8081:8080
+       - 50000:50000
+ 
+#API GATEWAY PACKAGE
+  kong-database:
+    image: postgres:9.5
+    ports:
+       - 5432:5432
+    environment:
+       - "POSTGRES_USER=kong"
+       - "POSTGRES_DB=kong"
+    healthcheck:
+       test: ["CMD", "curl", "-f", "http://localhost:5432"]
+       interval: 1m30s
+       timeout: 10s
+       retries: 3
+   
+  kong-migration:
+    image: kong:0.13
+    environment:
+       - "KONG_DATABASE=postgres"
+       - "KONG_CASSANDRA_CONTACT_POINTS=kong-database"
+       - "KONG_PG_HOST=kong-database"
+    links:
+       - kong-database:kong-database
+    command: kong migrations up
+
+  thekong:
+    image: kong:0.13
+    depends_on:
+       - kong-database
+       - kong-migration
+   
+    environment:
+       - "KONG_DATABASE=postgres"
+       - "KONG_PG_HOST=kong-database"
+       - "KONG_PROXY_ACCESS_LOG=/dev/stdout"
+       - "KONG_ADMIN_ACCESS_LOG=/dev/stdout"
+       - "KONG_PROXY_ERROR_LOG=/dev/stderr"
+       - "KONG_ADMIN_ERROR_LOG=/dev/stderr"
+       - "KONG_ADMIN_LISTEN=0.0.0.0:8001" 
+       - "KONG_ADMIN_LISTEN_SSL=0.0.0.0:8444"
+
+    volumes:
+      - /opt/kong:/etc/kong
+    ports:
+       - 8000:8000
+       - 8443:8443
+       - 8001:8001
+       - 8444:8444
+    links: 
+       - kong-database:kong-database
+
+  kong-dashboard:
+    image: pgbi/kong-dashboard
+    environment:
+       - "KONG_DATABASE=postgres"
+       - "KONG_CASSANDRA_CONTACT_POINTS=kong-database"
+       - "KONG_PG_HOST=kong-database"
+    ports:
+       - 8080:8080
+    links:
+       - kong-database:kong-database
+       - thekong:thekong
+    depends_on:
+       - kong-database
+       - thekong
+
+    command: start --kong-url http://thekong:8001 --basic-auth ntustsc=bmwee809
+
+######API############
+
+  post:
+    image: avbee/post
+    ports:
+      - 8081:8080
