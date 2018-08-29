@@ -93,16 +93,16 @@ type CPMSnd struct {
 	GET117        float64       `json:"pb" bson:"pb"`
 	GET118        float64       `json:"pc" bson:"pc"`
 	GET119        float64       `json:"p.sum" bson:"p.sum"`
-	GET120        float64       `json:"qa" bson:"qa"`
-	GET121        float64       `json:"qb" bson:"qb"`
-	GET122        float64       `json:"qc" bson:"qc"`
-	GET123        float64       `json:"q.sum" bson:"q.sum"`
-	GET124        float64       `json:"sa" bson:"sa"`
-	GET125        float64       `json:"sb" bson:"sb"`
-	GET126        float64       `json:"sc" bson:"sc"`
-	GET127        float64       `json:"s.sum" bson:"s.sum"`
-	GET128        float64       `json:"pfa" bson:"pfa"`
-	GET129        float64       `json:"pfb" bson:"pfb"`
+	GET120        float64       `json:"sa" bson:"sa"`
+	GET121        float64       `json:"sb" bson:"sb"`
+	GET122        float64       `json:"sc" bson:"sc"`
+	GET123        float64       `json:"s.sum" bson:"s.sum"`
+	GET124        float64       `json:"pfa" bson:"pfa"`
+	GET125        float64       `json:"pfb" bson:"pfb"`
+	GET126        float64       `json:"pfc" bson:"pfc"`
+	GET127        float64       `json:"pf.avg" bson:"pf.avg"`
+	GET128        float64       `json:"uavg.thd" bson:"avg.thd"`
+	GET129        float64       `json:"iavg.thd" bson:"iavg.thd"`
 }
 
 type CPMRcv struct {
