@@ -1,0 +1,15 @@
+version: '3'
+services:
+  reverse_proxy:
+    image: nginx
+    volumes:
+      - /opt/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+     - "10000:8080"
+     - "10001:8081"
+     - "10002:8082"
+     - "10003:8083"
+     - "10004:8084"
+     - "10005:8085"
+     - "10006:8086"
+     - "10007:8087"
