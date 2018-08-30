@@ -17,6 +17,7 @@ const (
 	db           = "sc"
 	c_lastreport = "lastreport"
 	c_devices    = "devices"
+	c_gwtstat    = "gw_status"
 )
 
 var session *mgo.Session
@@ -41,7 +42,7 @@ type CPMSnd struct {
 	GWID          string        `json:"GW_ID" bson:"GW_ID"`
 }
 
-func goget(w http.ResponseWriter, r *http.Request) {
+func gogetlastreport(w http.ResponseWriter, r *http.Request) {
 
 	container := []CPMSnd{}
 	sess := session.Clone()
@@ -78,11 +79,29 @@ func gogetDevices(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(container)
 }
 
+type gwstat struct {
+	Timestamp     time.Time `json:"Timestamp" bson:"Timestamp"`
+	TimestampUnix int64     `json:"Timestamp_Unix" bson:"Timestamp_Unix"`
+	GWID          string    `json:"GW_ID" bson:"GW_ID"`
+}
+
+func gogetgwstat(w http.ResponseWriter, r *http.Request) {
+
+	container := []gwstat{}
+	sess := session.Clone()
+	defer sess.Close()
+
+	Mongo := sess.DB(db).C(c_gwtstat)
+	Mongo.Find(bson.M{}).All(&container)
+	json.NewEncoder(w).Encode(container)
+	fmt.Println(container)
+}
 func main() {
 
 	router := mux.NewRouter()
-	router.HandleFunc("/meter/lastreport", goget).Methods("GET")
+	router.HandleFunc("/meter/lastreport", gogetlastreport).Methods("GET")
 	router.HandleFunc("/meter/devices", gogetDevices).Methods("GET")
+	router.HandleFunc("/meter/gwstat", gogetgwstat).Methods("GET")
 
 	log.Println(http.ListenAndServe(":8081", router))
 

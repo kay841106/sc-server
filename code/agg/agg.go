@@ -81,7 +81,7 @@ func pipeDeviceHourWhole(devID string) []bson.M {
 			// "max_val": bson.M{"$max": "$ae.tot"},
 			// "min_val": bson.M{"$min": "$ae.tot"},
 			// "ae_tot":  bson.M{"$subtract": []interface{}{"$max_val", "$min_val"}},
-			"pfAvg": bson.M{"$avg": "$wire"},
+			"pfAvg": bson.M{"$avg": bson.M{"$literal": "$ae.tot"}},
 			"pSum":  bson.M{"$avg": "$p.sum"},
 			// "min_Usage":  bson.M{"$min": "$Usage"},
 			// "avg_PF":     bson.M{"$avg": bson.M{"$abs": "$PF"}},
