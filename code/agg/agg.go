@@ -30,6 +30,8 @@ const (
 	c_gw_status  = "gw_status"
 	c_devices    = "devices"
 	c_hour       = "hour"
+	c_day        = "day"
+	c_month      = "month"
 
 	displayDataCalcCollection = "SC01_displayData_Calc_"
 	displayDataCollection     = "SC01_displayData_"
@@ -165,110 +167,76 @@ func pipeDeviceDayWhole(devID string) []bson.M {
 	pipeline := []bson.M{
 		bson.M{
 			"$match": bson.M{
-				"Device_ID": devID,
+				"MAC_Address": devID,
 			}}}
 
 	pipeline = append(pipeline, bson.M{
 
 		"$group": bson.M{
 			"_id": bson.M{
-				"Device_ID":  "$Device_ID",
-				"Year":       bson.M{"$year": "$lastReportTime"},
-				"day":        bson.M{"$dayOfYear": "$lastReportTime"},
-				"Gateway_ID": "$Gateway_ID",
+				"MAC_Address": "$MAC_Address",
+				"GW_ID":       "$GW_ID",
+				// "Hour":        bson.M{"$hour": "$Timestamp"},
+				"Year": bson.M{"$year": "$Timestamp"},
+				"day":  bson.M{"$dayOfYear": "$Timestamp"},
 			},
-			"lastReportTime":   bson.M{"$last": "$lastReportTime"},
-			"Floor":            bson.M{"$last": "$Floor"},
-			"Building_Name":    bson.M{"$last": "$Building_Name"},
-			"Device_Name":      bson.M{"$last": "$Device_Name"},
-			"Facility":         bson.M{"$last": "$Facility"},
-			"Device_Type":      bson.M{"$last": "$Device_Type"},
-			"Building_Details": bson.M{"$last": "$Building_Details"},
-
-			"max_Demand":  bson.M{"$max": "$avg_Demand"},
-			"min_Demand":  bson.M{"$min": "$avg_Demand"},
-			"max_Usage":   bson.M{"$max": "$avg_Usage"},
-			"min_Usage":   bson.M{"$min": "$avg_Usage"},
-			"avg_PF":      bson.M{"$avg": bson.M{"$abs": "$avg_PF"}},
-			"max_PF":      bson.M{"$max": bson.M{"$abs": "$avg_PF"}},
-			"min_PF":      bson.M{"$min": bson.M{"$abs": "$avg_PF"}},
-			"PF_Limit":    bson.M{"$avg": "$PF_Limit"},
-			"avg_Usage":   bson.M{"$avg": "$avg_Usage"},
-			"avg_Demand":  bson.M{"$avg": "$avg_Demand"},
-			"total_Usage": bson.M{"$sum": "$avg_Usage"},
-			"CC":          bson.M{"$avg": "$CC"},
+			"Timestamp": bson.M{"$last": "$Timestamp"},
+			"max_val":   bson.M{"$avg": "$ae_tot"},
+			"min_val":   bson.M{"$min": "$ae_tot"},
+			"pf_avg":    bson.M{"$avg": "$pf_avg"},
+			"p_sum":     bson.M{"$avg": "$p_sum"},
 		},
 	})
+
 	pipeline = append(pipeline, bson.M{
 		"$project": bson.M{
 			"_id": 0,
 
-			"Device_ID":  "$_id.Device_ID",
-			"Gateway_ID": "$_id.Gateway_ID",
+			"MAC_Address": "$_id.MAC_Address",
+			"GW_ID":       "$_id.GW_ID",
 
-			"lastReportTime":   1,
-			"Floor":            1,
-			"Building_Name":    1,
-			"Device_Name":      1,
-			"Facility":         1,
-			"Device_Type":      1,
-			"Building_Details": 1,
+			"Timestamp": 1,
 
-			"CC": "$CC",
+			"pf_avg": 1,
+			"p_sum":  1,
 
-			"avg_Usage":   1,
-			"avg_Demand":  1,
-			"max_Demand":  1,
-			"min_Demand":  1,
-			"max_Usage":   1,
-			"min_Usage":   1,
-			"total_Usage": 1,
-
-			"max_PF":   1,
-			"min_PF":   1,
-			"avg_PF":   bson.M{"$abs": "$avg_PF"},
-			"PF_Limit": 1,
+			"ae_tot": bson.M{"$subtract": []interface{}{"$max_val", "$min_val"}},
 		},
 	})
 
 	pipeline = append(pipeline, bson.M{
 		"$sort": bson.M{
-			"lastReportTime": 1},
+			"Timestamp": 1},
 	})
 
 	return pipeline
 }
+
 func pipeDeviceDay(start time.Time, devID string) []bson.M {
-	pipeline := []bson.M{}
+
+	pipeline := []bson.M{
+		bson.M{
+			"$match": bson.M{
+				"Timestamp": bson.M{
+					"$gt": start,
+				}, "MAC_Address": devID,
+			},
+		}}
 	pipeline = append(pipeline, bson.M{
 
 		"$group": bson.M{
 			"_id": bson.M{
-				"Device_ID":  "$Device_ID",
-				"Year":       bson.M{"$year": "$lastReportTime"},
-				"day":        bson.M{"$dayOfYear": "$lastReportTime"},
-				"Gateway_ID": "$Gateway_ID",
+				"MAC_Address": "$MAC_Address",
+				"GW_ID":       "$GW_ID",
+				// "Hour":        bson.M{"$hour": "$Timestamp"},
+				"Year": bson.M{"$year": "$Timestamp"},
+				"day":  bson.M{"$dayOfYear": "$Timestamp"},
 			},
-			"lastReportTime":   bson.M{"$last": "$lastReportTime"},
-			"Floor":            bson.M{"$last": "$Floor"},
-			"Building_Name":    bson.M{"$last": "$Building_Name"},
-			"Device_Name":      bson.M{"$last": "$Device_Name"},
-			"Facility":         bson.M{"$last": "$Facility"},
-			"Device_Type":      bson.M{"$last": "$Device_Type"},
-			"Building_Details": bson.M{"$last": "$Building_Details"},
-
-			"max_Demand":  bson.M{"$max": "$avg_Demand"},
-			"min_Demand":  bson.M{"$min": "$avg_Demand"},
-			"max_Usage":   bson.M{"$max": "$total_Usage"},
-			"min_Usage":   bson.M{"$min": "$total_Usage"},
-			"avg_PF":      bson.M{"$avg": bson.M{"$abs": "$avg_PF"}},
-			"max_PF":      bson.M{"$max": bson.M{"$abs": "$avg_PF"}},
-			"min_PF":      bson.M{"$min": bson.M{"$abs": "$avg_PF"}},
-			"PF_Limit":    bson.M{"$avg": "$PF_Limit"},
-			"avg_Usage":   bson.M{"$avg": "$total_Usage"},
-			"avg_Demand":  bson.M{"$avg": "$avg_Demand"},
-			"total_Usage": bson.M{"$sum": "$total_Usage"},
-			"CC":          bson.M{"$avg": "$CC"},
+			"Timestamp": bson.M{"$last": "$Timestamp"},
+			"max_val":   bson.M{"$avg": "$ae_tot"},
+			"min_val":   bson.M{"$min": "$ae_tot"},
+			"pf_avg":    bson.M{"$abs": bson.M{"$avg": "$pf_avg"}},
+			"p_sum":     bson.M{"$avg": "$p_sum"},
 		},
 	})
 
@@ -276,36 +244,19 @@ func pipeDeviceDay(start time.Time, devID string) []bson.M {
 		"$project": bson.M{
 			"_id": 0,
 
-			"Building_Name": "$_id.Building_Name",
-			"Gateway_ID":    "$_id.Gateway_ID",
+			"MAC_Address": "$_id.MAC_Address",
+			"GW_ID":       "$_id.GW_ID",
 
-			"CC":             "$CC",
-			"lastReportTime": 1,
-			"total_Usage":    1,
+			"Timestamp": 1,
 
-			"Floor":            1,
-			"Device_Name":      1,
-			"Facility":         1,
-			"Device_Type":      1,
-			"Building_Details": 1,
-
-			"avg_Usage":  1,
-			"avg_Demand": 1,
-			"max_Demand": 1,
-			"min_Demand": 1,
-			"max_Usage":  1,
-			"min_Usage":  1,
-
-			"max_PF":   1,
-			"min_PF":   1,
-			"PF_Limit": 1,
-			"avg_PF":   bson.M{"$abs": "$avg_PF"},
+			"pf_avg": 1,
+			"ae_tot": bson.M{"$subtract": []interface{}{"$max_val", "$min_val"}},
 		},
 	})
 
 	pipeline = append(pipeline, bson.M{
 		"$sort": bson.M{
-			"lastReportTime": 1},
+			"Timestamp": 1},
 	})
 
 	return pipeline
@@ -315,111 +266,76 @@ func pipeDeviceMonthWhole(devID string) []bson.M {
 	pipeline := []bson.M{
 		bson.M{
 			"$match": bson.M{
-				"Device_ID": devID,
+				"MAC_Address": devID,
 			}}}
 
 	pipeline = append(pipeline, bson.M{
 
 		"$group": bson.M{
 			"_id": bson.M{
-				"Device_ID": "$Device_ID",
-
-				"Month":      bson.M{"$month": "$lastReportTime"},
-				"Year":       bson.M{"$year": "$lastReportTime"},
-				"Gateway_ID": "$Gateway_ID",
+				"MAC_Address": "$MAC_Address",
+				"GW_ID":       "$GW_ID",
+				// "Hour":        bson.M{"$hour": "$Timestamp"},
+				"Year":  bson.M{"$year": "$Timestamp"},
+				"month": bson.M{"$month": "$Timestamp"},
 			},
-			"lastReportTime":   bson.M{"$last": "$lastReportTime"},
-			"Floor":            bson.M{"$last": "$Floor"},
-			"Building_Name":    bson.M{"$last": "$Building_Name"},
-			"Device_Name":      bson.M{"$last": "$Device_Name"},
-			"Facility":         bson.M{"$last": "$Facility"},
-			"Device_Type":      bson.M{"$last": "$Device_Type"},
-			"Building_Details": bson.M{"$last": "$Building_Details"},
-
-			"max_Demand":  bson.M{"$max": "$avg_Demand"},
-			"min_Demand":  bson.M{"$min": "$avg_Demand"},
-			"max_Usage":   bson.M{"$max": "$total_Usage"},
-			"min_Usage":   bson.M{"$min": "$total_Usage"},
-			"avg_PF":      bson.M{"$avg": bson.M{"$abs": "$avg_PF"}},
-			"max_PF":      bson.M{"$max": bson.M{"$abs": "$avg_PF"}},
-			"min_PF":      bson.M{"$min": bson.M{"$abs": "$avg_PF"}},
-			"PF_Limit":    bson.M{"$avg": "$PF_Limit"},
-			"avg_Usage":   bson.M{"$avg": "$total_Usage"},
-			"avg_Demand":  bson.M{"$avg": "$avg_Demand"},
-			"total_Usage": bson.M{"$sum": "$total_Usage"},
-			"CC":          bson.M{"$avg": "$CC"},
+			"Timestamp": bson.M{"$last": "$Timestamp"},
+			"max_val":   bson.M{"$avg": "$ae_tot"},
+			"min_val":   bson.M{"$min": "$ae_tot"},
+			"pf_avg":    bson.M{"$avg": "$pf_avg"},
+			"p_sum":     bson.M{"$avg": "$p_sum"},
 		},
 	})
+
 	pipeline = append(pipeline, bson.M{
 		"$project": bson.M{
 			"_id": 0,
 
-			"Device_ID":  "$_id.Device_ID",
-			"Gateway_ID": "$_id.Gateway_ID",
+			"MAC_Address": "$_id.MAC_Address",
+			"GW_ID":       "$_id.GW_ID",
 
-			"lastReportTime":   1,
-			"Floor":            1,
-			"Building_Name":    1,
-			"Device_Name":      1,
-			"Facility":         1,
-			"Device_Type":      1,
-			"Building_Details": 1,
+			"Timestamp": 1,
 
-			"CC": "$CC",
+			"pf_avg": 1,
+			"p_sum":  1,
 
-			"avg_Usage":   1,
-			"avg_Demand":  1,
-			"max_Demand":  1,
-			"min_Demand":  1,
-			"max_Usage":   1,
-			"min_Usage":   1,
-			"total_Usage": 1,
-
-			"max_PF":   1,
-			"min_PF":   1,
-			"PF_Limit": 1,
-			"avg_PF":   bson.M{"$abs": "$avg_PF"},
+			"ae_tot": bson.M{"$subtract": []interface{}{"$max_val", "$min_val"}},
 		},
 	})
 
 	pipeline = append(pipeline, bson.M{
 		"$sort": bson.M{
-			"lastReportTime": 1},
+			"Timestamp": 1},
 	})
 
 	return pipeline
 }
+
 func pipeDeviceMonth(start time.Time, devID string) []bson.M {
-	pipeline := []bson.M{}
+
+	pipeline := []bson.M{
+		bson.M{
+			"$match": bson.M{
+				"Timestamp": bson.M{
+					"$gt": start,
+				}, "MAC_Address": devID,
+			},
+		}}
 	pipeline = append(pipeline, bson.M{
 
 		"$group": bson.M{
 			"_id": bson.M{
-				"Device_ID": "$Device_ID",
-
-				"Month":      bson.M{"$month": "$lastReportTime"},
-				"Year":       bson.M{"$year": "$lastReportTime"},
-				"Gateway_ID": "$Gateway_ID",
+				"MAC_Address": "$MAC_Address",
+				"GW_ID":       "$GW_ID",
+				// "Hour":        bson.M{"$hour": "$Timestamp"},
+				"Year":  bson.M{"$year": "$Timestamp"},
+				"month": bson.M{"$month": "$Timestamp"},
 			},
-			"lastReportTime":   bson.M{"$last": "$lastReportTime"},
-			"Floor":            bson.M{"$last": "$Floor"},
-			"Building_Name":    bson.M{"$last": "$Building_Name"},
-			"Device_Name":      bson.M{"$last": "$Device_Name"},
-			"Facility":         bson.M{"$last": "$Facility"},
-			"Device_Type":      bson.M{"$last": "$Device_Type"},
-			"Building_Details": bson.M{"$last": "$Building_Details"},
-
-			"max_Demand":  bson.M{"$max": "$avg_Demand"},
-			"min_Demand":  bson.M{"$min": "$avg_Demand"},
-			"max_Usage":   bson.M{"$max": "$avg_Usage"},
-			"min_Usage":   bson.M{"$min": "$avg_Usage"},
-			"avg_PF":      bson.M{"$avg": bson.M{"$abs": "$avg_PF"}},
-			"max_PF":      bson.M{"$max": bson.M{"$abs": "$avg_PF"}},
-			"min_PF":      bson.M{"$min": bson.M{"$abs": "$avg_PF"}},
-			"avg_Usage":   bson.M{"$avg": "$avg_Usage"},
-			"avg_Demand":  bson.M{"$avg": "$avg_Demand"},
-			"total_Usage": bson.M{"$sum": "$total_Usage"},
-			"CC":          bson.M{"$avg": "$CC"},
+			"Timestamp": bson.M{"$last": "$Timestamp"},
+			"max_val":   bson.M{"$avg": "$ae_tot"},
+			"min_val":   bson.M{"$min": "$ae_tot"},
+			"pf_avg":    bson.M{"$abs": bson.M{"$avg": "$pf_avg"}},
+			"p_sum":     bson.M{"$avg": "$p_sum"},
 		},
 	})
 
@@ -427,37 +343,19 @@ func pipeDeviceMonth(start time.Time, devID string) []bson.M {
 		"$project": bson.M{
 			"_id": 0,
 
-			"Building_Name": "$_id.Building_Name",
-			"Gateway_ID":    "$_id.Gateway_ID",
+			"MAC_Address": "$_id.MAC_Address",
+			"GW_ID":       "$_id.GW_ID",
 
-			"CC":             "$CC",
-			"lastReportTime": 1,
-			"total_Usage":    1,
+			"Timestamp": 1,
 
-			"Floor":            1,
-			"Device_Name":      1,
-			"Facility":         1,
-			"Device_Type":      1,
-			"Building_Details": 1,
-
-			"avg_Usage":  1,
-			"avg_Demand": 1,
-			"max_Demand": 1,
-			"min_Demand": 1,
-			"max_Usage":  1,
-			"min_Usage":  1,
-
-			"max_PF": 1,
-			"min_PF": 1,
-
-			"PF_Limit": 1,
-			"avg_PF":   bson.M{"$abs": "$avg_PF"},
+			"pf_avg": 1,
+			"ae_tot": bson.M{"$subtract": []interface{}{"$max_val", "$min_val"}},
 		},
 	})
 
 	pipeline = append(pipeline, bson.M{
 		"$sort": bson.M{
-			"lastReportTime": 1},
+			"Timestamp": 1},
 	})
 
 	return pipeline
@@ -476,7 +374,8 @@ type aggHourStruct struct {
 }
 
 type tempstruct struct {
-	Timestamp time.Time `json:"Timestamp" bson:"Timestamp"`
+	MACAddress string    `json:"MAC_Address" bson:"MAC_Address"`
+	Timestamp  time.Time `json:"Timestamp" bson:"Timestamp"`
 }
 
 var session *mgo.Session
@@ -548,7 +447,8 @@ func aggHour() {
 
 		var cont []aggHourStruct
 		contdata := cont
-		tempstructs := []tempstruct{}
+		thetempstructs := []tempstruct{}
+		tempstructs := thetempstructs
 		// contz := aggHourStruct{}
 		// containerhour := []aggHourStruct{}
 		var containerdevMan []interface{}
@@ -558,15 +458,20 @@ func aggHour() {
 
 		for _, one := range containerdevMan {
 
-			count, _ := qu.C(c_hour).Find(bson.M{}).Count()
+			count, _ := qu.C(c_hour).Find(bson.M{"MAC_Address": one.(string)}).Count()
+			// fmt.Print(count)
 			if count != 0 {
-				qu.C(c_hour).Find(bson.M{"Mac_Address": one}).Limit(1).Sort("-Timestamp").All(&tempstructs)
+				err := qu.C(c_hour).Find(bson.M{"MAC_Address": one.(string)}).Limit(1).Sort("-Timestamp").All(&tempstructs)
+				fmt.Print(tempstructs)
+				if err != nil {
+					fmt.Print(err)
+				}
 				for _, two := range tempstructs {
 					err := qu.C(c_cpm).Pipe(pipeDeviceHour(two.Timestamp, one.(string))).All(&contdata)
 					for _, each := range contdata {
 						if (each.Timestamp != time.Time{}) {
 
-							each.Timestamp = convertHour(each.Timestamp.Unix())
+							each.Timestamp = SetTimeStampForHour(each.Timestamp)
 
 							each.ID = getObjectIDTwoArg(each.GWID, each.MACAddress, each.Timestamp.Unix())
 
@@ -575,177 +480,173 @@ func aggHour() {
 								fmt.Print(err)
 							}
 						}
+						fmt.Print(each)
+						contdata = cont
 
-						// containerhour.WeatherTemp=
-						// fmt.Print(containerdevID)
-
-						// 	// 	qu.C(c_devices).Find(bson.M{"Building_Name": one}).Distinct("devID", &containerdevID)
-						// 	// fmt.Println(containerdevID)
-						// 	for _, two := range containerdevID {
-
-						// 		fmt.Println("two" + two.(string))
-						// 		qu.C(hourCollection).Find(bson.M{"Device_ID": two}).Limit(1).Sort("-lastReportTime").One(&containerLastRecord)
-						// 		fmt.Println(containerLastRecord.DeviceID)
-						// 		// fmt.Println(containerLastRecord)
-						// 		if (aggHourStruct{}) == containerLastRecord {
-
-						// 			thepipe := pipeDeviceHourWhole(two.(string))
-						// 			// qu.C(displayDataCalcCollection + one.(string)).Pipe(thepipe).AllowDiskUse().All(&explainacontainer)
-
-						// 			for _, each := range explainacontainer {
-						// 				fmt.Println(each.BuildingName, each.DeviceID, each.LastReportTime)
-						// 				tempTime := SetTimeStampForHour(each.LastReportTime)
-						// 				each.LastReportTime = tempTime
-						// 				each.PFLimit = 0.8
-
-						// 				qu.C(hourCollection).Upsert(bson.M{"Device_ID": each.DeviceID, "lastReportTime": each.LastReportTime}, each)
-						// 			}
-						// 		} else {
-						// 			thepipe := pipeDeviceHour(containerLastRecord.LastReportTime, containerLastRecord.DeviceID)
-						// 			// qu.C(displayDataCalcCollection + one.(string)).Pipe(thepipe).AllowDiskUse().All(&explainacontainer)
-						// 			fmt.Println(explainacontainer)
-						// 			for _, each := range explainacontainer {
-						// 				fmt.Println(each.BuildingName, each.DeviceID, each.LastReportTime)
-						// 				tempTime := SetTimeStampForHour(each.LastReportTime)
-						// 				each.LastReportTime = tempTime
-						// 				each.PFLimit = 0.8
-						// 				qu.C(hourCollection).Upsert(bson.M{"Device_ID": each.DeviceID, "lastReportTime": each.LastReportTime}, each)
-						// 			}
-						// 		}
-						// 		explainacontainer = []aggHourStruct{}
-						// 		containerLastRecord = aggHourStruct{}
-						// 	}
 					}
 				}
+				tempstructs = thetempstructs
 			} else {
 				err := qu.C(c_cpm).Pipe(pipeDeviceHourWhole(one.(string))).All(&contdata)
 				for _, each := range contdata {
 					if (each.Timestamp != time.Time{}) {
 
-						each.Timestamp = convertHour(each.Timestamp.Unix())
+						each.Timestamp = SetTimeStampForHour(each.Timestamp)
 
 						each.ID = getObjectIDTwoArg(each.GWID, each.MACAddress, each.Timestamp.Unix())
+						fmt.Print(each)
 
 						qu.C(c_hour).Insert(each)
 						if err != nil {
 							fmt.Print(err)
 						}
+						contdata = cont
 					}
 				}
-				// 	fmt.Println(_EOF)
-				session.Close()
 
 			}
 		}
 	}
+	session.Close()
 }
 
-// func AggDay() {
-// 	status := checkDBStatus()
-// 	if status == true {
-// 		mongo := meter.GetMongo()
-// 		containerLastRecord := meter.AggDayStruct{}
-// 		var containerdevMan []interface{}
-// 		explainacontainer := []meter.AggDayStruct{}
+func aggDay() {
 
-// 		qu := mongo.DB(meter.DBName)
-// 		qu.C(CdevMan).Find(nil).Distinct("devID", &containerdevMan)
+	if checkDBStatus(); true {
 
-// 		// fmt.Println(containerdevMan)
-// 		for _, two := range containerdevMan {
+		var cont []aggHourStruct
+		contdata := cont
+		thetempstructs := []tempstruct{}
+		tempstructs := thetempstructs
+		// contz := aggHourStruct{}
+		// containerhour := []aggHourStruct{}
+		var containerdevMan []interface{}
 
-// 			fmt.Println(two)
-// 			qu.C(dayCollection).Find(bson.M{"Device_ID": two}).Limit(1).Sort("-lastReportTime").One(&containerLastRecord)
-// 			// fmt.Println("devID_query = ", containerLastRecord.DeviceID, two)
-// 			// fmt.Println(containerLastRecord)
+		qu := session.DB(db)
+		qu.C(c_devices).Find(nil).Distinct("MACAddress", &containerdevMan)
 
-// 			if (meter.AggDayStruct{}) == containerLastRecord {
+		for _, one := range containerdevMan {
 
-// 				thepipe := pipeDeviceDayWhole(two.(string))
-// 				qu.C(hourCollection).Pipe(thepipe).AllowDiskUse().All(&explainacontainer)
-// 				fmt.Println(explainacontainer)
-// 				for _, each := range explainacontainer {
-// 					// fmt.Println(each.BuildingName, each.DeviceID, each.LastReportTime)
-// 					tempTime := SetTimeStampForDay(each.LastReportTime)
-// 					each.LastReportTime = tempTime
-// 					qu.C(dayCollection).Upsert(bson.M{"Device_ID": each.DeviceID, "lastReportTime": each.LastReportTime}, each)
-// 					// each = meter.AggDayStruct{}
-// 				}
-// 				explainacontainer = []meter.AggDayStruct{}
+			count, _ := qu.C(c_day).Find(bson.M{"MAC_Address": one.(string)}).Count()
+			// fmt.Print(count)
+			if count != 0 {
+				err := qu.C(c_day).Find(bson.M{"MAC_Address": one.(string)}).Limit(1).Sort("-Timestamp").All(&tempstructs)
+				fmt.Print(tempstructs)
+				if err != nil {
+					fmt.Print(err)
+				}
+				for _, two := range tempstructs {
+					err := qu.C(c_hour).Pipe(pipeDeviceDay(two.Timestamp, one.(string))).All(&contdata)
+					for _, each := range contdata {
+						if (each.Timestamp != time.Time{}) {
 
-// 			} else {
+							each.Timestamp = SetTimeStampForDay(each.Timestamp)
 
-// 				thepipe := pipeDeviceDay(containerLastRecord.LastReportTime, containerLastRecord.DeviceID)
-// 				qu.C(hourCollection).Pipe(thepipe).AllowDiskUse().All(&explainacontainer)
-// 				fmt.Println(explainacontainer)
-// 				for _, each := range explainacontainer {
-// 					// fmt.Println(each.BuildingName, each.DeviceID, each.LastReportTime)
-// 					tempTime := SetTimeStampForDay(each.LastReportTime)
-// 					each.LastReportTime = tempTime
-// 					qu.C(dayCollection).Upsert(bson.M{"Device_ID": each.DeviceID, "lastReportTime": each.LastReportTime}, each)
-// 					// each = meter.AggDayStruct{}
-// 				}
-// 				explainacontainer = []meter.AggDayStruct{}
+							each.ID = getObjectIDTwoArg(each.GWID, each.MACAddress, each.Timestamp.Unix())
 
-// 			}
-// 			containerLastRecord = meter.AggDayStruct{}
-// 		}
+							qu.C(c_day).Insert(each)
+							if err != nil {
+								fmt.Print(err)
+							}
+						}
+						fmt.Print(each)
+						contdata = cont
 
-// 		fmt.Println(_EOF)
-// 		qu.Close()
-// 	}
-// }
-// func AggMonth() {
-// 	status := checkDBStatus()
-// 	if status == true {
-// 		mongo := meter.GetMongo()
-// 		containerLastRecord := meter.AggDayStruct{}
-// 		var containerdevMan []interface{}
-// 		explainacontainer := []meter.AggDayStruct{}
+					}
+				}
+				tempstructs = thetempstructs
+			} else {
+				err := qu.C(c_hour).Pipe(pipeDeviceDayWhole(one.(string))).All(&contdata)
+				for _, each := range contdata {
+					if (each.Timestamp != time.Time{}) {
 
-// 		qu := mongo.DB(meter.DBName)
-// 		qu.C(CdevMan).Find(nil).Distinct("devID", &containerdevMan)
+						each.Timestamp = SetTimeStampForDay(each.Timestamp)
 
-// 		// fmt.Println(containerdevMan)
+						each.ID = getObjectIDTwoArg(each.GWID, each.MACAddress, each.Timestamp.Unix())
+						fmt.Print(each)
 
-// 		for _, two := range containerdevMan {
+						qu.C(c_day).Insert(each)
+						if err != nil {
+							fmt.Print(err)
+						}
+						contdata = cont
+					}
+				}
 
-// 			fmt.Println(two)
-// 			qu.C(monthCollection).Find(bson.M{"Device_ID": two}).Limit(1).Sort("-lastReportTime").One(&containerLastRecord)
-// 			fmt.Println(containerLastRecord.DeviceID)
-// 			if (meter.AggDayStruct{}) == containerLastRecord {
+			}
+		}
+	}
+	// session.Close()
+}
 
-// 				thepipe := pipeDeviceMonthWhole(two.(string))
-// 				qu.C(dayCollection).Pipe(thepipe).AllowDiskUse().All(&explainacontainer)
+func aggMonth() {
 
-// 				for _, each := range explainacontainer {
-// 					fmt.Println(each.BuildingName, each.DeviceID, each.LastReportTime)
-// 					tempTime := SetTimeStampForMonth(each.LastReportTime)
-// 					fmt.Println(tempTime)
-// 					each.LastReportTime = tempTime
-// 					qu.C(monthCollection).Upsert(bson.M{"Device_ID": each.DeviceID, "lastReportTime": each.LastReportTime}, each)
-// 				}
-// 			} else {
-// 				thepipe := pipeDeviceMonth(containerLastRecord.LastReportTime, containerLastRecord.DeviceID)
-// 				qu.C(dayCollection).Pipe(thepipe).AllowDiskUse().All(&explainacontainer)
-// 				fmt.Println(explainacontainer)
-// 				for _, each := range explainacontainer {
-// 					fmt.Println(each.BuildingName, each.DeviceID, each.LastReportTime)
-// 					tempTime := SetTimeStampForMonth(each.LastReportTime)
+	if checkDBStatus(); true {
 
-// 					each.LastReportTime = tempTime
-// 					qu.C(monthCollection).Upsert(bson.M{"Device_ID": each.DeviceID, "lastReportTime": each.LastReportTime}, each)
-// 				}
-// 				explainacontainer = []meter.AggDayStruct{}
-// 			}
+		var cont []aggHourStruct
+		contdata := cont
+		thetempstructs := []tempstruct{}
+		tempstructs := thetempstructs
+		// contz := aggHourStruct{}
+		// containerhour := []aggHourStruct{}
+		var containerdevMan []interface{}
 
-// 			containerLastRecord = meter.AggDayStruct{}
-// 		}
+		qu := session.DB(db)
+		qu.C(c_devices).Find(nil).Distinct("MACAddress", &containerdevMan)
 
-// 		fmt.Println(_EOF)
-// 		qu.Close()
-// 	}
-// }
+		for _, one := range containerdevMan {
+
+			count, _ := qu.C(c_month).Find(bson.M{"MAC_Address": one.(string)}).Count()
+			// fmt.Print(count)
+			if count != 0 {
+				err := qu.C(c_month).Find(bson.M{"MAC_Address": one.(string)}).Limit(1).Sort("-Timestamp").All(&tempstructs)
+				fmt.Print(tempstructs)
+				if err != nil {
+					fmt.Print(err)
+				}
+				for _, two := range tempstructs {
+					err := qu.C(c_day).Pipe(pipeDeviceMonth(two.Timestamp, one.(string))).All(&contdata)
+					for _, each := range contdata {
+						if (each.Timestamp != time.Time{}) {
+
+							each.Timestamp = SetTimeStampForMonth(each.Timestamp)
+
+							each.ID = getObjectIDTwoArg(each.GWID, each.MACAddress, each.Timestamp.Unix())
+
+							qu.C(c_month).Insert(each)
+							if err != nil {
+								fmt.Print(err)
+							}
+						}
+						fmt.Print(each)
+						contdata = cont
+
+					}
+				}
+				tempstructs = thetempstructs
+			} else {
+				err := qu.C(c_day).Pipe(pipeDeviceMonthWhole(one.(string))).All(&contdata)
+				for _, each := range contdata {
+					if (each.Timestamp != time.Time{}) {
+
+						each.Timestamp = SetTimeStampForMonth(each.Timestamp)
+
+						each.ID = getObjectIDTwoArg(each.GWID, each.MACAddress, each.Timestamp.Unix())
+						fmt.Print(each)
+
+						qu.C(c_month).Insert(each)
+						if err != nil {
+							fmt.Print(err)
+						}
+						contdata = cont
+					}
+				}
+
+			}
+		}
+	}
+	// session.Close()
+}
 
 //SetTimeStampForHour set minute second to 0
 func SetTimeStampForHour(theTime time.Time) time.Time {
@@ -754,28 +655,20 @@ func SetTimeStampForHour(theTime time.Time) time.Time {
 	return time.Date(year, month, day, hour, 0, 0, 0, time.UTC)
 }
 
-func convertHour(t int64) time.Time {
-	times := time.Unix(t, 0).UTC()
-	year, month, day := times.Date()
-	hour, _, _ := times.Clock()
-	return time.Date(year, month, day, hour, 0, 0, 0, time.UTC)
-}
-
 //SetTimeStampForDay set hour minute second to 0
 func SetTimeStampForDay(theTime time.Time) time.Time {
-	date := theTime.Day()
-	month := theTime.Month()
-	year := theTime.Year()
-	return time.Date(year, month, date, 0, 0, 0, 0, time.Local)
+	year, month, day := theTime.Date()
+	return time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
 }
 
 //SetTimeStampForMonth set day hour minute sec to 0
 func SetTimeStampForMonth(theTime time.Time) time.Time {
-	month := theTime.Month()
-	year := theTime.Year()
+	year, month, _ := theTime.Date()
 	return time.Date(year, month, 1, 0, 0, 0, 0, time.Local)
 }
 
 func main() {
 	aggHour()
+	aggDay()
+	aggMonth()
 }
