@@ -85,6 +85,28 @@ type gwstat struct {
 	GWID          string    `json:"GW_ID" bson:"GW_ID"`
 }
 
+type gwdata struct {
+	GWID  string `json:"GWID" bson:"GWID"`
+	MGWID string `json:"M_GWID" bson:"M_GWID"`
+	// MMAC      string `json:"M_MAC" bson:"M_MAC"`
+	// NUM       string `json:"NUM" bson:"NUM"`
+	Place string `json:"Place" bson:"Place"`
+	// Territory string `json:"Territory" bson:"Territory"`
+	// Type      string `json:"Type" bson:"Type"`
+}
+
+func unique(intSlice []string) []string {
+	keys := make(map[string]bool)
+	list := []string{}
+	for _, entry := range intSlice {
+		if _, value := keys[entry]; !value {
+			keys[entry] = true
+			list = append(list, entry)
+		}
+	}
+	return list
+}
+
 func gogetgwstat(w http.ResponseWriter, r *http.Request) {
 
 	container := []gwstat{}
@@ -96,12 +118,54 @@ func gogetgwstat(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(container)
 	fmt.Println(container)
 }
+
+func gogetgwdetail(w http.ResponseWriter, r *http.Request) {
+
+	container := []gwstat{}
+	container2 := []gwdata{}
+	container3 := []string{}
+	container4 := []gwdata{}
+	container5 := []gwdata{}
+	sess := session.Clone()
+	defer sess.Close()
+
+	Mongo := sess.DB(db).C(c_gwtstat)
+	Mongo.Find(bson.M{}).All(&container)
+	sess.DB(db).C(c_devices).Find(bson.M{}).Distinct("GWID", &container2)
+
+	for _, each := range unique(container2) {
+		// fmt.Print(each)
+		for _, each2 := range container {
+
+			if each2.GWID[0:7] != each.GWID[0:7] {
+				fmt.Println(each2.GWID)
+				// continue
+				container3 = append(container3, each.MGWID)
+			}
+		}
+
+	}
+
+	// json.NewEncoder(w).Encode(container3)
+
+	for _, each3 := range unique(container3) {
+		sess.DB(db).C(c_devices).Find(bson.M{"M_GWID": each3}).Limit(1).All(&container4)
+		for _, each := range container4 {
+			container5 = append(container5, each)
+		}
+
+	}
+	fmt.Println(container5)
+	json.NewEncoder(w).Encode(container5)
+}
+
 func main() {
 
 	router := mux.NewRouter()
 	router.HandleFunc("/meter/lastreport", gogetlastreport).Methods("GET")
 	router.HandleFunc("/meter/devices", gogetDevices).Methods("GET")
 	router.HandleFunc("/meter/gwstat", gogetgwstat).Methods("GET")
+	router.HandleFunc("/meter/gwdetail", gogetgwdetail).Methods("GET")
 
 	log.Println(http.ListenAndServe(":8081", router))
 
