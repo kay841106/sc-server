@@ -11,6 +11,7 @@ import (
 
 	"github.com/globalsign/mgo"
 	"github.com/globalsign/mgo/bson"
+	"github.com/robfig/cron"
 	// "sc.dforcepro.com/meter"
 )
 
@@ -449,8 +450,7 @@ func aggHour() {
 		contdata := cont
 		thetempstructs := []tempstruct{}
 		tempstructs := thetempstructs
-		// contz := aggHourStruct{}
-		// containerhour := []aggHourStruct{}
+
 		var containerdevMan []interface{}
 
 		qu := session.DB(db)
@@ -459,7 +459,7 @@ func aggHour() {
 		for _, one := range containerdevMan {
 
 			count, _ := qu.C(c_hour).Find(bson.M{"MAC_Address": one.(string)}).Count()
-			// fmt.Print(count)
+
 			if count != 0 {
 				err := qu.C(c_hour).Find(bson.M{"MAC_Address": one.(string)}).Limit(1).Sort("-Timestamp").All(&tempstructs)
 				fmt.Print(tempstructs)
@@ -468,6 +468,24 @@ func aggHour() {
 				}
 				for _, two := range tempstructs {
 					err := qu.C(c_cpm).Pipe(pipeDeviceHour(two.Timestamp, one.(string))).All(&contdata)
+					for _, each := range contdata {
+						if (each.Timestamp != time.Time{}) {
+
+							each.Timestamp = SetTimeStampForHour(each.Timestamp)
+
+							each.ID = getObjectIDTwoArg(each.GWID, each.MACAddress, each.Timestamp.Unix())
+
+							qu.C(c_hour).Insert(each)
+							if err != nil {
+								fmt.Print(err)
+							}
+						}
+						fmt.Print(each)
+						contdata = cont
+
+					}
+
+					err = qu.C(c_aemdra).Pipe(pipeDeviceHour(two.Timestamp, one.(string))).All(&contdata)
 					for _, each := range contdata {
 						if (each.Timestamp != time.Time{}) {
 
@@ -503,11 +521,27 @@ func aggHour() {
 						contdata = cont
 					}
 				}
+				err = qu.C(c_aemdra).Pipe(pipeDeviceHourWhole(one.(string))).All(&contdata)
+				for _, each := range contdata {
+					if (each.Timestamp != time.Time{}) {
+
+						each.Timestamp = SetTimeStampForHour(each.Timestamp)
+
+						each.ID = getObjectIDTwoArg(each.GWID, each.MACAddress, each.Timestamp.Unix())
+						fmt.Print(each)
+
+						qu.C(c_hour).Insert(each)
+						if err != nil {
+							fmt.Print(err)
+						}
+						contdata = cont
+					}
+				}
 
 			}
 		}
 	}
-	session.Close()
+	// session.Close()
 }
 
 func aggDay() {
@@ -668,7 +702,10 @@ func SetTimeStampForMonth(theTime time.Time) time.Time {
 }
 
 func main() {
+
+	c := cron.New()
+
 	aggHour()
-	aggDay()
-	aggMonth()
+	// aggDay()
+	// aggMonth()
 }
