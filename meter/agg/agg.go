@@ -541,7 +541,7 @@ func aggHour() {
 			}
 		}
 	}
-	// session.Close()
+
 }
 
 func aggDay() {
@@ -552,8 +552,7 @@ func aggDay() {
 		contdata := cont
 		thetempstructs := []tempstruct{}
 		tempstructs := thetempstructs
-		// contz := aggHourStruct{}
-		// containerhour := []aggHourStruct{}
+
 		var containerdevMan []interface{}
 
 		qu := session.DB(db)
@@ -610,7 +609,7 @@ func aggDay() {
 			}
 		}
 	}
-	// session.Close()
+
 }
 
 func aggMonth() {
@@ -621,8 +620,7 @@ func aggMonth() {
 		contdata := cont
 		thetempstructs := []tempstruct{}
 		tempstructs := thetempstructs
-		// contz := aggHourStruct{}
-		// containerhour := []aggHourStruct{}
+
 		var containerdevMan []interface{}
 
 		qu := session.DB(db)
@@ -679,7 +677,7 @@ func aggMonth() {
 			}
 		}
 	}
-	// session.Close()
+
 }
 
 //SetTimeStampForHour set minute second to 0
@@ -705,7 +703,11 @@ func main() {
 
 	c := cron.New()
 
-	aggHour()
-	// aggDay()
-	// aggMonth()
+	c.AddFunc("@hourly", aggHour)
+	c.AddFunc("@daily", aggDay)
+	c.AddFunc("@monthly", aggMonth)
+
+	c.Start()
+	select {}
+
 }
