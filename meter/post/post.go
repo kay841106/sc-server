@@ -18,20 +18,10 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func init() {
-
-	dbInfo := &mgo.DialInfo{
-		Addrs:    strings.SplitN("140.118.70.136:10003", ",", -1),
-		Database: "admin",
-		Username: "dontask",
-		Password: "idontknow",
-		Timeout:  time.Second * 2,
-	}
-	session, _ = mgo.DialWithInfo(dbInfo)
-}
-
 const (
-	db = "sc"
+	db       = "sc"
+	dblocal  = "172.16.0.132:27017"
+	dbpublic = "140.118.70.136:10003"
 	// c            = "testing"
 	c_lastreport = "lastreport"
 	c_aemdra     = "aemdra"
@@ -237,12 +227,12 @@ type AEMDRARcv struct {
 	GET137        float64 `json:"GET_1_37" bson:"GET_1_37"`
 	GET138        float64 `json:"GET_1_38" bson:"GET_1_38"`
 }
-
-type GWStatus struct {
+type gwstat struct {
 	Timestamp     time.Time `json:"Timestamp" bson:"Timestamp"`
 	TimestampUnix int64     `json:"Timestamp_Unix" bson:"Timestamp_Unix"`
 	GWID          string    `json:"GW_ID" bson:"GW_ID"`
-	// Status        bool      `json:"Status" bson:"Status"`
+	// Place         string    `json:"Place" bson:"Place"`
+	// MGWID         string    `json:"M_GWID" bson:"M_GWID"`
 }
 
 type lastreport struct {
@@ -487,21 +477,21 @@ func aemdraPost(w http.ResponseWriter, r *http.Request) {
 				MACAddress: containerSnd.MACAddress,
 			}
 
-			inf, err := Mongo.C(c_lastreport).Upsert(bson.M{"MAC_Address": Lastreportcontainer.MACAddress}, Lastreportcontainer)
+			err = Mongo.C(c_lastreport).Update(bson.M{"MACAddress": Lastreportcontainer.MACAddress}, Lastreportcontainer)
 			if err != nil {
-				fmt.Println(err, inf)
+				fmt.Println(err)
 			}
 
-			GWStatuscontainer := GWStatus{
+			GWStatuscontainer := gwstat{
 				Timestamp:     time.Now().UTC(),
 				TimestampUnix: time.Now().Unix(),
 				GWID:          containerSnd.GWID[0:8],
 				// Status:        statuscheck(containerSnd.TimestampUnix),
 			}
 			// update gwstatus
-			inf, err = Mongo.C(c_gw_status).Upsert(bson.M{"GW_ID": containerSnd.GWID[0:8]}, GWStatuscontainer)
+			err = Mongo.C(c_gw_status).Update(bson.M{"GW_ID": containerSnd.GWID[0:8]}, bson.M{"$set": GWStatuscontainer})
 			if err != nil {
-				fmt.Println(err, inf)
+				fmt.Println(err)
 			}
 		}
 	}
@@ -588,13 +578,13 @@ func cpmPost(w http.ResponseWriter, r *http.Request) {
 				MACAddress: containerSnd.MACAddress,
 			}
 
-			inf, err := Mongo.C(c_lastreport).Upsert(bson.M{"MAC_Address": Lastreportcontainer.MACAddress}, Lastreportcontainer)
+			err = Mongo.C(c_lastreport).Update(bson.M{"MACAddress": Lastreportcontainer.MACAddress}, bson.M{"$set": Lastreportcontainer})
 
 			if err != nil {
-				fmt.Println(err, inf)
+				fmt.Println(err)
 			}
 			// fmt.Println("last ok")
-			GWStatuscontainer := GWStatus{
+			GWStatuscontainer := gwstat{
 				Timestamp:     time.Now().UTC(),
 				TimestampUnix: time.Now().Unix(),
 				GWID:          containerSnd.GWID[0:8],
@@ -603,7 +593,7 @@ func cpmPost(w http.ResponseWriter, r *http.Request) {
 			// update gwstatus
 			// containerSnd.ID = bson.NewObjectId()
 
-			inf, err = Mongo.C(c_gw_status).Upsert(bson.M{"GW_ID": containerSnd.GWID[0:8]}, GWStatuscontainer)
+			err = Mongo.C(c_gw_status).Update(bson.M{"GW_ID": containerSnd.GWID[0:8]}, bson.M{"$set": GWStatuscontainer})
 			// fmt.Println("gw ok")
 			if err != nil {
 				fmt.Println(err)
@@ -612,6 +602,18 @@ func cpmPost(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+}
+
+func init() {
+
+	dbInfo := &mgo.DialInfo{
+		Addrs:    strings.SplitN(dbpublic, ",", -1),
+		Database: "admin",
+		Username: "dontask",
+		Password: "idontknow",
+		Timeout:  time.Second * 2,
+	}
+	session, _ = mgo.DialWithInfo(dbInfo)
 }
 
 func main() {
