@@ -14,6 +14,9 @@ const (
 	c_lastreport = "lastreport"
 	c_devices    = "devices"
 	c_gwtstat    = "gw_status"
+
+	dblocal  = "172.16.0.132:27017"
+	dbpublic = "140.118.70.136:10003"
 )
 
 var session *mgo.Session
@@ -21,7 +24,7 @@ var session *mgo.Session
 func init() {
 
 	dbInfo := &mgo.DialInfo{
-		Addrs:    strings.SplitN("140.118.70.136:10003", ",", -1),
+		Addrs:    strings.SplitN(dbpublic, ",", -1),
 		Database: "admin",
 		Username: "dontask",
 		Password: "idontknow",
@@ -34,7 +37,18 @@ type gwstat struct {
 	Timestamp     time.Time `json:"Timestamp" bson:"Timestamp"`
 	TimestampUnix int64     `json:"Timestamp_Unix" bson:"Timestamp_Unix"`
 	GWID          string    `json:"GW_ID" bson:"GW_ID"`
+	Place         string    `json:"Place" bson:"Place"`
+	MGWID         string    `json:"M_GWID" bson:"M_GWID"`
 }
+
+type gwstat2 struct {
+	Timestamp     time.Time `json:"Timestamp" bson:"Timestamp"`
+	TimestampUnix int64     `json:"Timestamp_Unix" bson:"Timestamp_Unix"`
+	GWID          string    `json:"GWID" bson:"GWID"`
+	Place         string    `json:"Place" bson:"Place"`
+	MGWID         string    `json:"M_GWID" bson:"M_GWID"`
+}
+
 type gwdata struct {
 	MACAddress string `json:"MACAddress" bson:"MACAddress"`
 	DevID      int    `json:"DevID" bson:"DevID"`
@@ -48,6 +62,25 @@ type gwdata struct {
 	Type       string `json:"Type" bson:"Type"`
 }
 
+type lastreport struct {
+	MACAddress    string    `json:"MACAddress" bson:"MACAddress"`
+	DevID         int       `json:"DevID" bson:"DevID"`
+	Floor         string    `json:"Floor" bson:"Floor"`
+	GWID          string    `json:"GW_ID" bson:"GW_ID"`
+	MGWID         string    `json:"M_GWID" bson:"M_GWID"`
+	MMAC          string    `json:"M_MAC" bson:"M_MAC"`
+	NUM           string    `json:"NUM" bson:"NUM"`
+	Place         string    `json:"Place" bson:"Place"`
+	Territory     string    `json:"Territory" bson:"Territory"`
+	Type          string    `json:"Type" bson:"Type"`
+	Timestamp     time.Time `json:"Timestamp" bson:"Timestamp"`
+	TimestampUnix int64     `json:"Timestamp_Unix" bson:"Timestamp_Unix"`
+}
+
+type tmp struct {
+	GWID string `json:"GWID" bson:"GWID"`
+}
+
 func unique(intSlice []string) []string {
 	keys := make(map[string]bool)
 	list := []string{}
@@ -58,6 +91,55 @@ func unique(intSlice []string) []string {
 		}
 	}
 	return list
+}
+
+func gwupload() {
+
+	container := gwstat{}
+	container2 := gwstat2{}
+	container3 := []string{}
+	// container4 := []gwdata{}
+	// container5 := []gwdata{}
+	sess := session.Clone()
+	defer sess.Close()
+
+	// Mongo := sess.DB(db).C(c_gwtstat)
+	// Mongo.Find(bson.M{}).All(&container)
+	// sess.DB(db).C(c_devices).Find(bson.M{}).All(&container2)
+	sess.DB(db).C(c_devices).Find(bson.M{}).Distinct("M_GWID", &container3)
+	for _, each := range container3 {
+		sess.DB(db).C(c_devices).Find(bson.M{"M_GWID": each}).Limit(1).One(&container2)
+		container.GWID = container2.GWID[0:8]
+		container.MGWID = container2.MGWID
+		container.Place = container2.Place
+		sess.DB(db).C(c_gwtstat).Insert(container)
+		fmt.Print(container2)
+	}
+}
+
+func lastreportupload() {
+
+	container := tmp{}
+	container2 := lastreport{}
+	container3 := []string{}
+	// container4 := []gwdata{}
+	// container5 := []gwdata{}
+	sess := session.Clone()
+	defer sess.Close()
+
+	// Mongo := sess.DB(db).C(c_gwtstat)
+	// Mongo.Find(bson.M{}).All(&container)
+	// sess.DB(db).C(c_devices).Find(bson.M{}).All(&container2)
+	sess.DB(db).C(c_devices).Find(bson.M{}).Distinct("MACAddress", &container3)
+	for _, each := range container3 {
+		sess.DB(db).C(c_devices).Find(bson.M{"MACAddress": each}).One(&container2)
+		sess.DB(db).C(c_devices).Find(bson.M{"MACAddress": each}).One(&container)
+		container2.GWID = container.GWID
+		// container.MGWID = container2.MGWID
+		// container.Place = container2.Place
+		sess.DB(db).C(c_lastreport).Upsert(bson.M{"MAC_Address": container2.MACAddress}, container2)
+		fmt.Print(container2)
+	}
 }
 
 func gogetgwstat() {
@@ -99,5 +181,5 @@ func gogetgwstat() {
 }
 
 func main() {
-	gogetgwstat()
+	lastreportupload()
 }

@@ -84,6 +84,8 @@ type gwstat struct {
 	Timestamp     time.Time `json:"Timestamp" bson:"Timestamp"`
 	TimestampUnix int64     `json:"Timestamp_Unix" bson:"Timestamp_Unix"`
 	GWID          string    `json:"GW_ID" bson:"GW_ID"`
+	MGWID         string    `json:"M_GWID" bson:"M_GWID"`
+	Place         string    `json:"Place" bson:"Place"`
 }
 
 type gwdata struct {
@@ -498,7 +500,6 @@ func main() {
 	router.HandleFunc("/meter/lastreport", gogetlastreport).Methods("GET")
 	router.HandleFunc("/meter/devices", gogetDevices).Methods("GET")
 	router.HandleFunc("/meter/gwstat", gogetgwstat).Methods("GET")
-	router.HandleFunc("/meter/gwdetail", gogetgwdetail).Methods("GET")
 
 	router.HandleFunc("/space/state/id/{id}/name/{state}", deviceState).Methods("GET")
 	router.HandleFunc("/space/state/id/{id}/name/{state}/arg/{argbv}", deviceACState).Methods("GET")
