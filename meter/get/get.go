@@ -15,6 +15,9 @@ import (
 )
 
 const (
+	dblocal  = "172.16.0.132:27017"
+	dbpublic = "140.118.70.136:10003"
+
 	db           = "sc"
 	c_lastreport = "lastreport"
 	c_devices    = "devices"
@@ -26,7 +29,7 @@ var session *mgo.Session
 func init() {
 
 	dbInfo := &mgo.DialInfo{
-		Addrs:    strings.SplitN("140.118.70.136:10003", ",", -1),
+		Addrs:    strings.SplitN(dblocal, ",", -1),
 		Database: "admin",
 		Username: "dontask",
 		Password: "idontknow",
@@ -43,9 +46,24 @@ type CPMSnd struct {
 	GWID          string        `json:"GW_ID" bson:"GW_ID"`
 }
 
+type getlastreport struct {
+	Timestamp     time.Time `json:"Timestamp" bson:"Timestamp"`
+	TimestampUnix int64     `json:"Timestamp_Unix" bson:"Timestamp_Unix"`
+	MACAddress    string    `json:"MAC_Address" bson:"MAC_Address"`
+	GWID          string    `json:"GW_ID" bson:"GW_ID"`
+	DevID         int       `json:"DevID" bson:"DevID"`
+	Floor         string    `json:"Floor" bson:"Floor"`
+	MGWID         string    `json:"M_GWID" bson:"M_GWID"`
+	MMAC          string    `json:"M_MAC" bson:"M_MAC"`
+	NUM           string    `json:"NUM" bson:"NUM"`
+	Place         string    `json:"Place" bson:"Place"`
+	Territory     string    `json:"Territory" bson:"Territory"`
+	Type          string    `json:"Type" bson:"Type"`
+}
+
 func gogetlastreport(w http.ResponseWriter, r *http.Request) {
 
-	container := []CPMSnd{}
+	container := []getlastreport{}
 	sess := session.Clone()
 	defer sess.Close()
 

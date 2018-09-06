@@ -23,6 +23,15 @@ const (
 	db                = "sc"
 )
 
+var bannr = `
+Program name : weather
+
+maintainer   : avbee.lab@gmail.com
+
+Date         : 09/06/2018
+
+`
+
 type citys struct {
 	City   string `json:"city,omitempty"`
 	Cityid string `json:"cityid,omitempty"`
@@ -180,9 +189,10 @@ func getweather() {
 }
 
 func main() {
+	fmt.Println(bannr)
 	c := cron.New()
 
-	c.AddFunc("0 1 * * * *", getweather)
+	c.AddFunc("@daily", getweather)
 
 	c.Start()
 	select {}

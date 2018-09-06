@@ -231,8 +231,6 @@ type gwstat struct {
 	Timestamp     time.Time `json:"Timestamp" bson:"Timestamp"`
 	TimestampUnix int64     `json:"Timestamp_Unix" bson:"Timestamp_Unix"`
 	GWID          string    `json:"GW_ID" bson:"GW_ID"`
-	// Place         string    `json:"Place" bson:"Place"`
-	// MGWID         string    `json:"M_GWID" bson:"M_GWID"`
 }
 
 type lastreport struct {
