@@ -19,15 +19,18 @@ import (
 )
 
 const (
-	db       = "sc"
-	dblocal  = "172.16.0.132:27017"
-	dbpublic = "140.118.70.136:10003"
+	db        = "sc"
+	db_airbox = "airbox"
+	dblocal   = "172.16.0.132:27017"
+	dbpublic  = "140.118.70.136:10003"
 	// c            = "testing"
 	c_lastreport = "lastreport"
 	c_aemdra     = "aemdra"
 	c_cpm        = "cpm"
 	c_gw_status  = "gw_status"
 	c_devices    = "devices"
+
+	c_airboxraw = "airbox_raw"
 )
 
 var session *mgo.Session
@@ -604,7 +607,7 @@ func cpmPost(w http.ResponseWriter, r *http.Request) {
 func init() {
 
 	dbInfo := &mgo.DialInfo{
-		Addrs:    strings.SplitN(dblocal, ",", -1),
+		Addrs:    strings.SplitN(dbpublic, ",", -1),
 		Database: "admin",
 		Username: "dontask",
 		Password: "idontknow",
@@ -618,6 +621,7 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/meter/aemdra", aemdraPost).Methods("POST")
 	router.HandleFunc("/meter/cpm", cpmPost).Methods("POST")
+	router.HandleFunc("/airbox_post", airboxPost).Methods("POST")
 
 	log.Println(http.ListenAndServe(":8080", router))
 
