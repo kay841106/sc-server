@@ -1,23 +1,23 @@
 version: '3'
 services:
-  jupyter:
-    image: avbee/jupynote-spark-pytorch
-    environment:
-       - "JUPYTER_LAB_ENABLE=yes" 
-   # host_command: export UID
-    volumes:
-       - /home/ubuntu/jupyter:/home/jovyan
-    ports:
-       - 8888:8888
+#  jupyter:
+#    image: avbee/jupynote-spark-pytorch
+#    environment:
+#       - "JUPYTER_LAB_ENABLE=yes" 
+#   # host_command: export UID
+#    volumes:
+#       - /home/ubuntu/jupyter:/home/jovyan
+#    ports:
+#       - 8888:8888
 
-  jenkins:
-    image: jenkins
-    user: root
-    volumes:
-       - /opt/jenkins:/var/jenkins_home
-    ports:
-       - 8081:8080
-       - 50000:50000
+#  jenkins:
+#    image: jenkins
+#    user: root
+#    volumes:
+#       - /opt/jenkins:/var/jenkins_home
+#    ports:
+#       - 8081:8080
+#       - 50000:50000
  
 #API GATEWAY PACKAGE
   kong-database:
@@ -27,30 +27,41 @@ services:
     environment:
        - "POSTGRES_USER=kong"
        - "POSTGRES_DB=kong"
+    volumes:
+       - /home/ubuntu/my-postgres.conf:/etc/postgresql/postgresql.conf
+
+    command: -c config_file=/etc/postgresql/postgresql.conf
+
     healthcheck:
        test: ["CMD", "curl", "-f", "http://localhost:5432"]
        interval: 1m30s
        timeout: 10s
        retries: 3
-   
-  kong-migration:
-    image: kong:0.13
-    environment:
-       - "KONG_DATABASE=postgres"
-       - "KONG_CASSANDRA_CONTACT_POINTS=kong-database"
-       - "KONG_PG_HOST=kong-database"
-    links:
-       - kong-database:kong-database
-    command: kong migrations up
+
+#  kong-database:
+#    image: cassandra:3
+#    ports:
+#       - 9042:9042
+ 
+#  kong-migration:
+#    image: kong:0.13
+#    environment:
+#       - "KONG_DATABASE=postgres"
+#       - "KONG_CASSANDRA_CONTACT_POINTS=kong-database"
+#       - "KONG_PG_HOST=kong-database"
+#    links:
+#       - kong-database:kong-database
+#    command: kong migrations up
 
   thekong:
     image: kong:0.13
     depends_on:
        - kong-database
-       - kong-migration
+#       - kong-migration
    
     environment:
        - "KONG_DATABASE=postgres"
+       - "KONG_CASSANDRA_CONTACT_POINTS=kong-database"
        - "KONG_PG_HOST=kong-database"
        - "KONG_PROXY_ACCESS_LOG=/dev/stdout"
        - "KONG_ADMIN_ACCESS_LOG=/dev/stdout"
@@ -90,5 +101,17 @@ services:
 
   post:
     image: avbee/post
+    restart: always
     ports:
-      - 8081:8080
+      - 8880:8080
+ 
+  get:
+    image: avbee/get
+    restart: always
+    ports:
+      - 8881:8081
+
+  weather:
+    image: avbee/weather
+    restart: always
+

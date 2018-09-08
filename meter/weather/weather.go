@@ -11,12 +11,13 @@ import (
 
 	"github.com/robfig/cron"
 
-	"github.com/globalsign/mgo/bson"
-
 	"github.com/globalsign/mgo"
 )
 
 const (
+	dblocal  = "172.16.0.132:27017"
+	dbpublic = "140.118.70.136:10003"
+
 	weatherCollection = "weather"
 	localTimeZoneExt  = "+08:00"
 	c_weather         = "weather"
@@ -98,7 +99,7 @@ var session *mgo.Session
 func init() {
 
 	dbInfo := &mgo.DialInfo{
-		Addrs:    strings.SplitN("140.118.70.136:10003", ",", -1),
+		Addrs:    strings.SplitN(dblocal, ",", -1),
 		Database: "admin",
 		Username: "dontask",
 		Password: "idontknow",
@@ -108,8 +109,7 @@ func init() {
 }
 
 func getweather() {
-	// mark := make(map[string]string)
-	sess := session.Clone()
+	// sess := session.Clone()
 	fmt.Println("hello")
 
 	cityID := "F-D0047-063"
@@ -132,22 +132,11 @@ func getweather() {
 		fmt.Println(string(contents))
 
 		finaldata := realdata{}
-		// finaldata.City = id
 		finaldata.Town = townID
 
-		// str := a.Rawdata.Locations[0].Location[0].WeatherElement[0].Time[0].Startime
-		// str = strings.Replace(str, " ", "T", -1) + ".371Z"
-		// t, _ := time.Parse(time.RFC3339, str)
-		// finaldata.Startime = t
-
-		// strt := a.Rawdata.Locations[0].Location[0].WeatherElement[0].Time[0].EndTime
-		// strt = strings.Replace(strt, " ", "T", -1) + ".371Z"
-		// t2, _ := time.Parse(time.RFC3339, strt)
-		// finaldata.EndTime = t2
-		// fmt.Println(a.Rawdata.Locations[0].Location[0].WeatherElement[0].Time[0].ElementValue)
 		for _, weather := range a.Rawdata.Locations[0].Location[0].WeatherElement {
 			if weather.ElementName == "T" {
-				// fmt.Println(weather.Time[0].ElementValue[0])
+
 				for _, j := range weather.Thetime {
 					fmt.Println(j.EndTime)
 					tick, _ := time.Parse(time.RFC3339, strings.Replace(j.Startime, " ", "T", -1)+localTimeZoneExt)
@@ -163,25 +152,13 @@ func getweather() {
 					}
 					fmt.Println(finaldata)
 
-					sess.DB(db).C(c_weather).Upsert(bson.M{"weatherElement": finaldata.ElementName, "startTime": finaldata.Startime, "endTime": finaldata.EndTime}, finaldata)
+					// sess.DB(db).C(c_weather).Upsert(bson.M{"weatherElement": finaldata.ElementName, "startTime": finaldata.Startime, "endTime": finaldata.EndTime}, finaldata)
 				}
-
-				// finaldata.ElementName = weather.ElementName
-				// finaldata.ElementValue = weather.Time[i].ElementValue[i].Value j.ElementValue
 
 			}
 			finaldata.ElementName = weather.ElementName
-
-			// finaldata.ElementValue = weather.Time[0].ElementValue.Value
-			// fmt.Println("TEST" + weather.Time[0].ElementValue[0].Value)
-			//finaldata.WeatherElementreal = append(finaldata.WeatherElementreal, struc)
-
-			//c.Insert(finaldata)
-
-			// c.Upsert(bson.M{"town": finaldata.Town, "weatherElement": finaldata.ElementName, "startTime": finaldata.Startime, "endTime": finaldata.EndTime}, finaldata)
 		}
-		// fmt.Println(a.Rawdata.Locations[0].Location[0].WeatherElement)
-		//c.Update(bson.M{"town": finaldata.Town}, bson.M{"$set": finaldata})
+
 		fmt.Println("finish")
 
 	}

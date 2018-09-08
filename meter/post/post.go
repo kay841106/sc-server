@@ -274,7 +274,7 @@ func MACAuth(macid string) bool {
 
 	Mongo := sess.DB(db)
 
-	Mongo.C(c_devices).Find(bson.M{}).Distinct("MACAddress", &slice)
+	Mongo.C(c_devices).Find(bson.M{}).Distinct("MAC_Address", &slice)
 	// fmt.Println(i)
 	m := make(map[string]bool)
 	for i := 0; i < len(slice); i++ {
@@ -449,7 +449,7 @@ func aemdraPost(w http.ResponseWriter, r *http.Request) {
 	}
 	// fmt.Println("init:", time.Unix(container.TimestampUnix, 0).UTC(), "crc:", time.Unix(recalcUnix(container.TimestampUnix), 0).UTC())
 	if GWAuth(containerSnd.GWID) == true {
-
+		fmt.Print(containerSnd.MACAddress)
 		if MACAuth(containerSnd.MACAddress) == true {
 
 			// Mongo.C(c_lastreport).Upsert(bson.M{"MAC_Address": containerSnd.MACAddress}, containerSnd)
@@ -475,7 +475,7 @@ func aemdraPost(w http.ResponseWriter, r *http.Request) {
 				MACAddress: containerSnd.MACAddress,
 			}
 
-			err = Mongo.C(c_lastreport).Update(bson.M{"MACAddress": Lastreportcontainer.MACAddress}, Lastreportcontainer)
+			err = Mongo.C(c_lastreport).Update(bson.M{"MAC_Address": Lastreportcontainer.MACAddress}, bson.M{"$set": Lastreportcontainer})
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -507,7 +507,7 @@ func cpmPost(w http.ResponseWriter, r *http.Request) {
 
 	json.NewDecoder(r.Body).Decode(&container)
 	r.Body.Close()
-
+	// fmt.Print(container)
 	containerSnd := &CPMSnd{
 
 		ID:            getObjectIDTwoArg(container.GWID, container.MACAddress, container.TimestampUnix),
@@ -555,16 +555,15 @@ func cpmPost(w http.ResponseWriter, r *http.Request) {
 
 	// fmt.Println("init:", time.Unix(container.TimestampUnix, 0).UTC(), "crc:", time.Unix(recalcUnix(container.TimestampUnix), 0).UTC())
 	if GWAuth(containerSnd.GWID) == true {
-
+		// fmt.Print(containerSnd.MACAddress)
 		if MACAuth(containerSnd.MACAddress) == true {
-
 			// update cpm rawdata
 			err := Mongo.C(c_cpm).Insert(containerSnd)
 			if err != nil {
 				fmt.Println(err)
 				json.NewEncoder(w).Encode(err)
 			}
-
+			fmt.Print(containerSnd)
 			json.NewEncoder(w).Encode(containerSnd)
 
 			// update lastreport
@@ -575,8 +574,8 @@ func cpmPost(w http.ResponseWriter, r *http.Request) {
 				// Status:        statuscheck(containerSnd.TimestampUnix),
 				MACAddress: containerSnd.MACAddress,
 			}
-
-			err = Mongo.C(c_lastreport).Update(bson.M{"MACAddress": Lastreportcontainer.MACAddress}, bson.M{"$set": Lastreportcontainer})
+			// fmt.Print(Lastreportcontainer)
+			err = Mongo.C(c_lastreport).Update(bson.M{"MAC_Address": Lastreportcontainer.MACAddress}, bson.M{"$set": Lastreportcontainer})
 
 			if err != nil {
 				fmt.Println(err)
@@ -592,7 +591,7 @@ func cpmPost(w http.ResponseWriter, r *http.Request) {
 			// containerSnd.ID = bson.NewObjectId()
 
 			err = Mongo.C(c_gw_status).Update(bson.M{"GW_ID": containerSnd.GWID[0:8]}, bson.M{"$set": GWStatuscontainer})
-			// fmt.Println("gw ok")
+			// fmt.Println(GWStatuscontainer)
 			if err != nil {
 				fmt.Println(err)
 				// fmt.Println(err, inf)
@@ -605,11 +604,11 @@ func cpmPost(w http.ResponseWriter, r *http.Request) {
 func init() {
 
 	dbInfo := &mgo.DialInfo{
-		Addrs:    strings.SplitN(dbpublic, ",", -1),
+		Addrs:    strings.SplitN(dblocal, ",", -1),
 		Database: "admin",
 		Username: "dontask",
 		Password: "idontknow",
-		Timeout:  time.Second * 2,
+		Timeout:  time.Second * 60,
 	}
 	session, _ = mgo.DialWithInfo(dbInfo)
 }

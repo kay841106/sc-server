@@ -50,7 +50,7 @@ type gwstat2 struct {
 }
 
 type gwdata struct {
-	MACAddress string `json:"MACAddress" bson:"MACAddress"`
+	MACAddress string `json:"MAC_Address" bson:"MAC_Address"`
 	DevID      int    `json:"DevID" bson:"DevID"`
 	Floor      string `json:"Floor" bson:"Floor"`
 	GWID       string `json:"GWID" bson:"GWID"`
@@ -63,7 +63,7 @@ type gwdata struct {
 }
 
 type lastreport struct {
-	MACAddress    string    `json:"MACAddress" bson:"MACAddress"`
+	MACAddress    string    `json:"MAC_Address" bson:"MAC_Address"`
 	DevID         int       `json:"DevID" bson:"DevID"`
 	Floor         string    `json:"Floor" bson:"Floor"`
 	GWID          string    `json:"GW_ID" bson:"GW_ID"`
@@ -130,16 +130,17 @@ func lastreportupload() {
 	// Mongo := sess.DB(db).C(c_gwtstat)
 	// Mongo.Find(bson.M{}).All(&container)
 	// sess.DB(db).C(c_devices).Find(bson.M{}).All(&container2)
-	sess.DB(db).C(c_devices).Find(bson.M{}).Distinct("MACAddress", &container3)
+	sess.DB(db).C(c_devices).Find(bson.M{}).Distinct("MAC_Address", &container3)
 	for _, each := range container3 {
-		sess.DB(db).C(c_devices).Find(bson.M{"MACAddress": each}).One(&container2)
-		sess.DB(db).C(c_devices).Find(bson.M{"MACAddress": each}).One(&container)
+		sess.DB(db).C(c_devices).Find(bson.M{"MAC_Address": each}).One(&container2)
+		sess.DB(db).C(c_devices).Find(bson.M{"MAC_Address": each}).One(&container)
 		container2.GWID = container.GWID
 		// container.MGWID = container2.MGWID
 		// container.Place = container2.Place
 		sess.DB(db).C(c_lastreport).Upsert(bson.M{"MAC_Address": container2.MACAddress}, container2)
-		fmt.Print(container2)
+		fmt.Println(container2)
 	}
+	// fmt.Println(container)
 }
 
 func gogetgwstat() {
