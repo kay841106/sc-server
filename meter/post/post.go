@@ -621,7 +621,6 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/meter/aemdra", aemdraPost).Methods("POST")
 	router.HandleFunc("/meter/cpm", cpmPost).Methods("POST")
-	router.HandleFunc("/airbox_post", airboxPost).Methods("POST")
 
 	log.Println(http.ListenAndServe(":8080", router))
 

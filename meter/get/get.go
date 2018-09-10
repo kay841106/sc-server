@@ -74,7 +74,7 @@ func gogetlastreport(w http.ResponseWriter, r *http.Request) {
 }
 
 type devices struct {
-	MACAddress string `json:"MACAddress" bson:"MACAddress"`
+	MACAddress string `json:"MAC_Address" bson:"MAC_Address"`
 	DevID      int    `json:"DevID" bson:"DevID"`
 	Floor      string `json:"Floor" bson:"Floor"`
 	GWID       string `json:"GWID" bson:"GWID"`

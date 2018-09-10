@@ -454,7 +454,7 @@ func aggHour() {
 		var containerdevMan []interface{}
 
 		qu := session.DB(db)
-		qu.C(c_devices).Find(nil).Distinct("MACAddress", &containerdevMan)
+		qu.C(c_devices).Find(nil).Distinct("MAC_Address", &containerdevMan)
 
 		for _, one := range containerdevMan {
 
@@ -556,7 +556,7 @@ func aggDay() {
 		var containerdevMan []interface{}
 
 		qu := session.DB(db)
-		qu.C(c_devices).Find(nil).Distinct("MACAddress", &containerdevMan)
+		qu.C(c_devices).Find(nil).Distinct("MAC_Address", &containerdevMan)
 
 		for _, one := range containerdevMan {
 
@@ -624,7 +624,7 @@ func aggMonth() {
 		var containerdevMan []interface{}
 
 		qu := session.DB(db)
-		qu.C(c_devices).Find(nil).Distinct("MACAddress", &containerdevMan)
+		qu.C(c_devices).Find(nil).Distinct("MAC_Address", &containerdevMan)
 
 		for _, one := range containerdevMan {
 
