@@ -230,18 +230,109 @@ type AEMDRARcv struct {
 	GET137        float64 `json:"GET_1_37" bson:"GET_1_37"`
 	GET138        float64 `json:"GET_1_38" bson:"GET_1_38"`
 }
+
+type aemdraMetrics struct {
+	GET11  float64 `json:"ae_tot" bson:"ae_tot"`
+	GET12  float64 `json:"wire" bson:"wire"`
+	GET13  float64 `json:"freq" bson:"freq"`
+	GET14  float64 `json:"ua" bson:"ua"`
+	GET15  float64 `json:"ub" bson:"ub"`
+	GET16  float64 `json:"uc" bson:"uc"`
+	GET17  float64 `json:"u_avg" bson:"u_avg"`
+	GET18  float64 `json:"uab" bson:"uab"`
+	GET19  float64 `json:"ubc" bson:"ubc"`
+	GET110 float64 `json:"uca" bson:"uca"`
+	GET111 float64 `json:"uln_avg" bson:"uln_avg"`
+	GET112 float64 `json:"ia" bson:"ia"`
+	GET113 float64 `json:"ib" bson:"ib"`
+	GET114 float64 `json:"ic" bson:"ic"`
+	GET115 float64 `json:"i_avg" bson:"i_avg"`
+	GET116 float64 `json:"pa" bson:"pa"`
+	GET117 float64 `json:"pb" bson:"pb"`
+	GET118 float64 `json:"pc" bson:"pc"`
+	GET119 float64 `json:"p_sum" bson:"p_sum"`
+	GET120 float64 `json:"qa" bson:"qa"`
+	GET121 float64 `json:"qb" bson:"qb"`
+	GET122 float64 `json:"qc" bson:"qc"`
+	GET123 float64 `json:"q_sum" bson:"q_sum"`
+	GET124 float64 `json:"sa" bson:"sa"`
+	GET125 float64 `json:"sb" bson:"sb"`
+	GET126 float64 `json:"sc" bson:"sc"`
+	GET127 float64 `json:"s_sum" bson:"s_sum"`
+	GET128 float64 `json:"pfa" bson:"pfa"`
+	GET129 float64 `json:"pfb" bson:"pfb"`
+	GET130 float64 `json:"pfc" bson:"pfc"`
+	GET131 float64 `json:"pf_avg" bson:"pf_avg"`
+	GET132 float64 `json:"aea" bson:"aea"`
+	GET133 float64 `json:"aeb" bson:"aeb"`
+	GET134 float64 `json:"aec" bson:"aec"`
+	GET135 float64 `json:"rea" bson:"rea"`
+	GET136 float64 `json:"reb" bson:"reb"`
+	GET137 float64 `json:"rec" bson:"rec"`
+	GET138 float64 `json:"re_tot" bson:"re_tot"`
+}
 type gwstat struct {
 	Timestamp     time.Time `json:"Timestamp" bson:"Timestamp"`
 	TimestampUnix int64     `json:"Timestamp_Unix" bson:"Timestamp_Unix"`
 	GWID          string    `json:"GW_ID" bson:"GW_ID"`
 }
 
-type lastreport struct {
+type cpmMetrics struct {
+	GET11  float64 `json:"ae_tot" bson:"ae_tot"`
+	GET12  float64 `json:"wire" bson:"wire"`
+	GET13  float64 `json:"freq" bson:"freq"`
+	GET14  float64 `json:"ua" bson:"ua"`
+	GET15  float64 `json:"ub" bson:"ub"`
+	GET16  float64 `json:"uc" bson:"uc"`
+	GET17  float64 `json:"u_avg" bson:"u_avg"`
+	GET18  float64 `json:"uab" bson:"uab"`
+	GET19  float64 `json:"ubc" bson:"ubc"`
+	GET110 float64 `json:"uca" bson:"uca"`
+	GET111 float64 `json:"uln_avg" bson:"uln_avg"`
+	GET112 float64 `json:"ia" bson:"ia"`
+	GET113 float64 `json:"ib" bson:"ib"`
+	GET114 float64 `json:"ic" bson:"ic"`
+	GET115 float64 `json:"i_avg" bson:"i_avg"`
+	GET116 float64 `json:"pa" bson:"pa"`
+	GET117 float64 `json:"pb" bson:"pb"`
+	GET118 float64 `json:"pc" bson:"pc"`
+	GET119 float64 `json:"p_sum" bson:"p_sum"`
+	GET120 float64 `json:"sa" bson:"sa"`
+	GET121 float64 `json:"sb" bson:"sb"`
+	GET122 float64 `json:"sc" bson:"sc"`
+	GET123 float64 `json:"s_sum" bson:"s_sum"`
+	GET124 float64 `json:"pfa" bson:"pfa"`
+	GET125 float64 `json:"pfb" bson:"pfb"`
+	GET126 float64 `json:"pfc" bson:"pfc"`
+	GET127 float64 `json:"pf_avg" bson:"pf_avg"`
+	GET128 float64 `json:"uavg_thd" bson:"avg_thd"`
+	GET129 float64 `json:"iavg_thd" bson:"iavg_thd"`
+}
+
+type cpmlastreport struct {
 	Timestamp     time.Time `json:"Timestamp" bson:"Timestamp"`
 	TimestampUnix int64     `json:"Timestamp_Unix" bson:"Timestamp_Unix"`
 	GWID          string    `json:"GW_ID" bson:"GW_ID"`
 	// Status        bool      `json:"Status" bson:"Status"`
-	MACAddress string `json:"MAC_Address" bson:"MAC_Address"`
+	MACAddress string     `json:"MAC_Address" bson:"MAC_Address"`
+	Metrics    cpmMetrics `json:"metrics" bson:"metrics"`
+}
+
+type aemdralastreport struct {
+	Timestamp     time.Time `json:"Timestamp" bson:"Timestamp"`
+	TimestampUnix int64     `json:"Timestamp_Unix" bson:"Timestamp_Unix"`
+	GWID          string    `json:"GW_ID" bson:"GW_ID"`
+	// Status        bool      `json:"Status" bson:"Status"`
+	MACAddress string        `json:"MAC_Address" bson:"MAC_Address"`
+	Metrics    aemdraMetrics `json:"metrics" bson:"metrics"`
+}
+
+type structmetrics struct {
+	getMtrcs float64 `json:"ae_tot" bson:"ae_tot"`
+}
+
+type getmetrics struct {
+	Metrics structmetrics `json:"metrics" bson:"metrics"`
 }
 
 func GWAuth(gwid string) bool {
@@ -450,6 +541,47 @@ func aemdraPost(w http.ResponseWriter, r *http.Request) {
 		GET137:      container.GET137,
 		GET138:      container.GET138,
 	}
+
+	lastreportmetrics := aemdraMetrics{
+		GET11:  container.GET11,
+		GET12:  container.GET12,
+		GET13:  container.GET13,
+		GET14:  container.GET14,
+		GET15:  container.GET15,
+		GET16:  container.GET16,
+		GET17:  container.GET17,
+		GET18:  container.GET18,
+		GET19:  container.GET19,
+		GET110: container.GET110,
+		GET111: container.GET111,
+		GET112: container.GET112,
+		GET113: container.GET113,
+		GET114: container.GET114,
+		GET115: container.GET115,
+		GET116: container.GET116,
+		GET117: container.GET117,
+		GET118: container.GET118,
+		GET119: container.GET119,
+		GET120: container.GET120,
+		GET121: container.GET121,
+		GET122: container.GET122,
+		GET123: container.GET123,
+		GET124: container.GET124,
+		GET125: container.GET125,
+		GET126: container.GET126,
+		GET127: container.GET127,
+		GET128: container.GET128,
+		GET129: container.GET129,
+		GET130: container.GET130,
+		GET131: container.GET131,
+		GET132: container.GET132,
+		GET133: container.GET133,
+		GET134: container.GET134,
+		GET135: container.GET135,
+		GET136: container.GET136,
+		GET137: container.GET137,
+		GET138: container.GET138,
+	}
 	// fmt.Println("init:", time.Unix(container.TimestampUnix, 0).UTC(), "crc:", time.Unix(recalcUnix(container.TimestampUnix), 0).UTC())
 	if GWAuth(containerSnd.GWID) == true {
 		fmt.Print(containerSnd.MACAddress)
@@ -469,15 +601,24 @@ func aemdraPost(w http.ResponseWriter, r *http.Request) {
 
 			// containerSnd.ID = bson.NewObjectId()
 			// update lastreport
+			getthemetrics := getmetrics{}
 
-			Lastreportcontainer := lastreport{
+			Lastreportcontainer := aemdralastreport{
 				Timestamp:     time.Unix(containerSnd.TimestampUnix, 0).UTC(),
 				TimestampUnix: containerSnd.TimestampUnix,
 				GWID:          containerSnd.GWID[0:8],
 				// Status:        statuscheck(containerSnd.TimestampUnix),
 				MACAddress: containerSnd.MACAddress,
+				Metrics:    lastreportmetrics,
 			}
 
+			err = Mongo.C(c_lastreport).Find(bson.M{"MAC_Address": Lastreportcontainer.MACAddress}).One(&getthemetrics)
+			if err != nil {
+				fmt.Println("false")
+				json.NewEncoder(w).Encode(err)
+			}
+
+			Lastreportcontainer.Metrics.GET11 = Lastreportcontainer.Metrics.GET11 - getthemetrics.Metrics.getMtrcs
 			err = Mongo.C(c_lastreport).Update(bson.M{"MAC_Address": Lastreportcontainer.MACAddress}, bson.M{"$set": Lastreportcontainer})
 			if err != nil {
 				fmt.Println(err)
@@ -555,7 +696,37 @@ func cpmPost(w http.ResponseWriter, r *http.Request) {
 	}
 	// fmt.Println(containerSnd.Timestamp)
 	// fmt.Println(GWAuth(containerSnd.GWID))
-
+	lastreportmetrics := cpmMetrics{
+		GET11:  container.GET11,
+		GET12:  container.GET12,
+		GET13:  container.GET13,
+		GET14:  container.GET14,
+		GET15:  container.GET15,
+		GET16:  container.GET16,
+		GET17:  container.GET17,
+		GET18:  container.GET18,
+		GET19:  container.GET19,
+		GET110: container.GET110,
+		GET111: container.GET111,
+		GET112: container.GET112,
+		GET113: container.GET113,
+		GET114: container.GET114,
+		GET115: container.GET115,
+		GET116: container.GET116,
+		GET117: container.GET117,
+		GET118: container.GET118,
+		GET119: container.GET119,
+		GET120: container.GET120,
+		GET121: container.GET121,
+		GET122: container.GET122,
+		GET123: container.GET123,
+		GET124: container.GET124,
+		GET125: container.GET125,
+		GET126: container.GET126,
+		GET127: container.GET127,
+		GET128: container.GET128,
+		GET129: container.GET129,
+	}
 	// fmt.Println("init:", time.Unix(container.TimestampUnix, 0).UTC(), "crc:", time.Unix(recalcUnix(container.TimestampUnix), 0).UTC())
 	if GWAuth(containerSnd.GWID) == true {
 		// fmt.Print(containerSnd.MACAddress)
@@ -569,20 +740,34 @@ func cpmPost(w http.ResponseWriter, r *http.Request) {
 			fmt.Print(containerSnd)
 			json.NewEncoder(w).Encode(containerSnd)
 
+			// declare the struct
+			getthemetrics := getmetrics{}
+
 			// update lastreport
-			Lastreportcontainer := lastreport{
+			Lastreportcontainer := cpmlastreport{
 				Timestamp:     time.Unix(containerSnd.TimestampUnix, 0).UTC(),
 				TimestampUnix: containerSnd.TimestampUnix,
 				GWID:          containerSnd.GWID[0:8],
 				// Status:        statuscheck(containerSnd.TimestampUnix),
 				MACAddress: containerSnd.MACAddress,
+				Metrics:    lastreportmetrics,
 			}
 			// fmt.Print(Lastreportcontainer)
-			err = Mongo.C(c_lastreport).Update(bson.M{"MAC_Address": Lastreportcontainer.MACAddress}, bson.M{"$set": Lastreportcontainer})
 
+			// get previous metric from db
+			err = Mongo.C(c_lastreport).Find(bson.M{"MAC_Address": Lastreportcontainer.MACAddress}).One(&getthemetrics)
+			if err != nil {
+				fmt.Println("false")
+				json.NewEncoder(w).Encode(err)
+			}
+
+			// get delta metrics and set to the container
+			Lastreportcontainer.Metrics.GET11 = Lastreportcontainer.Metrics.GET11 - getthemetrics.Metrics.getMtrcs
+			err = Mongo.C(c_lastreport).Update(bson.M{"MAC_Address": Lastreportcontainer.MACAddress}, bson.M{"$set": Lastreportcontainer})
 			if err != nil {
 				fmt.Println(err)
 			}
+
 			// fmt.Println("last ok")
 			GWStatuscontainer := gwstat{
 				Timestamp:     time.Now().UTC(),
@@ -607,7 +792,7 @@ func cpmPost(w http.ResponseWriter, r *http.Request) {
 func init() {
 
 	dbInfo := &mgo.DialInfo{
-		Addrs:    strings.SplitN(dbpublic, ",", -1),
+		Addrs:    strings.SplitN(dblocal, ",", -1),
 		Database: "admin",
 		Username: "dontask",
 		Password: "idontknow",

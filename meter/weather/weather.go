@@ -108,6 +108,45 @@ func init() {
 	session, _ = mgo.DialWithInfo(dbInfo)
 }
 
+func getObjectIDTwoArg(GWID string, macID string, timestamp int64) bson.ObjectId {
+	var b [12]byte
+	var sum [8]byte
+	var c [4]byte
+	// timestamp := time.Unix(LastReportTime, 0)
+	// binary.BigEndian.PutUint32(b[:], uint32(timestamp))
+	binary.BigEndian.PutUint32(c[:], uint32(timestamp))
+
+	did := sum[:]
+	gid := sum[:]
+
+	hw := md5.New()
+	hw.Write([]byte(GWID))
+	copy(did, hw.Sum(nil))
+	hw.Write([]byte(macID))
+	copy(gid, hw.Sum(nil))
+	// b[0] = c[:1]
+	b[0] = c[0]
+	b[1] = c[1]
+	b[2] = c[2]
+	b[3] = c[3]
+	b[4] = did[4]
+	b[5] = did[5]
+	b[6] = did[6]
+	b[7] = did[7]
+	b[8] = gid[4]
+	b[9] = gid[5]
+	b[10] = gid[6]
+	b[11] = gid[7]
+
+	dst := hex.EncodeToString(b[:])
+	theid := bson.ObjectIdHex(dst)
+
+	fmt.Println(theid, uint32(timestamp))
+	return theid
+
+}
+
+
 func getweather() {
 	// sess := session.Clone()
 	fmt.Println("hello")
@@ -152,7 +191,7 @@ func getweather() {
 					}
 					fmt.Println(finaldata)
 
-					// sess.DB(db).C(c_weather).Upsert(bson.M{"weatherElement": finaldata.ElementName, "startTime": finaldata.Startime, "endTime": finaldata.EndTime}, finaldata)
+					sess.DB(db).C(c_weather).Upsert(bson.M{"weatherElement": finaldata.ElementName, "startTime": finaldata.Startime, "endTime": finaldata.EndTime}, finaldata)
 				}
 
 			}

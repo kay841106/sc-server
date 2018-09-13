@@ -46,6 +46,12 @@ type CPMSnd struct {
 	GWID          string        `json:"GW_ID" bson:"GW_ID"`
 }
 
+type Metrics struct {
+	GET11 float64 `json:"ae_tot" bson:"ae_tot"`
+	GET12 float64 `json:"p_sum" bson:"p_sum"`
+	GET13 float64 `json:"pf_avg" bson:"pf_avg"`
+}
+
 type getlastreport struct {
 	Timestamp     time.Time `json:"Timestamp" bson:"Timestamp"`
 	TimestampUnix int64     `json:"Timestamp_Unix" bson:"Timestamp_Unix"`
@@ -59,6 +65,27 @@ type getlastreport struct {
 	Place         string    `json:"Place" bson:"Place"`
 	Territory     string    `json:"Territory" bson:"Territory"`
 	Type          string    `json:"Type" bson:"Type"`
+	Metrics       Metrics
+}
+
+type postlastreport struct {
+	MACAddress string `json:"MAC_Address" bson:"MAC_Address"`
+}
+
+func gopostlastreport(w http.ResponseWriter, r *http.Request) {
+
+	headercontainer := postlastreport{}
+
+	json.NewDecoder(r.Body).Decode(&headercontainer)
+	fmt.Println(headercontainer)
+	container := []getlastreport{}
+	sess := session.Clone()
+	defer sess.Close()
+
+	Mongo := sess.DB(db).C(c_lastreport)
+	Mongo.Find(bson.M{"MAC_Address": headercontainer.MACAddress}).All(&container)
+	json.NewEncoder(w).Encode(container)
+	fmt.Println(container)
 }
 
 func gogetlastreport(w http.ResponseWriter, r *http.Request) {
@@ -514,6 +541,8 @@ func thedeviceStatusRes(w http.ResponseWriter, req *http.Request) {
 func main() {
 
 	router := mux.NewRouter()
+
+	router.HandleFunc("/meter/lastreport", gopostlastreport).Methods("POST")
 
 	router.HandleFunc("/meter/lastreport", gogetlastreport).Methods("GET")
 	router.HandleFunc("/meter/devices", gogetDevices).Methods("GET")
