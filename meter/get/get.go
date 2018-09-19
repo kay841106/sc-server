@@ -29,7 +29,7 @@ var session *mgo.Session
 func init() {
 
 	dbInfo := &mgo.DialInfo{
-		Addrs:    strings.SplitN(dblocal, ",", -1),
+		Addrs:    strings.SplitN(dbpublic, ",", -1),
 		Database: "admin",
 		Username: "dontask",
 		Password: "idontknow",
@@ -72,6 +72,10 @@ type postlastreport struct {
 	MACAddress string `json:"MAC_Address" bson:"MAC_Address"`
 }
 
+type postGWID struct {
+	GWID string `json:"GW_ID" bson:"GW_ID"`
+}
+
 func gopostlastreport(w http.ResponseWriter, r *http.Request) {
 
 	headercontainer := postlastreport{}
@@ -84,6 +88,22 @@ func gopostlastreport(w http.ResponseWriter, r *http.Request) {
 
 	Mongo := sess.DB(db).C(c_lastreport)
 	Mongo.Find(bson.M{"MAC_Address": headercontainer.MACAddress}).All(&container)
+	json.NewEncoder(w).Encode(container)
+	fmt.Println(container)
+}
+
+func gopostgwstat(w http.ResponseWriter, r *http.Request) {
+
+	headercontainer := postGWID{}
+
+	json.NewDecoder(r.Body).Decode(&headercontainer)
+	fmt.Println(headercontainer)
+	container := []gwstat{}
+	sess := session.Clone()
+	defer sess.Close()
+
+	Mongo := sess.DB(db).C(c_gwtstat)
+	Mongo.Find(bson.M{"GW_ID": headercontainer.GWID}).All(&container)
 	json.NewEncoder(w).Encode(container)
 	fmt.Println(container)
 }
@@ -543,6 +563,7 @@ func main() {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/meter/lastreport", gopostlastreport).Methods("POST")
+	router.HandleFunc("/meter/gwstat", gopostgwstat).Methods("POST")
 
 	router.HandleFunc("/meter/lastreport", gogetlastreport).Methods("GET")
 	router.HandleFunc("/meter/devices", gogetDevices).Methods("GET")
