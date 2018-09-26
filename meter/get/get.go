@@ -9,9 +9,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/globalsign/mgo"
-	"github.com/globalsign/mgo/bson"
+	// "github.com/globalsign/mgo"
+	// "github.com/globalsign/mgo/bson"
 	"github.com/gorilla/mux"
+
+	// change due to high cpu using globalsign
+	mgo "gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 const (
@@ -26,14 +30,14 @@ const (
 
 var session *mgo.Session
 
-func init() {
+func db_connect() {
 
 	dbInfo := &mgo.DialInfo{
 		Addrs:    strings.SplitN(dblocal, ",", -1),
 		Database: "admin",
 		Username: "dontask",
 		Password: "idontknow",
-		Timeout:  time.Second * 2,
+		Timeout:  time.Second * 10,
 	}
 	session, _ = mgo.DialWithInfo(dbInfo)
 }
@@ -560,6 +564,7 @@ func thedeviceStatusRes(w http.ResponseWriter, req *http.Request) {
 
 func main() {
 
+	db_connect()
 	router := mux.NewRouter()
 
 	router.HandleFunc("/meter/lastreport", gopostlastreport).Methods("POST")

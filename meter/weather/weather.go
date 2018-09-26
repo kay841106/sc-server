@@ -1,6 +1,9 @@
 package main
 
 import (
+	"crypto/md5"
+	"encoding/binary"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -11,7 +14,12 @@ import (
 
 	"github.com/robfig/cron"
 
-	"github.com/globalsign/mgo"
+	// "github.com/globalsign/mgo"
+	// "github.com/globalsign/mgo/bson"
+
+	// change due to high cpu using globalsign
+	mgo "gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 const (
@@ -96,7 +104,7 @@ type elVal struct {
 
 var session *mgo.Session
 
-func init() {
+func db_connect() {
 
 	dbInfo := &mgo.DialInfo{
 		Addrs:    strings.SplitN(dblocal, ",", -1),
@@ -146,9 +154,8 @@ func getObjectIDTwoArg(GWID string, macID string, timestamp int64) bson.ObjectId
 
 }
 
-
 func getweather() {
-	// sess := session.Clone()
+	sess := session.Clone()
 	fmt.Println("hello")
 
 	cityID := "F-D0047-063"
@@ -205,6 +212,7 @@ func getweather() {
 }
 
 func main() {
+	db_connect()
 	fmt.Println(bannr)
 	c := cron.New()
 

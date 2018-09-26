@@ -12,8 +12,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/globalsign/mgo"
-	"github.com/globalsign/mgo/bson"
+	// "github.com/globalsign/mgo"
+	// "github.com/globalsign/mgo/bson"
+
+	// change due to high cpu using globalsign
+	mgo "gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
+
 	"github.com/gorilla/mux"
 )
 
@@ -21,6 +26,7 @@ const (
 	db_airbox = "airbox"
 	dblocal   = "172.16.0.132:27017"
 	dbpublic  = "140.118.70.136:10003"
+	dbleoass  = "140.118.123.95"
 	// c            = "testing"
 
 	c_airboxraw = "airbox_raw"
@@ -50,6 +56,10 @@ type airboxSnd struct {
 	CO             float32       `json:"CO" bson:"CO"`
 	CO2            float32       `json:"CO2" bson:"CO2"`
 	Noise          int           `json:"Noise" bson:"Noise"`
+}
+
+type thekey struct {
+	Key string `json:"Key" bson:"Key"`
 }
 
 func getObjectIDTwoArg(GWID string, macID string, timestamp int64) bson.ObjectId {
@@ -92,10 +102,19 @@ func getObjectIDTwoArg(GWID string, macID string, timestamp int64) bson.ObjectId
 
 func airboxPost(w http.ResponseWriter, r *http.Request) {
 
-	// sess := session.Clone()
-	// defer sess.Close()
+	dbInfo := &mgo.DialInfo{
+		Addrs:    strings.SplitN(dbleoass, ",", -1),
+		Database: "admin",
+		// Username: "dontask",
+		// Password: "idontknow",
+		Timeout: time.Minute * 15,
+	}
+	sess, _ := mgo.DialWithInfo(dbInfo)
 
-	// Mongo := sess.DB(db_airbox)
+	// sess := session.Clone()
+	defer sess.Close()
+
+	Mongo := sess.DB(db_airbox)
 
 	container := airbox{}
 	var containertemp interface{}
@@ -111,11 +130,11 @@ func airboxPost(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(r.Header)
 
 	// v := reflect.ValueOf(containertemp)
-	s := reflect.ValueOf(containertemp).NumField()
+	// s := reflect.ValueOf(containertemp).NumField()
 
 	// for _, v := range s.MapKeys() {
 
-	fmt.Println(s)
+	// fmt.Println(s)
 	// }
 	// for _, v := range container {
 
@@ -126,39 +145,46 @@ func airboxPost(w http.ResponseWriter, r *http.Request) {
 	// fmt.Println(v)
 
 	// // var container interface{}
-	// container2 := airboxSnd{
-	// 	ID:             getObjectIDTwoArg(container.DevID, container.DevID, time.Now().Unix()),
-	// 	Timestamp:      time.Now().UTC(),
-	// 	Timestamp_Unix: time.Now().Unix(),
-	// 	Temp:           container.Temp,
-	// 	Humidity:       container.Humidity,
-	// 	CO:             container.CO,
-	// 	CO2:            container.CO2,
-	// 	Noise:          container.Noise,
-	// 	PM2_5:          container.PM2_5,
-	// 	DevID:          container.DevID,
-	// }
-
-	// Mongo.C(c_airboxraw).Insert(container2)
-	r.Body.Close()
-	fmt.Print(container)
-
-}
-
-func init() {
-
-	dbInfo := &mgo.DialInfo{
-		Addrs:    strings.SplitN(dbpublic, ",", -1),
-		Database: "admin",
-		Username: "dontask",
-		Password: "idontknow",
-		Timeout:  time.Second * 60,
+	checkey := thekey{
+		Key: container.Key,
 	}
-	session, _ = mgo.DialWithInfo(dbInfo)
+	if checkey.Key == "ntustairbox2" {
+
+		container2 := airboxSnd{
+			ID:             getObjectIDTwoArg(container.DevID, container.DevID, time.Now().Unix()),
+			Timestamp:      time.Now().UTC(),
+			Timestamp_Unix: time.Now().Unix(),
+			Temp:           container.Temp,
+			Humidity:       container.Humidity,
+			CO:             container.CO,
+			CO2:            container.CO2,
+			Noise:          container.Noise,
+			PM2_5:          container.PM2_5,
+			DevID:          container.DevID,
+		}
+
+		Mongo.C(c_airboxraw).Insert(container2)
+		r.Body.Close()
+		fmt.Print(container)
+	}
+
 }
+
+// func db_connect() *Session {
+
+// 	dbInfo := &mgo.DialInfo{
+// 		Addrs:    strings.SplitN(dblocal, ",", -1),
+// 		Database: "admin",
+// 		Username: "dontask",
+// 		Password: "idontknow",
+// 		Timeout:  time.Second * 120,
+// 	}
+// 	session, _ = mgo.DialWithInfo(dbInfo)
+// 	return session
+// }
 
 func main() {
-
+	// db_connect()
 	router := mux.NewRouter()
 	router.HandleFunc("/airbox_post", airboxPost).Methods("POST")
 

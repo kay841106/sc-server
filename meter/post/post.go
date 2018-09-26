@@ -11,9 +11,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/globalsign/mgo/bson"
+	// "github.com/globalsign/mgo/bson"
+	mgo "gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 
-	"github.com/globalsign/mgo"
+	// "github.com/globalsign/mgo"
 
 	"github.com/gorilla/mux"
 )
@@ -23,6 +25,7 @@ const (
 	db_airbox = "airbox"
 	dblocal   = "172.16.0.132:27017"
 	dbpublic  = "140.118.70.136:10003"
+	dbleoass  = "140.118.123.95"
 	// c            = "testing"
 	c_lastreport = "lastreport"
 	c_aemdra     = "aemdra"
@@ -488,7 +491,7 @@ func aemdraPost(w http.ResponseWriter, r *http.Request) {
 	// 		},
 	// 	})
 	json.NewDecoder(r.Body).Decode(&container)
-	r.Body.Close()
+	defer r.Body.Close()
 
 	containerSnd := &AEMDRASnd{
 
@@ -650,7 +653,7 @@ func cpmPost(w http.ResponseWriter, r *http.Request) {
 	container := CPMRcv{}
 
 	json.NewDecoder(r.Body).Decode(&container)
-	r.Body.Close()
+	defer r.Body.Close()
 	// fmt.Print(container)
 	containerSnd := &CPMSnd{
 
@@ -789,19 +792,21 @@ func cpmPost(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func init() {
+func db_connect() {
 
 	dbInfo := &mgo.DialInfo{
-		Addrs:    strings.SplitN(dblocal, ",", -1),
+		Addrs:    strings.SplitN(dbleoass, ",", -1),
 		Database: "admin",
-		Username: "dontask",
-		Password: "idontknow",
-		Timeout:  time.Second * 60,
+		// Username: "dontask",
+		// Password: "idontknow",
+		Timeout: time.Second * 10,
 	}
 	session, _ = mgo.DialWithInfo(dbInfo)
 }
 
 func main() {
+
+	db_connect()
 
 	router := mux.NewRouter()
 	router.HandleFunc("/meter/aemdra", aemdraPost).Methods("POST")
