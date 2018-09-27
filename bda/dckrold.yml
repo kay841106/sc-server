@@ -110,12 +110,30 @@ services:
     restart: unless-stopped
     ports:
       - 8880:8080
+      
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
 
   get:
     image: avbee/get
     restart: unless-stopped
     ports:
       - 8881:8081
+      
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+      
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
 
   weather:
     image: avbee/weather
@@ -126,4 +144,9 @@ services:
     restart: unless-stopped
     ports:
     - 8890:8090
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
        
