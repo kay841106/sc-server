@@ -1,5 +1,7 @@
 version: '3'
 services:
+
+### Deprecated ###
 #  jupyter:
 #    image: avbee/jupynote-spark-pytorch
 #    environment:
@@ -18,7 +20,8 @@ services:
 #    ports:
 #       - 8081:8080
 #       - 50000:50000
- 
+
+
 #API GATEWAY PACKAGE
   kong-database:
     image: postgres:9.5
@@ -27,10 +30,12 @@ services:
     environment:
        - "POSTGRES_USER=kong"
        - "POSTGRES_DB=kong"
-    volumes:
-       - /home/ubuntu/my-postgres.conf:/etc/postgresql/postgresql.conf
+       
+### No conf file ###       
+#    volumes:
+#       - /home/ubuntu/my-postgres.conf:/etc/postgresql/postgresql.conf
 
-    command: -c config_file=/etc/postgresql/postgresql.conf
+#    command: -c config_file=/etc/postgresql/postgresql.conf
 
     healthcheck:
        test: ["CMD", "curl", "-f", "http://localhost:5432"]
@@ -38,11 +43,13 @@ services:
        timeout: 10s
        retries: 3
 
+
 #  kong-database:
 #    image: cassandra:3
 #    ports:
 #       - 9042:9042
  
+### Migration should be done manually once ###
 #  kong-migration:
 #    image: kong:0.13
 #    environment:
@@ -53,8 +60,9 @@ services:
 #       - kong-database:kong-database
 #    command: kong migrations up
 
+
   thekong:
-    image: kong:0.13
+    image: kong:0.14
     depends_on:
        - kong-database
 #       - kong-migration
@@ -101,17 +109,20 @@ services:
 
   post:
     image: avbee/post
-    restart: always
+    restart: unless-stopped
     ports:
       - 8880:8080
  
   get:
     image: avbee/get
-    restart: always
+    restart: unless-stopped
     ports:
       - 8881:8081
 
   weather:
     image: avbee/weather
-    restart: always
+    restart: unless-stopped
 
+  airboxpost:
+    image: avbee/airboxpost
+    restart: unless-stopped
