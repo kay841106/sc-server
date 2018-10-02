@@ -26,6 +26,10 @@ const (
 	c_lastreport = "lastreport"
 	c_devices    = "devices"
 	c_gwtstat    = "gw_status"
+
+	c_hourly = "hour"
+	c_daily  = "day"
+	c_month  = "month"
 )
 
 var session *mgo.Session
@@ -85,7 +89,7 @@ func gopostlastreport(w http.ResponseWriter, r *http.Request) {
 	headercontainer := postlastreport{}
 
 	json.NewDecoder(r.Body).Decode(&headercontainer)
-	fmt.Println(headercontainer)
+	// fmt.Println(headercontainer)
 	container := []getlastreport{}
 	sess := session.Clone()
 	defer sess.Close()
@@ -93,7 +97,7 @@ func gopostlastreport(w http.ResponseWriter, r *http.Request) {
 	Mongo := sess.DB(db).C(c_lastreport)
 	Mongo.Find(bson.M{"MAC_Address": headercontainer.MACAddress}).All(&container)
 	json.NewEncoder(w).Encode(container)
-	fmt.Println(container)
+	// fmt.Println(container)
 }
 
 func gopostgwstat(w http.ResponseWriter, r *http.Request) {
@@ -101,7 +105,7 @@ func gopostgwstat(w http.ResponseWriter, r *http.Request) {
 	headercontainer := postGWID{}
 
 	json.NewDecoder(r.Body).Decode(&headercontainer)
-	fmt.Println(headercontainer)
+	// fmt.Println(headercontainer)
 	container := []gwstat{}
 	sess := session.Clone()
 	defer sess.Close()
@@ -109,7 +113,7 @@ func gopostgwstat(w http.ResponseWriter, r *http.Request) {
 	Mongo := sess.DB(db).C(c_gwtstat)
 	Mongo.Find(bson.M{"GW_ID": headercontainer.GWID}).All(&container)
 	json.NewEncoder(w).Encode(container)
-	fmt.Println(container)
+	// fmt.Println(container)
 }
 
 func gogetlastreport(w http.ResponseWriter, r *http.Request) {
@@ -121,7 +125,7 @@ func gogetlastreport(w http.ResponseWriter, r *http.Request) {
 	Mongo := sess.DB(db).C(c_lastreport)
 	Mongo.Find(bson.M{}).All(&container)
 	json.NewEncoder(w).Encode(container)
-	fmt.Println(container)
+	// fmt.Println(container)
 }
 
 type devices struct {
@@ -146,7 +150,7 @@ func gogetDevices(w http.ResponseWriter, r *http.Request) {
 	Mongo := sess.DB(db).C(c_devices)
 	Mongo.Find(bson.M{}).All(&container)
 	json.NewEncoder(w).Encode(container)
-	fmt.Println(container)
+	// fmt.Println(container)
 }
 
 type gwstat struct {
@@ -326,8 +330,8 @@ type checkState struct {
 func checkBool(x string) bool {
 
 	tmpVal, _ := strconv.ParseFloat(x, 32)
-	fmt.Println(tmpVal)
-	fmt.Println(x)
+	// fmt.Println(tmpVal)
+	// fmt.Println(x)
 	if (tmpVal) > 5 {
 		return true
 	} else {
@@ -371,7 +375,7 @@ func gogetgwstat(w http.ResponseWriter, r *http.Request) {
 	Mongo := sess.DB(db).C(c_gwtstat)
 	Mongo.Find(bson.M{}).All(&container)
 	json.NewEncoder(w).Encode(container)
-	fmt.Println(container)
+	// fmt.Println(container)
 }
 
 func gogetgwdetail(w http.ResponseWriter, r *http.Request) {
@@ -393,7 +397,7 @@ func gogetgwdetail(w http.ResponseWriter, r *http.Request) {
 		for _, each2 := range container {
 
 			if each2.GWID[0:7] != each.GWID[0:7] {
-				fmt.Println(each2.GWID)
+				// fmt.Println(each2.GWID)
 				// continue
 				container3 = append(container3, each.MGWID)
 			}
@@ -408,8 +412,123 @@ func gogetgwdetail(w http.ResponseWriter, r *http.Request) {
 		}
 
 	}
-	fmt.Println(container5)
+	// fmt.Println(container5)
 	json.NewEncoder(w).Encode(container5)
+}
+
+type getAgg struct {
+	Timestamp  time.Time `json:"Timestamp" bson:"Timestamp"`
+	MACAddress string    `json:"MAC_Address" bson:"MAC_Address"`
+	GWID       string    `json:"GW_ID" bson:"GW_ID"`
+	// Metrics    Metrics   `json:"Metrics" bson:"Metrics"`
+	GET11 float64 `json:"pf_avg" bson:"pf_avg"`
+	GET12 float64 `json:"ae_tot" bson:"ae_tot"`
+	GET13 float64 `json:"p_sum" bson:"p_sum"`
+}
+
+type postAgg struct {
+	Start      *string `json:"Start" bson:"Start"`
+	Stop       *string `json:"Stop" bson:"Stop"`
+	MACAddress *string `json:"MAC_Address" bson:"MAC_Address"`
+}
+
+func gopostqueryHourly(w http.ResponseWriter, r *http.Request) {
+
+	headercontainer := postAgg{}
+
+	json.NewDecoder(r.Body).Decode(&headercontainer)
+
+	if *headercontainer.Start != "" && *headercontainer.Stop != "" {
+
+		start, e := time.ParseInLocation("2006-01-02T15", *headercontainer.Start, time.Local)
+		stop, er := time.ParseInLocation("2006-01-02T15", *headercontainer.Stop, time.Local)
+		diff := stop.Sub(start)
+
+		if e != nil || er != nil {
+			log.Println(e)
+			log.Println(er)
+		}
+		if diff <= time.Hour*24 {
+
+			container := []getAgg{}
+			sess := session.Clone()
+			defer sess.Close()
+
+			Mongo := sess.DB(db).C(c_hourly)
+			Mongo.Find(bson.M{"Timestamp": bson.M{"$gte": start, "$lte": stop}}).All(&container)
+			json.NewEncoder(w).Encode(container)
+			fmt.Println(diff)
+		} else {
+			WARNING := "Time more than 24 hours"
+			json.NewEncoder(w).Encode(WARNING)
+		}
+	}
+}
+
+func gopostqueryDaily(w http.ResponseWriter, r *http.Request) {
+
+	headercontainer := postAgg{}
+
+	json.NewDecoder(r.Body).Decode(&headercontainer)
+
+	if *headercontainer.Start != "" && *headercontainer.Stop != "" {
+
+		start, e := time.ParseInLocation("2006-01-02", *headercontainer.Start, time.Local)
+		stop, er := time.ParseInLocation("2006-01-02", *headercontainer.Stop, time.Local)
+		diff := stop.Sub(start)
+
+		if e != nil || er != nil {
+			log.Println(e)
+			log.Println(er)
+		}
+		if diff <= time.Hour*21*31 {
+
+			container := []getAgg{}
+			sess := session.Clone()
+			defer sess.Close()
+
+			Mongo := sess.DB(db).C(c_daily)
+			Mongo.Find(bson.M{"Timestamp": bson.M{"$gte": start, "$lte": stop}}).All(&container)
+			json.NewEncoder(w).Encode(container)
+			fmt.Println(diff)
+		} else {
+			WARNING := "Time more than 31 days"
+			json.NewEncoder(w).Encode(WARNING)
+		}
+	}
+}
+
+func gopostqueryMonthly(w http.ResponseWriter, r *http.Request) {
+
+	headercontainer := postAgg{}
+
+	json.NewDecoder(r.Body).Decode(&headercontainer)
+
+	if *headercontainer.Start != "" && *headercontainer.Stop != "" {
+
+		start, e := time.ParseInLocation("2006-01", *headercontainer.Start, time.Local)
+		stop, er := time.ParseInLocation("2006-01", *headercontainer.Stop, time.Local)
+		diff := stop.Sub(start)
+
+		if e != nil || er != nil {
+			log.Println(e)
+			log.Println(er)
+		}
+		if diff <= time.Hour*24*30*36 {
+
+			container := []getAgg{}
+			sess := session.Clone()
+			defer sess.Close()
+
+			Mongo := sess.DB(db).C(c_month)
+			Mongo.Find(bson.M{"Timestamp": bson.M{"$gte": start, "$lte": stop}}).All(&container)
+			json.NewEncoder(w).Encode(container)
+			fmt.Println(diff)
+		} else {
+			WARNING := "Time more than 36 months"
+			json.NewEncoder(w).Encode(WARNING)
+		}
+	}
 }
 
 // `````
@@ -417,6 +536,7 @@ func gogetgwdetail(w http.ResponseWriter, r *http.Request) {
 // `````
 
 func deviceState(w http.ResponseWriter, req *http.Request) {
+
 	vars := mux.Vars(req)
 	deviceID := vars["id"]
 	state := vars["state"]
@@ -432,7 +552,7 @@ func deviceState(w http.ResponseWriter, req *http.Request) {
 	url := "http://m10513020@gapps.ntust.edu.tw:Ntust27333141@140.118.19.197:7288/api/callAction?deviceID=" + deviceID + "&name=turn" + state
 
 	response, err := http.Get(url)
-	fmt.Println(response)
+	// fmt.Println(response)
 
 	if err != nil {
 
@@ -552,7 +672,7 @@ func thedeviceStatusRes(w http.ResponseWriter, req *http.Request) {
 		json.NewDecoder(response.Body).Decode(&record)
 		recordVal, _ := strconv.ParseBool(record.Properties.Value)
 		json.NewEncoder(w).Encode(checkState{State: recordVal})
-		fmt.Println(req.RemoteAddr)
+		// fmt.Println(req.RemoteAddr)
 		return
 	}
 
@@ -569,6 +689,10 @@ func main() {
 
 	router.HandleFunc("/meter/lastreport", gopostlastreport).Methods("POST")
 	router.HandleFunc("/meter/gwstat", gopostgwstat).Methods("POST")
+
+	router.HandleFunc("/meter/hourly", gopostqueryHourly).Methods("POST")
+	router.HandleFunc("/meter/daily", gopostqueryDaily).Methods("POST")
+	router.HandleFunc("/meter/monthly", gopostqueryMonthly).Methods("POST")
 
 	router.HandleFunc("/meter/lastreport", gogetlastreport).Methods("GET")
 	router.HandleFunc("/meter/devices", gogetDevices).Methods("GET")

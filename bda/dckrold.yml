@@ -29,14 +29,15 @@ services:
        - "POSTGRES_DB=kong"
     volumes:
        - /home/ubuntu/my-postgres.conf:/etc/postgresql/postgresql.conf
-
-    command: -c config_file=/etc/postgresql/postgresql.conf
-
+       - /var/lib/postgresql/data:/var/lib/postgresql/data
+       
     healthcheck:
-       test: ["CMD", "curl", "-f", "http://localhost:5432"]
-       interval: 1m30s
-       timeout: 10s
+#       test: ["CMD", "curl", "-f", "http://localhost:5432"]
+       test: ["CMD-SHELL","pg_isready -U postgres"]
+       interval: 10s
+       timeout: 5s
        retries: 3
+
 
 #  kong-database:
 #    image: cassandra:3
@@ -101,17 +102,87 @@ services:
 
   post:
     image: avbee/post
-    restart: always
     ports:
       - 8880:8080
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+    deploy:
+      resources:
+        limits:
+          #cpus: '0.50'
+          memory: 50M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
  
   get:
     image: avbee/get
-    restart: always
     ports:
       - 8881:8081
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+    deploy:
+      resources:
+        limits:
+          #cpus: '0.50'
+          memory: 50M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
 
   weather:
     image: avbee/weather
-    restart: always
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+    deploy:
+      resources:
+        limits:
+          #cpus: '0.50'
+          memory: 50M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
+
+  airboxpost:
+    image: avbee/airboxpost:0.9.0
+    restart: unless-stopped
+    ports:
+    - 8890:8090
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+
+    deploy:
+      resources:
+        limits:
+#          cpus: '0.50'
+          memory: 50M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
+
+
+  aggregate:
+    image: avbee/agg
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+
 

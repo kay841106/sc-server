@@ -25,7 +25,7 @@ const (
 	db_airbox = "airbox"
 	dblocal   = "172.16.0.132:27017"
 	dbpublic  = "140.118.70.136:10003"
-	dbleoass  = "140.118.123.95"
+	dbleoass  = "140.118.123.95:27017"
 	// c            = "testing"
 	c_lastreport = "lastreport"
 	c_aemdra     = "aemdra"
@@ -463,7 +463,7 @@ func getObjectIDTwoArg(GWID string, macID string, timestamp int64) bson.ObjectId
 	dst := hex.EncodeToString(b[:])
 	theid := bson.ObjectIdHex(dst)
 
-	fmt.Println(theid, uint32(timestamp))
+	// fmt.Println(theid, uint32(timestamp))
 	return theid
 
 }
@@ -587,7 +587,7 @@ func aemdraPost(w http.ResponseWriter, r *http.Request) {
 	}
 	// fmt.Println("init:", time.Unix(container.TimestampUnix, 0).UTC(), "crc:", time.Unix(recalcUnix(container.TimestampUnix), 0).UTC())
 	if GWAuth(containerSnd.GWID) == true {
-		fmt.Print(containerSnd.MACAddress)
+		// fmt.Print(containerSnd.MACAddress)
 		if MACAuth(containerSnd.MACAddress) == true {
 
 			// Mongo.C(c_lastreport).Upsert(bson.M{"MAC_Address": containerSnd.MACAddress}, containerSnd)
@@ -740,7 +740,7 @@ func cpmPost(w http.ResponseWriter, r *http.Request) {
 				fmt.Println(err)
 				json.NewEncoder(w).Encode(err)
 			}
-			fmt.Print(containerSnd)
+			// fmt.Print(containerSnd)
 			json.NewEncoder(w).Encode(containerSnd)
 
 			// declare the struct
@@ -760,7 +760,7 @@ func cpmPost(w http.ResponseWriter, r *http.Request) {
 			// get previous metric from db
 			err = Mongo.C(c_lastreport).Find(bson.M{"MAC_Address": Lastreportcontainer.MACAddress}).One(&getthemetrics)
 			if err != nil {
-				fmt.Println("false")
+				// fmt.Println(c"false")
 				json.NewEncoder(w).Encode(err)
 			}
 
@@ -795,11 +795,11 @@ func cpmPost(w http.ResponseWriter, r *http.Request) {
 func db_connect() {
 
 	dbInfo := &mgo.DialInfo{
-		Addrs:    strings.SplitN(dbleoass, ",", -1),
+		Addrs:    strings.SplitN(dblocal, ",", -1),
 		Database: "admin",
-		// Username: "dontask",
-		// Password: "idontknow",
-		Timeout: time.Second * 10,
+		Username: "dontask",
+		Password: "idontknow",
+		Timeout:  time.Second * 10,
 	}
 	session, _ = mgo.DialWithInfo(dbInfo)
 }
