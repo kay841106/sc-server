@@ -1,5 +1,7 @@
 version: '3'
 services:
+
+### Deprecated ###
 #  jupyter:
 #    image: avbee/jupynote-spark-pytorch
 #    environment:
@@ -18,7 +20,8 @@ services:
 #    ports:
 #       - 8081:8080
 #       - 50000:50000
- 
+
+
 #API GATEWAY PACKAGE
   kong-database:
     image: postgres:9.5
@@ -27,10 +30,18 @@ services:
     environment:
        - "POSTGRES_USER=kong"
        - "POSTGRES_DB=kong"
+<<<<<<< HEAD
     volumes:
        - /home/ubuntu/my-postgres.conf:/etc/postgresql/postgresql.conf
        - /var/lib/postgresql/data:/var/lib/postgresql/data
        
+=======
+
+### No conf file ###       
+#    volumes:
+#       - /home/ubuntu/my-postgres.conf:/etc/postgresql/postgresql.conf
+
+>>>>>>> 62b66d233a0c0a9e708d82f701a3d2a45e2f6aa2
     healthcheck:
 #       test: ["CMD", "curl", "-f", "http://localhost:5432"]
        test: ["CMD-SHELL","pg_isready -U postgres"]
@@ -43,7 +54,8 @@ services:
 #    image: cassandra:3
 #    ports:
 #       - 9042:9042
- 
+
+### Migration should be done manually once ###
 #  kong-migration:
 #    image: kong:0.13
 #    environment:
@@ -54,31 +66,31 @@ services:
 #       - kong-database:kong-database
 #    command: kong migrations up
 
+
   thekong:
-    image: kong:0.13
+    image: kong:0.14
     depends_on:
        - kong-database
 #       - kong-migration
-   
+    restart : unless-stopped
     environment:
        - "KONG_DATABASE=postgres"
        - "KONG_CASSANDRA_CONTACT_POINTS=kong-database"
        - "KONG_PG_HOST=kong-database"
        - "KONG_PROXY_ACCESS_LOG=/dev/stdout"
-       - "KONG_ADMIN_ACCESS_LOG=/dev/stdout"
-       - "KONG_PROXY_ERROR_LOG=/dev/stderr"
+      - "KONG_PROXY_ERROR_LOG=/dev/stderr"
        - "KONG_ADMIN_ERROR_LOG=/dev/stderr"
-       - "KONG_ADMIN_LISTEN=0.0.0.0:8001" 
+       - "KONG_ADMIN_LISTEN=0.0.0.0:8001"
        - "KONG_ADMIN_LISTEN_SSL=0.0.0.0:8444"
 
-    volumes:
-      - /opt/kong:/etc/kong
+#    volumes:
+#      - /opt/kong:/etc/kong
     ports:
        - 8000:8000
        - 8443:8443
        - 8001:8001
        - 8444:8444
-    links: 
+    links:
        - kong-database:kong-database
 
   kong-dashboard:
@@ -102,14 +114,22 @@ services:
 
   post:
     image: avbee/post
+<<<<<<< HEAD
     ports:
       - 8880:8080
     restart: unless-stopped
+=======
+    restart: unless-stopped
+    ports:
+      - 8880:8080
+      
+>>>>>>> 62b66d233a0c0a9e708d82f701a3d2a45e2f6aa2
     logging:
       driver: "json-file"
       options:
         max-size: "200k"
         max-file: "10"
+<<<<<<< HEAD
     deploy:
       resources:
         limits:
@@ -124,11 +144,27 @@ services:
     ports:
       - 8881:8081
     restart: unless-stopped
+=======
+
+  get:
+    image: avbee/get
+    restart: unless-stopped
+    ports:
+      - 8881:8081
+      
     logging:
       driver: "json-file"
       options:
         max-size: "200k"
         max-file: "10"
+      
+>>>>>>> 62b66d233a0c0a9e708d82f701a3d2a45e2f6aa2
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+<<<<<<< HEAD
     deploy:
       resources:
         limits:
@@ -137,10 +173,13 @@ services:
         reservations:
           cpus: '0.25'
           memory: 20M
+=======
+>>>>>>> 62b66d233a0c0a9e708d82f701a3d2a45e2f6aa2
 
   weather:
     image: avbee/weather
     restart: unless-stopped
+<<<<<<< HEAD
     logging:
       driver: "json-file"
       options:
@@ -185,4 +224,17 @@ services:
         max-size: "200k"
         max-file: "10"
 
+=======
+>>>>>>> 62b66d233a0c0a9e708d82f701a3d2a45e2f6aa2
 
+  airboxpost:
+    image: avbee/airboxpost
+    restart: unless-stopped
+    ports:
+    - 8890:8090
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+       
