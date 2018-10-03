@@ -455,7 +455,7 @@ func gopostqueryHourly(w http.ResponseWriter, r *http.Request) {
 			defer sess.Close()
 
 			Mongo := sess.DB(db).C(c_hourly)
-			Mongo.Find(bson.M{"Timestamp": bson.M{"$gte": start, "$lte": stop}}).All(&container)
+			Mongo.Find(bson.M{"MAC_Address": *headercontainer.MACAddress, "Timestamp": bson.M{"$gte": start, "$lte": stop}}).All(&container)
 			json.NewEncoder(w).Encode(container)
 			fmt.Println(diff)
 		} else {
@@ -488,7 +488,7 @@ func gopostqueryDaily(w http.ResponseWriter, r *http.Request) {
 			defer sess.Close()
 
 			Mongo := sess.DB(db).C(c_daily)
-			Mongo.Find(bson.M{"Timestamp": bson.M{"$gte": start, "$lte": stop}}).All(&container)
+			Mongo.Find(bson.M{"MAC_Address": *headercontainer.MACAddress, "Timestamp": bson.M{"$gte": start, "$lte": stop}}).All(&container)
 			json.NewEncoder(w).Encode(container)
 			fmt.Println(diff)
 		} else {
@@ -521,7 +521,7 @@ func gopostqueryMonthly(w http.ResponseWriter, r *http.Request) {
 			defer sess.Close()
 
 			Mongo := sess.DB(db).C(c_month)
-			Mongo.Find(bson.M{"Timestamp": bson.M{"$gte": start, "$lte": stop}}).All(&container)
+			Mongo.Find(bson.M{"MAC_Address": *headercontainer.MACAddress, "Timestamp": bson.M{"$gte": start, "$lte": stop}}).All(&container)
 			json.NewEncoder(w).Encode(container)
 			fmt.Println(diff)
 		} else {

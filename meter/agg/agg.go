@@ -695,13 +695,12 @@ func init() {
 func main() {
 
 	c := cron.New()
-	fmt.Print("aa")
-	// c.AddFunc("@every 10s", aggHour)
-	aggDay()
+	fmt.Print("start")
 
-	// c.AddFunc("@hourly", aggHour)
-	// c.AddFunc("@daily", aggDay)
-	// c.AddFunc("@monthly", aggMonth)
+	c.AddFunc("@hourly", aggHour)
+	c.AddFunc("@daily", aggDay)
+	c.AddFunc("@monthly", aggMonth)
+
 	fmt.Println("end")
 	c.Start()
 	select {}
