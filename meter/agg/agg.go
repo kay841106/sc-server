@@ -34,33 +34,11 @@ const (
 	c_day        = "day"
 	c_month      = "month"
 
-	displayDataCalcCollection = "SC01_displayData_Calc_"
-	displayDataCollection     = "SC01_displayData_"
-	hourCollection            = "SC01_hour_All"
-	dayCollection             = "SC01_day_All"
-	monthCollection           = "SC01_month_All"
-	_EMPTYDEST                = "DESTINATION IS EMPTY"
-	_AGG                      = "AGGREGATION ->"
-	_NEC                      = "NON_EMPTY_COLL"
-	_EOF                      = "END_OF_FILE"
+	_EMPTYDEST = "DESTINATION IS EMPTY"
+	_AGG       = "AGGREGATION ->"
+	_NEC       = "NON_EMPTY_COLL"
+	_EOF       = "END_OF_FILE"
 
-	streamCollection    = "SC01_Stream"
-	statusCollection    = "SC01_Status"
-	streamAllCollection = "SC01_Stream_All"
-
-	coll = "SC01_displayData_Calc_"
-	//collAll = "SC01_displayData_All"
-
-	collHour         = "SC01_hour_All"
-	lookupHourOnTime = "SC01_hour_All"
-
-	collDay         = "SC01_day_All"
-	lookupDayOnTime = "SC01_day_All"
-
-	collMonth         = "SC01_month_All"
-	lookupMonthOnTime = "SC01_month_All"
-
-	CdevMan = "SC01_DeviceManager"
 	// weatherCollection = "SC01_Weather1"
 
 )
@@ -124,6 +102,7 @@ func pipeDeviceHour(start time.Time, devID string) []bson.M {
 				}, "MAC_Address": devID,
 			},
 		}}
+
 	pipeline = append(pipeline, bson.M{
 
 		"$group": bson.M{
@@ -137,7 +116,7 @@ func pipeDeviceHour(start time.Time, devID string) []bson.M {
 			"Timestamp": bson.M{"$last": "$Timestamp"},
 			"max_val":   bson.M{"$avg": "$ae_tot"},
 			"min_val":   bson.M{"$min": "$ae_tot"},
-			"pf_avg":    bson.M{"$abs": bson.M{"$avg": "$pf_avg"}},
+			"pf_avg":    bson.M{"$avg": "$pf_avg"},
 			"p_sum":     bson.M{"$avg": "$p_sum"},
 		},
 	})
@@ -152,6 +131,8 @@ func pipeDeviceHour(start time.Time, devID string) []bson.M {
 			"Timestamp": 1,
 
 			"pf_avg": 1,
+			"p_sum":  1,
+
 			"ae_tot": bson.M{"$subtract": []interface{}{"$max_val", "$min_val"}},
 		},
 	})
@@ -223,6 +204,7 @@ func pipeDeviceDay(start time.Time, devID string) []bson.M {
 				}, "MAC_Address": devID,
 			},
 		}}
+
 	pipeline = append(pipeline, bson.M{
 
 		"$group": bson.M{
@@ -236,7 +218,7 @@ func pipeDeviceDay(start time.Time, devID string) []bson.M {
 			"Timestamp": bson.M{"$last": "$Timestamp"},
 			"max_val":   bson.M{"$avg": "$ae_tot"},
 			"min_val":   bson.M{"$min": "$ae_tot"},
-			"pf_avg":    bson.M{"$abs": bson.M{"$avg": "$pf_avg"}},
+			"pf_avg":    bson.M{"$avg": "$pf_avg"},
 			"p_sum":     bson.M{"$avg": "$p_sum"},
 		},
 	})
@@ -251,6 +233,8 @@ func pipeDeviceDay(start time.Time, devID string) []bson.M {
 			"Timestamp": 1,
 
 			"pf_avg": 1,
+			"p_sum":  1,
+
 			"ae_tot": bson.M{"$subtract": []interface{}{"$max_val", "$min_val"}},
 		},
 	})
@@ -322,6 +306,7 @@ func pipeDeviceMonth(start time.Time, devID string) []bson.M {
 				}, "MAC_Address": devID,
 			},
 		}}
+
 	pipeline = append(pipeline, bson.M{
 
 		"$group": bson.M{
@@ -335,7 +320,7 @@ func pipeDeviceMonth(start time.Time, devID string) []bson.M {
 			"Timestamp": bson.M{"$last": "$Timestamp"},
 			"max_val":   bson.M{"$avg": "$ae_tot"},
 			"min_val":   bson.M{"$min": "$ae_tot"},
-			"pf_avg":    bson.M{"$abs": bson.M{"$avg": "$pf_avg"}},
+			"pf_avg":    bson.M{"$avg": "$pf_avg"},
 			"p_sum":     bson.M{"$avg": "$p_sum"},
 		},
 	})
@@ -350,6 +335,8 @@ func pipeDeviceMonth(start time.Time, devID string) []bson.M {
 			"Timestamp": 1,
 
 			"pf_avg": 1,
+			"p_sum":  1,
+
 			"ae_tot": bson.M{"$subtract": []interface{}{"$max_val", "$min_val"}},
 		},
 	})
@@ -389,19 +376,8 @@ func checkDBStatus() bool {
 		time.Sleep(5 * time.Second)
 		session.Refresh()
 	}
+	fmt.Println("DB GOOD")
 	return true
-}
-
-func init() {
-
-	dbInfo := &mgo.DialInfo{
-		Addrs:    strings.SplitN(dblocal, ",", -1),
-		Database: "admin",
-		Username: "dontask",
-		Password: "idontknow",
-		Timeout:  time.Second * 2,
-	}
-	session, _ = mgo.DialWithInfo(dbInfo)
 }
 
 func getObjectIDTwoArg(GWID string, macID string, timestamp int64) bson.ObjectId {
@@ -443,9 +419,10 @@ func getObjectIDTwoArg(GWID string, macID string, timestamp int64) bson.ObjectId
 }
 
 func aggHour() {
+	// fmt.Println("ASU")
 
 	if checkDBStatus(); true {
-
+		// fmt.Println("Aaaaaaa")
 		var cont []aggHourStruct
 		contdata := cont
 		thetempstructs := []tempstruct{}
@@ -455,11 +432,11 @@ func aggHour() {
 
 		qu := session.DB(db)
 		qu.C(c_devices).Find(nil).Distinct("MAC_Address", &containerdevMan)
-
+		// fmt.Println(containerdevMan)
 		for _, one := range containerdevMan {
 
 			count, _ := qu.C(c_hour).Find(bson.M{"MAC_Address": one.(string)}).Count()
-
+			fmt.Println("COUNT = ", count)
 			if count != 0 {
 				err := qu.C(c_hour).Find(bson.M{"MAC_Address": one.(string)}).Limit(1).Sort("-Timestamp").All(&tempstructs)
 				fmt.Print(tempstructs)
@@ -467,7 +444,9 @@ func aggHour() {
 					fmt.Print(err)
 				}
 				for _, two := range tempstructs {
+					fmt.Println("timestamp=", two.Timestamp)
 					err := qu.C(c_cpm).Pipe(pipeDeviceHour(two.Timestamp, one.(string))).All(&contdata)
+
 					for _, each := range contdata {
 						if (each.Timestamp != time.Time{}) {
 
@@ -480,11 +459,13 @@ func aggHour() {
 								fmt.Print(err)
 							}
 						}
-						fmt.Print(each)
+						fmt.Println(each)
 						contdata = cont
 
 					}
 
+					// time.Sleep(time.Second * 1)
+					fmt.Println("AEM_DRA")
 					err = qu.C(c_aemdra).Pipe(pipeDeviceHour(two.Timestamp, one.(string))).All(&contdata)
 					for _, each := range contdata {
 						if (each.Timestamp != time.Time{}) {
@@ -498,7 +479,7 @@ func aggHour() {
 								fmt.Print(err)
 							}
 						}
-						fmt.Print(each)
+						fmt.Println(each)
 						contdata = cont
 
 					}
@@ -699,15 +680,29 @@ func SetTimeStampForMonth(theTime time.Time) time.Time {
 	return time.Date(year, month, 1, 0, 0, 0, 0, time.Local)
 }
 
+func init() {
+
+	dbInfo := &mgo.DialInfo{
+		Addrs:    strings.SplitN(dbpublic, ",", -1),
+		Database: "admin",
+		Username: "dontask",
+		Password: "idontknow",
+		Timeout:  time.Second * 2,
+	}
+	session, _ = mgo.DialWithInfo(dbInfo)
+}
+
 func main() {
 
 	c := cron.New()
+	fmt.Print("aa")
+	// c.AddFunc("@every 10s", aggHour)
+	aggDay()
 
-	c.AddFunc("@hourly", aggHour)
-	c.AddFunc("@daily", aggDay)
-	c.AddFunc("@monthly", aggMonth)
-
+	// c.AddFunc("@hourly", aggHour)
+	// c.AddFunc("@daily", aggDay)
+	// c.AddFunc("@monthly", aggMonth)
+	fmt.Println("end")
 	c.Start()
 	select {}
-
 }
