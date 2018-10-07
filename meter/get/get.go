@@ -3,8 +3,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -37,8 +39,8 @@ const (
 
 var session *mgo.Session
 
-func db_connect() {
-
+func dbConnect() {
+	var err error
 	dbInfo := &mgo.DialInfo{
 		Addrs:    strings.SplitN(dblocal, ",", -1),
 		Database: "admin",
@@ -46,7 +48,13 @@ func db_connect() {
 		Password: "idontknow",
 		Timeout:  time.Second * 10,
 	}
-	session, _ = mgo.DialWithInfo(dbInfo)
+
+	session, err = mgo.DialWithInfo(dbInfo)
+
+	if err != nil {
+		os.Exit(1)
+	}
+
 }
 
 type CPMSnd struct {
@@ -131,6 +139,7 @@ func gopostgwstat(w http.ResponseWriter, r *http.Request) {
 	// fmt.Println(headercontainer)
 	container := []gwstat{}
 	sess := session.Clone()
+
 	defer sess.Close()
 
 	Mongo := sess.DB(db).C(c_gwtstat)
@@ -866,6 +875,7 @@ func validator(w http.ResponseWriter, r *http.Request) {
 }
 
 func AddDev(w http.ResponseWriter, req *http.Request) {
+
 	log.Println("AddDev")
 
 	// tokenString := req.Header.Get("authorization")
@@ -898,16 +908,45 @@ func AddDev(w http.ResponseWriter, req *http.Request) {
 	// }
 }
 
+func checkDBStatus() bool {
+	err := session.Ping()
+	for err != nil {
+		log.Println("Connection to DB is down, restarting ....")
+		session.Close()
+		time.Sleep(5 * time.Second)
+		session.Refresh()
+	}
+	fmt.Println("DB GOOD")
+	return true
+}
+
+func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
+	if checkDBStatus(); true {
+		// A very simple health .
+		w.WriteHeader(http.StatusOK)
+		w.Header().Set("Content-Type", "application/json")
+		sess := session.Clone()
+		aa := sess.LiveServers()
+		fmt.Println(aa)
+
+		// In the future we could report back on the status of our DB, or our cache
+		// (e.g. Redis) by performing a simple PING, and include them in the response.
+		io.WriteString(w, `{"alive": true}`)
+	}
+}
+
 // ```
 // MAIN
 // ```
 
 func main() {
 
-	db_connect()
+	dbConnect()
 	// auth.GenAuth()
 	router := mux.NewRouter()
 
+	// HEALTHCHECK
+	router.HandleFunc("/health", HealthCheckHandler).Methods("GET")
 	// additional API for query all buildings data
 	router.HandleFunc("/meter/lastreport/allbuilding", gopostlastreportAllBuilding).Methods("GET")
 
