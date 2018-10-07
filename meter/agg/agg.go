@@ -147,11 +147,12 @@ func pipeDeviceHour(start time.Time, devID string) []bson.M {
 	return pipeline
 }
 
-func pipeDeviceDayWhole(devID string) []bson.M {
+func pipeDeviceDayWhole(stop time.Time, devID string) []bson.M {
 	pipeline := []bson.M{
 		bson.M{
 			"$match": bson.M{
 				"MAC_Address": devID,
+				"Timestamp":   bson.M{"$lte": stop},
 			}}}
 
 	pipeline = append(pipeline, bson.M{
@@ -165,10 +166,14 @@ func pipeDeviceDayWhole(devID string) []bson.M {
 				"day":  bson.M{"$dayOfYear": "$Timestamp"},
 			},
 			"Timestamp": bson.M{"$last": "$Timestamp"},
-			"max_val":   bson.M{"$avg": "$ae_tot"},
-			"min_val":   bson.M{"$min": "$ae_tot"},
-			"pf_avg":    bson.M{"$avg": "$pf_avg"},
-			"p_sum":     bson.M{"$avg": "$p_sum"},
+
+			// // Below is wrong aggregation. This is used if query data from rawdata collection. Get MAX and MIN
+			// "max_val":   bson.M{"$max": "$ae_tot"},
+			// "min_val":   bson.M{"$min": "$ae_tot"},
+
+			"ae_tot": bson.M{"$sum": "$ae_tot"},
+			"pf_avg": bson.M{"$avg": "$pf_avg"},
+			"p_sum":  bson.M{"$avg": "$p_sum"},
 		},
 	})
 
@@ -183,8 +188,10 @@ func pipeDeviceDayWhole(devID string) []bson.M {
 
 			"pf_avg": 1,
 			"p_sum":  1,
+			"ae_tot": 1,
+			// // Below is wrong aggregation. This is used if query data from rawdata collection. Get MAX and MIN
+			// "ae_tot": bson.M{"$subtract": []interface{}{"$max_val", "$min_val"}},
 
-			"ae_tot": bson.M{"$subtract": []interface{}{"$max_val", "$min_val"}},
 		},
 	})
 
@@ -196,13 +203,14 @@ func pipeDeviceDayWhole(devID string) []bson.M {
 	return pipeline
 }
 
-func pipeDeviceDay(start time.Time, devID string) []bson.M {
+func pipeDeviceDay(start time.Time, stop time.Time, devID string) []bson.M {
 
 	pipeline := []bson.M{
 		bson.M{
 			"$match": bson.M{
 				"Timestamp": bson.M{
-					"$gt": start,
+					"$gt":  start,
+					"$lte": stop,
 				}, "MAC_Address": devID,
 			},
 		}}
@@ -218,10 +226,14 @@ func pipeDeviceDay(start time.Time, devID string) []bson.M {
 				"day":  bson.M{"$dayOfYear": "$Timestamp"},
 			},
 			"Timestamp": bson.M{"$last": "$Timestamp"},
-			"max_val":   bson.M{"$avg": "$ae_tot"},
-			"min_val":   bson.M{"$min": "$ae_tot"},
-			"pf_avg":    bson.M{"$avg": "$pf_avg"},
-			"p_sum":     bson.M{"$avg": "$p_sum"},
+
+			// // Below is wrong aggregation. This is used if query data from rawdata collection. Get MAX and MIN
+			// "max_val":   bson.M{"$max": "$ae_tot"},
+			// "min_val":   bson.M{"$min": "$ae_tot"},
+
+			"ae_tot": bson.M{"$sum": "$ae_tot"},
+			"pf_avg": bson.M{"$avg": "$pf_avg"},
+			"p_sum":  bson.M{"$avg": "$p_sum"},
 		},
 	})
 
@@ -236,8 +248,11 @@ func pipeDeviceDay(start time.Time, devID string) []bson.M {
 
 			"pf_avg": 1,
 			"p_sum":  1,
+			"ae_tot": 1,
 
-			"ae_tot": bson.M{"$subtract": []interface{}{"$max_val", "$min_val"}},
+			// // Below is wrong aggregation. This is used if query data from rawdata collection. Get MAX and MIN
+			// "ae_tot": bson.M{"$subtract": []interface{}{"$max_val", "$min_val"}},
+
 		},
 	})
 
@@ -249,11 +264,12 @@ func pipeDeviceDay(start time.Time, devID string) []bson.M {
 	return pipeline
 }
 
-func pipeDeviceMonthWhole(devID string) []bson.M {
+func pipeDeviceMonthWhole(stop time.Time, devID string) []bson.M {
 	pipeline := []bson.M{
 		bson.M{
 			"$match": bson.M{
 				"MAC_Address": devID,
+				"Timestamp":   bson.M{"$lte": stop},
 			}}}
 
 	pipeline = append(pipeline, bson.M{
@@ -267,10 +283,13 @@ func pipeDeviceMonthWhole(devID string) []bson.M {
 				"month": bson.M{"$month": "$Timestamp"},
 			},
 			"Timestamp": bson.M{"$last": "$Timestamp"},
-			"max_val":   bson.M{"$avg": "$ae_tot"},
-			"min_val":   bson.M{"$min": "$ae_tot"},
-			"pf_avg":    bson.M{"$avg": "$pf_avg"},
-			"p_sum":     bson.M{"$avg": "$p_sum"},
+			// // Below is wrong aggregation. This is used if query data from rawdata collection. Get MAX and MIN
+			// "max_val":   bson.M{"$max": "$ae_tot"},
+			// "min_val":   bson.M{"$min": "$ae_tot"},
+
+			"ae_tot": bson.M{"$sum": "$ae_tot"},
+			"pf_avg": bson.M{"$avg": "$pf_avg"},
+			"p_sum":  bson.M{"$avg": "$p_sum"},
 		},
 	})
 
@@ -286,7 +305,10 @@ func pipeDeviceMonthWhole(devID string) []bson.M {
 			"pf_avg": 1,
 			"p_sum":  1,
 
-			"ae_tot": bson.M{"$subtract": []interface{}{"$max_val", "$min_val"}},
+			"ae_tot": 1,
+
+			// // Below is wrong aggregation. This is used if query data from rawdata collection. Get MAX and MIN
+			// "ae_tot": bson.M{"$subtract": []interface{}{"$max_val", "$min_val"}},
 		},
 	})
 
@@ -298,13 +320,14 @@ func pipeDeviceMonthWhole(devID string) []bson.M {
 	return pipeline
 }
 
-func pipeDeviceMonth(start time.Time, devID string) []bson.M {
+func pipeDeviceMonth(start time.Time, stop time.Time, devID string) []bson.M {
 
 	pipeline := []bson.M{
 		bson.M{
 			"$match": bson.M{
 				"Timestamp": bson.M{
-					"$gt": start,
+					"$gt":  start,
+					"$lte": stop,
 				}, "MAC_Address": devID,
 			},
 		}}
@@ -320,10 +343,13 @@ func pipeDeviceMonth(start time.Time, devID string) []bson.M {
 				"month": bson.M{"$month": "$Timestamp"},
 			},
 			"Timestamp": bson.M{"$last": "$Timestamp"},
-			"max_val":   bson.M{"$avg": "$ae_tot"},
-			"min_val":   bson.M{"$min": "$ae_tot"},
-			"pf_avg":    bson.M{"$avg": "$pf_avg"},
-			"p_sum":     bson.M{"$avg": "$p_sum"},
+			// // Below is wrong aggregation. This is used if query data from rawdata collection. Get MAX and MIN
+			// "max_val":   bson.M{"$max": "$ae_tot"},
+			// "min_val":   bson.M{"$min": "$ae_tot"},
+
+			"ae_tot": bson.M{"$sum": "$ae_tot"},
+			"pf_avg": bson.M{"$avg": "$pf_avg"},
+			"p_sum":  bson.M{"$avg": "$p_sum"},
 		},
 	})
 
@@ -339,7 +365,10 @@ func pipeDeviceMonth(start time.Time, devID string) []bson.M {
 			"pf_avg": 1,
 			"p_sum":  1,
 
-			"ae_tot": bson.M{"$subtract": []interface{}{"$max_val", "$min_val"}},
+			"ae_tot": 1,
+
+			// // Below is wrong aggregation. This is used if query data from rawdata collection. Get MAX and MIN
+			// "ae_tot": bson.M{"$subtract": []interface{}{"$max_val", "$min_val"}},
 		},
 	})
 
@@ -552,7 +581,7 @@ func aggDay() {
 					fmt.Print(err)
 				}
 				for _, two := range tempstructs {
-					err := qu.C(c_hour).Pipe(pipeDeviceDay(two.Timestamp, one.(string))).All(&contdata)
+					err := qu.C(c_hour).Pipe(pipeDeviceDay(two.Timestamp, SetTimeStampForDay(time.Now()), one.(string))).All(&contdata)
 					for _, each := range contdata {
 						if (each.Timestamp != time.Time{}) {
 
@@ -572,7 +601,7 @@ func aggDay() {
 				}
 				tempstructs = thetempstructs
 			} else {
-				err := qu.C(c_hour).Pipe(pipeDeviceDayWhole(one.(string))).All(&contdata)
+				err := qu.C(c_hour).Pipe(pipeDeviceDayWhole(SetTimeStampForDay(time.Now()), one.(string))).All(&contdata)
 				for _, each := range contdata {
 					if (each.Timestamp != time.Time{}) {
 
@@ -620,7 +649,7 @@ func aggMonth() {
 					fmt.Print(err)
 				}
 				for _, two := range tempstructs {
-					err := qu.C(c_day).Pipe(pipeDeviceMonth(two.Timestamp, one.(string))).All(&contdata)
+					err := qu.C(c_day).Pipe(pipeDeviceMonth(two.Timestamp, SetTimeStampForMonth(time.Now()), one.(string))).All(&contdata)
 					for _, each := range contdata {
 						if (each.Timestamp != time.Time{}) {
 
@@ -640,7 +669,7 @@ func aggMonth() {
 				}
 				tempstructs = thetempstructs
 			} else {
-				err := qu.C(c_day).Pipe(pipeDeviceMonthWhole(one.(string))).All(&contdata)
+				err := qu.C(c_day).Pipe(pipeDeviceMonthWhole(SetTimeStampForMonth(time.Now()), one.(string))).All(&contdata)
 				for _, each := range contdata {
 					if (each.Timestamp != time.Time{}) {
 
@@ -712,7 +741,8 @@ func main() {
 	// select {}
 
 	// // DEBUG
-	// aggHour()
+	// aggMonth()
+	// sig := make(chan os.Signal)
 	// signal.Notify(sig, os.Interrupt, os.Kill)
 	// <-sig
 }
