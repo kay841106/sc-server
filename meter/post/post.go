@@ -795,7 +795,7 @@ func cpmPost(w http.ResponseWriter, r *http.Request) {
 func db_connect() {
 
 	dbInfo := &mgo.DialInfo{
-		Addrs:    strings.SplitN(dblocal, ",", -1),
+		Addrs:    strings.SplitN(dbpublic, ",", -1),
 		Database: "admin",
 		Username: "dontask",
 		Password: "idontknow",

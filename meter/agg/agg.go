@@ -6,6 +6,8 @@ import (
 	"encoding/hex"
 	"fmt"
 	"log"
+	"os"
+	"os/signal"
 	"strings"
 	"time"
 
@@ -61,7 +63,7 @@ func pipeDeviceHourWhole(devID string) []bson.M {
 				"day":         bson.M{"$dayOfYear": "$Timestamp"},
 			},
 			"Timestamp": bson.M{"$last": "$Timestamp"},
-			"max_val":   bson.M{"$avg": "$ae_tot"},
+			"max_val":   bson.M{"$max": "$ae_tot"},
 			"min_val":   bson.M{"$min": "$ae_tot"},
 			"pf_avg":    bson.M{"$avg": "$pf_avg"},
 			"p_sum":     bson.M{"$avg": "$p_sum"},
@@ -683,7 +685,7 @@ func SetTimeStampForMonth(theTime time.Time) time.Time {
 func init() {
 
 	dbInfo := &mgo.DialInfo{
-		Addrs:    strings.SplitN(dbpublic, ",", -1),
+		Addrs:    strings.SplitN(dblocal, ",", -1),
 		Database: "admin",
 		Username: "dontask",
 		Password: "idontknow",
@@ -695,13 +697,22 @@ func init() {
 func main() {
 
 	c := cron.New()
+
 	fmt.Print("start")
 
 	c.AddFunc("@hourly", aggHour)
 	c.AddFunc("@daily", aggDay)
 	c.AddFunc("@monthly", aggMonth)
 
+	go c.Start()
+	sig := make(chan os.Signal)
 	fmt.Println("end")
-	c.Start()
-	select {}
+	signal.Notify(sig, os.Interrupt, os.Kill)
+	<-sig
+	// select {}
+
+	// // DEBUG
+	// aggHour()
+	// signal.Notify(sig, os.Interrupt, os.Kill)
+	// <-sig
 }
