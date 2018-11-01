@@ -1,0 +1,596 @@
+UID        PID  PPID  C STIME TTY          TIME CMD
+root         1     0  0 Oct29 ?        00:00:10 /sbin/init
+root         2     0  0 Oct29 ?        00:00:00 [kthreadd]
+root         3     2  0 Oct29 ?        00:00:06 [ksoftirqd/0]
+root         5     2  0 Oct29 ?        00:00:00 [kworker/0:0H]
+root         8     2  0 Oct29 ?        00:11:53 [rcu_sched]
+root         9     2  0 Oct29 ?        00:00:00 [rcu_bh]
+root        10     2  0 Oct29 ?        00:00:22 [migration/0]
+root        11     2  0 Oct29 ?        00:00:01 [watchdog/0]
+root        12     2  0 Oct29 ?        00:00:01 [watchdog/1]
+root        13     2  0 Oct29 ?        00:00:18 [migration/1]
+root        14     2  0 Oct29 ?        00:00:10 [ksoftirqd/1]
+root        16     2  0 Oct29 ?        00:00:00 [kworker/1:0H]
+root        17     2  0 Oct29 ?        00:00:01 [watchdog/2]
+root        18     2  0 Oct29 ?        00:00:16 [migration/2]
+root        19     2  0 Oct29 ?        00:00:09 [ksoftirqd/2]
+root        21     2  0 Oct29 ?        00:00:00 [kworker/2:0H]
+root        22     2  0 Oct29 ?        00:00:01 [watchdog/3]
+root        23     2  0 Oct29 ?        00:00:15 [migration/3]
+root        24     2  0 Oct29 ?        00:00:09 [ksoftirqd/3]
+root        26     2  0 Oct29 ?        00:00:00 [kworker/3:0H]
+root        27     2  0 Oct29 ?        00:00:01 [watchdog/4]
+root        28     2  0 Oct29 ?        00:00:14 [migration/4]
+root        29     2  0 Oct29 ?        00:00:08 [ksoftirqd/4]
+root        31     2  0 Oct29 ?        00:00:00 [kworker/4:0H]
+root        32     2  0 Oct29 ?        00:00:01 [watchdog/5]
+root        33     2  0 Oct29 ?        00:00:14 [migration/5]
+root        34     2  0 Oct29 ?        00:00:09 [ksoftirqd/5]
+root        36     2  0 Oct29 ?        00:00:00 [kworker/5:0H]
+root        37     2  0 Oct29 ?        00:00:01 [watchdog/6]
+root        38     2  0 Oct29 ?        00:00:13 [migration/6]
+root        39     2  0 Oct29 ?        00:00:08 [ksoftirqd/6]
+root        41     2  0 Oct29 ?        00:00:00 [kworker/6:0H]
+root        42     2  0 Oct29 ?        00:00:01 [watchdog/7]
+root        43     2  0 Oct29 ?        00:00:13 [migration/7]
+root        44     2  0 Oct29 ?        00:00:09 [ksoftirqd/7]
+root        46     2  0 Oct29 ?        00:00:00 [kworker/7:0H]
+root        47     2  0 Oct29 ?        00:00:01 [watchdog/8]
+root        48     2  0 Oct29 ?        00:00:23 [migration/8]
+root        49     2  0 Oct29 ?        00:00:04 [ksoftirqd/8]
+root        51     2  0 Oct29 ?        00:00:00 [kworker/8:0H]
+root        53     2  0 Oct29 ?        00:00:01 [watchdog/9]
+root        54     2  0 Oct29 ?        00:00:21 [migration/9]
+root        55     2  0 Oct29 ?        00:00:04 [ksoftirqd/9]
+root        57     2  0 Oct29 ?        00:00:00 [kworker/9:0H]
+root        58     2  0 Oct29 ?        00:00:01 [watchdog/10]
+root        59     2  0 Oct29 ?        00:00:19 [migration/10]
+root        60     2  0 Oct29 ?        00:00:04 [ksoftirqd/10]
+root        62     2  0 Oct29 ?        00:00:00 [kworker/10:0H]
+root        63     2  0 Oct29 ?        00:00:01 [watchdog/11]
+root        64     2  0 Oct29 ?        00:00:18 [migration/11]
+root        65     2  0 Oct29 ?        00:00:04 [ksoftirqd/11]
+root        67     2  0 Oct29 ?        00:00:00 [kworker/11:0H]
+root        68     2  0 Oct29 ?        00:00:01 [watchdog/12]
+root        69     2  0 Oct29 ?        00:00:18 [migration/12]
+root        70     2  0 Oct29 ?        00:00:04 [ksoftirqd/12]
+root        72     2  0 Oct29 ?        00:00:00 [kworker/12:0H]
+root        73     2  0 Oct29 ?        00:00:01 [watchdog/13]
+root        74     2  0 Oct29 ?        00:00:17 [migration/13]
+root        75     2  0 Oct29 ?        00:00:04 [ksoftirqd/13]
+root        77     2  0 Oct29 ?        00:00:00 [kworker/13:0H]
+root        78     2  0 Oct29 ?        00:00:01 [watchdog/14]
+root        79     2  0 Oct29 ?        00:00:17 [migration/14]
+root        80     2  0 Oct29 ?        00:00:04 [ksoftirqd/14]
+root        82     2  0 Oct29 ?        00:00:00 [kworker/14:0H]
+root        83     2  0 Oct29 ?        00:00:01 [watchdog/15]
+root        84     2  0 Oct29 ?        00:00:17 [migration/15]
+root        85     2  0 Oct29 ?        00:00:04 [ksoftirqd/15]
+root        87     2  0 Oct29 ?        00:00:00 [kworker/15:0H]
+root        88     2  0 Oct29 ?        00:00:01 [watchdog/16]
+root        89     2  0 Oct29 ?        00:00:06 [migration/16]
+root        90     2  0 Oct29 ?        00:00:04 [ksoftirqd/16]
+root        92     2  0 Oct29 ?        00:00:00 [kworker/16:0H]
+root        93     2  0 Oct29 ?        00:00:01 [watchdog/17]
+root        94     2  0 Oct29 ?        00:00:06 [migration/17]
+root        95     2  0 Oct29 ?        00:00:00 [ksoftirqd/17]
+root        97     2  0 Oct29 ?        00:00:00 [kworker/17:0H]
+root        98     2  0 Oct29 ?        00:00:00 [watchdog/18]
+root        99     2  0 Oct29 ?        00:00:07 [migration/18]
+root       100     2  0 Oct29 ?        00:00:00 [ksoftirqd/18]
+root       102     2  0 Oct29 ?        00:00:00 [kworker/18:0H]
+root       103     2  0 Oct29 ?        00:00:00 [watchdog/19]
+root       104     2  0 Oct29 ?        00:00:06 [migration/19]
+root       105     2  0 Oct29 ?        00:00:00 [ksoftirqd/19]
+root       107     2  0 Oct29 ?        00:00:00 [kworker/19:0H]
+root       108     2  0 Oct29 ?        00:00:00 [watchdog/20]
+root       109     2  0 Oct29 ?        00:00:06 [migration/20]
+root       110     2  0 Oct29 ?        00:00:00 [ksoftirqd/20]
+root       112     2  0 Oct29 ?        00:00:00 [kworker/20:0H]
+root       113     2  0 Oct29 ?        00:00:00 [watchdog/21]
+root       114     2  0 Oct29 ?        00:00:06 [migration/21]
+root       115     2  0 Oct29 ?        00:00:00 [ksoftirqd/21]
+root       117     2  0 Oct29 ?        00:00:00 [kworker/21:0H]
+root       118     2  0 Oct29 ?        00:00:01 [watchdog/22]
+root       119     2  0 Oct29 ?        00:00:06 [migration/22]
+root       120     2  0 Oct29 ?        00:00:00 [ksoftirqd/22]
+root       122     2  0 Oct29 ?        00:00:00 [kworker/22:0H]
+root       123     2  0 Oct29 ?        00:00:01 [watchdog/23]
+root       124     2  0 Oct29 ?        00:00:06 [migration/23]
+root       125     2  0 Oct29 ?        00:00:00 [ksoftirqd/23]
+root       127     2  0 Oct29 ?        00:00:00 [kworker/23:0H]
+root       128     2  0 Oct29 ?        00:00:00 [watchdog/24]
+root       129     2  0 Oct29 ?        00:00:07 [migration/24]
+root       130     2  0 Oct29 ?        00:00:01 [ksoftirqd/24]
+root       132     2  0 Oct29 ?        00:00:00 [kworker/24:0H]
+root       133     2  0 Oct29 ?        00:00:00 [watchdog/25]
+root       134     2  0 Oct29 ?        00:00:07 [migration/25]
+root       135     2  0 Oct29 ?        00:00:01 [ksoftirqd/25]
+root       137     2  0 Oct29 ?        00:00:00 [kworker/25:0H]
+root       138     2  0 Oct29 ?        00:00:00 [watchdog/26]
+root       139     2  0 Oct29 ?        00:00:07 [migration/26]
+root       140     2  0 Oct29 ?        00:00:01 [ksoftirqd/26]
+root       142     2  0 Oct29 ?        00:00:00 [kworker/26:0H]
+root       143     2  0 Oct29 ?        00:00:00 [watchdog/27]
+root       144     2  0 Oct29 ?        00:00:07 [migration/27]
+root       145     2  0 Oct29 ?        00:00:01 [ksoftirqd/27]
+root       147     2  0 Oct29 ?        00:00:00 [kworker/27:0H]
+root       148     2  0 Oct29 ?        00:00:00 [watchdog/28]
+root       149     2  0 Oct29 ?        00:00:07 [migration/28]
+root       150     2  0 Oct29 ?        00:00:01 [ksoftirqd/28]
+root       152     2  0 Oct29 ?        00:00:00 [kworker/28:0H]
+root       153     2  0 Oct29 ?        00:00:00 [watchdog/29]
+root       154     2  0 Oct29 ?        00:00:07 [migration/29]
+root       155     2  0 Oct29 ?        00:00:01 [ksoftirqd/29]
+root       157     2  0 Oct29 ?        00:00:00 [kworker/29:0H]
+root       158     2  0 Oct29 ?        00:00:00 [watchdog/30]
+root       159     2  0 Oct29 ?        00:00:07 [migration/30]
+root       160     2  0 Oct29 ?        00:00:01 [ksoftirqd/30]
+root       162     2  0 Oct29 ?        00:00:00 [kworker/30:0H]
+root       163     2  0 Oct29 ?        00:00:00 [watchdog/31]
+root       164     2  0 Oct29 ?        00:00:07 [migration/31]
+root       165     2  0 Oct29 ?        00:00:01 [ksoftirqd/31]
+root       167     2  0 Oct29 ?        00:00:00 [kworker/31:0H]
+root       168     2  0 Oct29 ?        00:00:00 [kdevtmpfs]
+root       169     2  0 Oct29 ?        00:00:00 [netns]
+root       170     2  0 Oct29 ?        00:00:00 [perf]
+root       171     2  0 Oct29 ?        00:00:00 [khungtaskd]
+root       172     2  0 Oct29 ?        00:00:00 [writeback]
+root       173     2  1 Oct29 ?        00:43:45 [ksmd]
+root       174     2  0 Oct29 ?        00:00:20 [khugepaged]
+root       175     2  0 Oct29 ?        00:00:00 [crypto]
+root       176     2  0 Oct29 ?        00:00:00 [kintegrityd]
+root       177     2  0 Oct29 ?        00:00:00 [bioset]
+root       178     2  0 Oct29 ?        00:00:00 [kblockd]
+root       180     2  0 Oct29 ?        00:00:00 [ata_sff]
+root       181     2  0 Oct29 ?        00:00:00 [md]
+root       182     2  0 Oct29 ?        00:00:00 [devfreq_wq]
+root       186     2  0 Oct29 ?        00:01:32 [kswapd0]
+root       187     2  0 Oct29 ?        00:02:40 [kswapd1]
+root       188     2  0 Oct29 ?        00:00:00 [vmstat]
+root       189     2  0 Oct29 ?        00:00:00 [fsnotify_mark]
+root       190     2  0 Oct29 ?        00:00:00 [ecryptfs-kthrea]
+root       206     2  0 Oct29 ?        00:00:00 [kthrotld]
+root       237     2  0 Oct29 ?        00:00:00 [acpi_thermal_pm]
+root       239     2  0 Oct29 ?        00:00:00 [bioset]
+root       240     2  0 Oct29 ?        00:00:00 [bioset]
+root       241     2  0 Oct29 ?        00:00:00 [bioset]
+root       242     2  0 Oct29 ?        00:00:00 [bioset]
+root       243     2  0 Oct29 ?        00:00:00 [bioset]
+root       244     2  0 Oct29 ?        00:00:00 [bioset]
+root       245     2  0 Oct29 ?        00:00:00 [bioset]
+root       246     2  0 Oct29 ?        00:00:00 [bioset]
+root       251     2  0 Oct29 ?        00:00:00 [ipv6_addrconf]
+root       265     2  0 Oct29 ?        00:00:00 [deferwq]
+root       267     2  0 Oct29 ?        00:00:00 [charger_manager]
+root       314     2  0 Oct29 ?        00:00:00 [scsi_eh_0]
+root       315     2  0 Oct29 ?        00:00:00 [scsi_tmf_0]
+root       316     2  0 Oct29 ?        00:00:00 [scsi_eh_1]
+root       317     2  0 Oct29 ?        00:00:00 [scsi_tmf_1]
+root       318     2  0 Oct29 ?        00:00:00 [scsi_eh_2]
+root       319     2  0 Oct29 ?        00:00:00 [scsi_tmf_2]
+root       320     2  0 Oct29 ?        00:00:00 [scsi_eh_3]
+root       321     2  0 Oct29 ?        00:00:00 [scsi_tmf_3]
+root       372     2  0 Oct29 ?        00:00:00 [scsi_eh_4]
+root       373     2  0 Oct29 ?        00:00:00 [scsi_eh_5]
+root       374     2  0 Oct29 ?        00:00:00 [scsi_tmf_5]
+root       375     2  0 Oct29 ?        00:00:00 [scsi_tmf_4]
+root       376     2  0 Oct29 ?        00:00:00 [scsi_eh_6]
+root       377     2  0 Oct29 ?        00:00:00 [scsi_tmf_6]
+root       380     2  0 Oct29 ?        00:00:00 [scsi_eh_7]
+root       383     2  0 Oct29 ?        00:00:00 [scsi_tmf_7]
+root       387     2  0 Oct29 ?        00:00:00 [scsi_eh_8]
+root       389     2  0 Oct29 ?        00:00:00 [scsi_tmf_8]
+root       390     2  0 Oct29 ?        00:00:00 [scsi_eh_9]
+root       391     2  0 Oct29 ?        00:00:00 [scsi_tmf_9]
+root       392     2  0 Oct29 ?        00:00:00 [scsi_eh_10]
+root       393     2  0 Oct29 ?        00:00:00 [scsi_tmf_10]
+root       401     2  0 Oct29 ?        00:00:00 [bioset]
+root       402     2  0 Oct31 ?        00:00:01 [kworker/21:1]
+root       449     2  0 Oct31 ?        00:00:01 [kworker/u64:1]
+root       473     2  0 Oct29 ?        00:00:00 [kpsmoused]
+root       565     2  0 Oct31 ?        00:00:01 [kworker/7:2]
+root       637     2  0 Oct29 ?        00:00:00 [ttm_swap]
+root       680     2  0 Oct29 ?        00:00:00 [bioset]
+root      1008     2  0 Oct29 ?        00:00:00 [raid5wq]
+root      1035     2  0 Oct29 ?        00:00:00 [bioset]
+root      1050     2  0 Oct31 ?        00:00:00 [kworker/6:1]
+root      1062     2  0 Oct29 ?        00:00:18 [jbd2/sda1-8]
+root      1063     2  0 Oct29 ?        00:00:00 [ext4-rsv-conver]
+root      1107     2  0 Oct29 ?        00:00:00 [kworker/28:1H]
+root      1123     2  0 Oct29 ?        00:00:00 [kauditd]
+root      1139     2  0 Oct29 ?        00:00:00 [rpciod]
+root      1146     2  0 Oct29 ?        00:00:00 [iscsi_eh]
+root      1147     1  0 Oct29 ?        00:00:03 /lib/systemd/systemd-journald
+root      1149     2  0 Oct29 ?        00:00:00 [ib_addr]
+root      1150     2  0 Oct29 ?        00:00:00 [ib_mcast]
+root      1151     2  0 Oct29 ?        00:00:00 [ib_nl_sa_wq]
+root      1153     2  0 Oct31 ?        00:00:01 [kworker/29:0]
+root      1155     2  0 Oct29 ?        00:00:00 [ib_cm]
+root      1157     2  0 Oct29 ?        00:00:00 [iw_cm_wq]
+root      1158     2  0 Oct29 ?        00:00:00 [rdma_cm]
+root      1173     1  0 Oct29 ?        00:00:00 /sbin/lvmetad -f
+root      1188     1  0 Oct29 ?        00:00:01 /lib/systemd/systemd-udevd
+root      1388     2  0 Oct29 ?        00:00:00 [kvm-irqfd-clean]
+root      1451     2  0 Oct31 ?        00:00:00 [kworker/25:1]
+systemd+  1503     1  0 Oct29 ?        00:00:00 /lib/systemd/systemd-timesyncd
+root      1533     2  0 Oct29 ?        00:00:00 [edac-poller]
+root      1534     2  0 Oct29 ?        00:00:04 [kipmi0]
+root      1591     2  0 Oct29 ?        00:00:00 [kworker/9:1H]
+root      1612     2  0 04:24 ?        00:00:00 [kworker/21:2]
+root      1856     2  0 Oct29 ?        00:00:00 [kworker/7:1H]
+root      1971     2  0 Oct31 ?        00:00:01 [kworker/17:1]
+root      1995     2  0 Oct29 ?        00:00:00 [kworker/12:1H]
+root      2004     1  0 Oct29 ?        00:00:00 /usr/sbin/cron -f
+root      2009     1  0 Oct29 ?        00:00:04 /usr/lib/accountsservice/accounts-daemon
+syslog    2012     1  0 Oct29 ?        00:00:01 /usr/sbin/rsyslogd -n
+root      2014     1  0 Oct29 ?        00:00:00 /sbin/cgmanager -m name=systemd
+avahi     2022     1  0 Oct29 ?        00:00:01 avahi-daemon: running [smartcampus.local]
+root      2045     1  0 Oct29 ?        00:00:21 /usr/lib/snapd/snapd
+message+  2056     1  0 Oct29 ?        00:00:11 /usr/bin/dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-ac
+avahi     2068  2022  0 Oct29 ?        00:00:00 avahi-daemon: chroot helper
+root      2080     1  0 Oct29 ?        00:00:11 /usr/sbin/NetworkManager --no-daemon
+root      2085     1  0 Oct29 ?        00:00:00 /lib/systemd/systemd-logind
+root      2092     1  0 Oct29 ?        00:00:00 /usr/sbin/acpid
+daemon    2104     1  0 Oct29 ?        00:00:00 /usr/sbin/atd -f
+root      2106     1  0 Oct29 ?        00:00:05 /usr/bin/lxcfs /var/lib/lxcfs/
+root      2144     1  0 Oct29 ?        00:00:05 /usr/lib/policykit-1/polkitd --no-debug
+root      2145     1  0 Oct29 ?        00:00:00 /sbin/mdadm --monitor --pid-file /run/mdadm/monitor.pid --daemonise --scan --syslo
+root      2185     2  0 Oct29 ?        00:00:00 [kworker/13:1H]
+root      2186     2  0 Oct29 ?        00:00:00 [kworker/8:1H]
+root      2295     1  0 Oct29 ?        00:00:00 /usr/sbin/sshd -D
+whoopsie  2297     1  0 Oct29 ?        00:00:02 /usr/bin/whoopsie -f
+root      2300     2  0 Oct31 ?        00:00:28 [kworker/0:2]
+root      2310     1  0 Oct29 ?        00:27:17 /usr/bin/dockerd -H fd://
+root      2315     1  0 Oct29 ?        00:00:05 /sbin/iscsid
+root      2316     1  0 Oct29 ?        00:00:29 /sbin/iscsid
+root      2331     1  0 Oct29 ?        00:00:05 /usr/sbin/libvirtd
+root      2369     1  0 Oct29 ?        00:00:08 /usr/bin/anydesk --service
+root      2394     1  0 Oct29 ?        00:01:01 /usr/sbin/irqbalance --pid=/var/run/irqbalance.pid
+root      2396     2  0 Oct29 ?        00:00:00 [nfsiod]
+root      2405     2  0 Oct31 ?        00:00:01 [kworker/23:2]
+root      2406     2  0 Oct29 ?        00:00:00 [kworker/24:1H]
+root      2407     2  0 Oct29 ?        00:00:00 [kworker/0:1H]
+statd     2430     1  0 Oct29 ?        00:00:00 /sbin/rpc.statd --no-notify
+root      2432     1  0 Oct29 ?        00:00:00 /sbin/rpcbind -f -w
+root      2434  2310  0 Oct29 ?        00:29:53 docker-containerd --config /var/run/docker/containerd/containerd.toml
+root      2438     2  0 Oct29 ?        00:00:00 [kworker/1:1H]
+root      2439     2  0 Oct29 ?        00:00:00 [lockd]
+root      2454     1  0 Oct29 tty1     00:00:00 /sbin/agetty --noclear tty1 linux
+root      2459     1  0 Oct29 ?        00:00:00 /usr/sbin/gdm3
+root      2467  2459  0 Oct29 ?        00:00:00 gdm-session-worker [pam/gdm-autologin]
+ntustsc   2513     1  0 Oct29 ?        00:00:02 /lib/systemd/systemd --user
+ntustsc   2514  2513  0 Oct29 ?        00:00:00 (sd-pam)
+ntustsc   2520  2467  0 Oct29 tty7     00:00:00 /usr/lib/gdm3/gdm-x-session --run-script gnome-session --session=gnome
+ntustsc   2522  2520  0 Oct29 tty7     00:00:05 /usr/lib/xorg/Xorg vt7 -displayfd 3 -auth /run/user/1000/gdm/Xauthority -backgroun
+root      2546     2  0 Oct29 ?        00:00:00 [kworker/15:1H]
+root      2565     2  0 Oct29 ?        00:00:00 [kworker/25:1H]
+ntustsc   2584  2520  0 Oct29 tty7     00:00:00 dbus-daemon --print-address 4 --session
+ntustsc   2587  2520  0 Oct29 tty7     00:00:03 /usr/lib/gnome-session/gnome-session-binary --session=gnome
+root      2609     2  0 Oct31 ?        00:00:02 [kworker/9:1]
+root      2658     2  0 Oct29 ?        00:00:00 [kworker/10:1H]
+root      2659     2  0 Oct29 ?        00:00:00 [kworker/14:1H]
+ntustsc   2840  2587  0 Oct29 ?        00:00:01 /usr/bin/ssh-agent /usr/bin/im-launch gnome-session --session=gnome
+root      2891     2  0 Oct29 ?        00:00:00 [kworker/3:1H]
+ntustsc   2903     1  0 Oct29 ?        00:00:00 /usr/bin/ibus-daemon --daemonize --xim --address unix:tmpdir=/tmp/ibus
+ntustsc   2909     1  0 Oct29 tty7     00:00:00 /usr/lib/gvfs/gvfsd
+ntustsc   2915     1  0 Oct29 tty7     00:00:00 /usr/lib/gvfs/gvfsd-fuse /run/user/1000/gvfs -f -o big_writes
+ntustsc   2923  2903  0 Oct29 ?        00:00:00 /usr/lib/ibus/ibus-dconf
+ntustsc   2924  2903  0 Oct29 ?        00:00:00 /usr/lib/ibus/ibus-ui-gtk3
+ntustsc   2927     1  0 Oct29 ?        00:00:00 /usr/lib/ibus/ibus-x11 --kill-daemon
+ntustsc   2990     1  0 Oct29 tty7     00:00:00 /usr/lib/at-spi2-core/at-spi-bus-launcher
+ntustsc   3000  2990  0 Oct29 tty7     00:00:00 /usr/bin/dbus-daemon --config-file=/etc/at-spi2/accessibility.conf --nofork --prin
+ntustsc   3002     1  0 Oct29 tty7     00:00:00 /usr/lib/at-spi2-core/at-spi2-registryd --use-gnome-session
+ntustsc   3041  2587  0 Oct29 tty7     00:00:08 /usr/lib/gnome-settings-daemon/gnome-settings-daemon
+ntustsc   3051     1  0 Oct29 tty7     00:00:00 /usr/bin/gnome-keyring-daemon --start --components=ssh
+root      3064     1  0 Oct29 ?        00:00:00 /usr/lib/upower/upowerd
+ntustsc   3078     1  0 Oct29 ?        00:00:00 /usr/bin/pulseaudio --start --log-target=syslog
+rtkit     3082     1  0 Oct29 ?        00:00:03 /usr/lib/rtkit/rtkit-daemon
+ntustsc   3096  2903  0 Oct29 ?        00:00:00 /usr/lib/ibus/ibus-engine-simple
+ntustsc   3113  2587  0 Oct29 tty7     00:01:22 /usr/bin/gnome-shell
+colord    3114     1  0 Oct29 ?        00:00:00 /usr/lib/colord/colord
+ntustsc   3118     1  0 Oct29 tty7     00:00:00 /usr/lib/gnome-settings-daemon/gsd-printer
+root      3146     2  0 Oct31 ?        00:00:00 [kworker/5:2]
+root      3170  2310  0 Oct29 ?        00:00:00 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 9093 -container-ip 17
+root      3176  2434  0 Oct29 ?        00:00:32 docker-containerd-shim -namespace moby -workdir /var/lib/docker/containerd/daemon/
+root      3177  2434  0 Oct29 ?        00:00:09 docker-containerd-shim -namespace moby -workdir /var/lib/docker/containerd/daemon/
+root      3242  2310  0 Oct29 ?        00:00:00 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 9091 -container-ip 17
+root      3293     2  0 13:23 ?        00:00:00 [kworker/u65:1]
+root      3303  2310  0 Oct29 ?        00:00:00 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 9090 -container-ip 17
+root      3350     2  0 Oct29 ?        00:00:00 [kworker/11:1H]
+ntustsc   3379     1  0 Oct29 tty7     00:00:00 /usr/lib/gnome-shell/gnome-shell-calendar-server
+ntustsc   3384     1  0 Oct29 tty7     00:00:00 /usr/lib/evolution/evolution-source-registry
+root      3391  2310  0 Oct29 ?        00:00:00 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 3000 -container-ip 17
+ntustsc   3398     1  0 Oct29 tty7     00:00:01 /usr/lib/gnome-online-accounts/goa-daemon
+root      3404  2434  0 Oct29 ?        00:00:09 docker-containerd-shim -namespace moby -workdir /var/lib/docker/containerd/daemon/
+ntustsc   3407     1  0 Oct29 tty7     00:00:03 /usr/lib/telepathy/mission-control-5
+root      3408     1  0 Oct29 ?        00:00:00 /sbin/wpa_supplicant -u -s -O /run/wpa_supplicant
+ntustsc   3411     1  0 Oct29 tty7     00:00:02 /usr/lib/gvfs/gvfs-udisks2-volume-monitor
+root      3416     1  0 Oct29 ?        00:00:01 /usr/lib/udisks2/udisksd --no-debug
+ntustsc   3428     1  0 Oct29 tty7     00:00:00 /usr/lib/gvfs/gvfs-goa-volume-monitor
+root      3470     2  0 Oct29 ?        00:00:00 [kworker/27:1H]
+root      3525  2434  0 Oct29 ?        00:00:09 docker-containerd-shim -namespace moby -workdir /var/lib/docker/containerd/daemon/
+ntustsc   3532     1  0 Oct29 tty7     00:00:04 /usr/lib/gnome-online-accounts/goa-identity-service
+ntustsc   3537     1  0 Oct29 tty7     00:00:00 /usr/lib/gvfs/gvfs-mtp-volume-monitor
+ntustsc   3550     1  0 Oct29 tty7     00:00:00 /usr/lib/gvfs/gvfs-afc-volume-monitor
+ntustsc   3560     1  0 Oct29 tty7     00:00:00 /usr/lib/gvfs/gvfs-gphoto2-volume-monitor
+root      3639  3177  1 Oct29 ?        01:01:23 /bin/node_exporter --path.procfs=/host/proc --path.sysfs=/host/sys --collector.fil
+root      3646  3176 13 Oct29 ?        09:15:47 /usr/bin/cadvisor -logtostderr
+root      3648  3404  0 Oct29 ?        00:00:08 /sbin/tini -- caddy -agree --conf /etc/caddy/Caddyfile
+root      3662  3525  0 Oct29 ?        00:05:43 /bin/alertmanager --config.file=/etc/alertmanager/config.yml --storage.path=/alert
+ntustsc   3735  2587  0 Oct29 tty7     00:00:00 /usr/lib/tracker/tracker-miner-user-guides
+ntustsc   3744  2587  0 Oct29 tty7     00:00:08 /usr/bin/anydesk --tray
+ntustsc   3756  2587  0 Oct29 tty7     00:00:00 /usr/lib/tracker/tracker-extract
+ntustsc   3759  2587  0 Oct29 tty7     00:00:00 /usr/lib/tracker/tracker-miner-apps
+ntustsc   3760  2587  0 Oct29 tty7     00:00:00 /usr/lib/tracker/tracker-miner-fs
+ntustsc   3768  2587  0 Oct29 tty7     00:00:06 /usr/bin/gnome-software --gapplication-service
+root      3775     2  0 Oct29 ?        00:00:00 [kworker/16:1H]
+ntustsc   3793  2587  0 Oct29 tty7     00:00:00 /usr/lib/evolution/evolution-alarm-notify
+ntustsc   3804     1  0 Oct29 tty7     00:00:00 /usr/lib/tracker/tracker-store
+root      3841     2  0 Oct29 ?        00:00:00 [kworker/2:1H]
+ntustsc   3872     1  0 Oct29 tty7     00:00:00 /usr/lib/evolution/evolution-calendar-factory
+root      3887  2295  0 10:52 ?        00:00:00 sshd: ntustsc [priv]
+root      3908  2434  0 Oct29 ?        00:00:09 docker-containerd-shim -namespace moby -workdir /var/lib/docker/containerd/daemon/
+root      3926     2  0 13:24 ?        00:00:00 [kworker/u66:2]
+ntustsc   3954  3887  0 10:52 ?        00:00:00 sshd: ntustsc@pts/3
+ntustsc   3955  3954  0 10:52 pts/3    00:00:00 -bash
+root      3974     2  0 Oct29 ?        00:00:00 [kworker/4:1H]
+root      3975     2  0 Oct29 ?        00:00:00 [kworker/5:1H]
+root      3980     2  0 Oct29 ?        00:00:00 [kworker/6:1H]
+root      4088  3648  0 Oct29 ?        00:03:06 caddy -agree --conf /etc/caddy/Caddyfile
+root      4104  3908  0 Oct29 ?        00:02:36 /bin/pushgateway
+ntustsc   4373  3872  0 Oct29 tty7     00:00:01 /usr/lib/evolution/evolution-calendar-factory-subprocess --factory contacts --bus-
+ntustsc   4652     1  0 Oct29 tty7     00:00:00 /usr/lib/evolution/evolution-addressbook-factory
+ntustsc   4668  3872  0 Oct29 tty7     00:00:01 /usr/lib/evolution/evolution-calendar-factory-subprocess --factory local --bus-nam
+root      4720  2434  0 Oct29 ?        00:00:10 docker-containerd-shim -namespace moby -workdir /var/lib/docker/containerd/daemon/
+472       4766  4720  0 Oct29 ?        00:00:00 /bin/bash /setup.sh
+ntustsc   4811  4652  0 Oct29 tty7     00:00:01 /usr/lib/evolution/evolution-addressbook-factory-subprocess --factory local --bus-
+root      4839     2  0 Oct31 ?        00:00:01 [kworker/10:0]
+472       4867  4766  0 Oct29 ?        00:07:21 grafana-server --homepath=/usr/share/grafana --config=/etc/grafana/grafana.ini cfg
+root      5194     2  0 Oct31 ?        00:00:01 [kworker/22:0]
+root      5905     2  0 13:29 ?        00:00:00 [kworker/20:1]
+root      5975     2  0 Oct29 ?        00:00:00 [kworker/18:1H]
+root      6255     2  0 Oct29 ?        00:00:00 [kworker/30:1H]
+root      6336     2  0 Oct31 ?        00:00:01 [kworker/20:0]
+libvirt+  6388     1  0 Oct29 ?        00:00:00 /usr/sbin/dnsmasq --conf-file=/var/lib/libvirt/dnsmasq/devstack.conf --leasefile-r
+root      6493     2  0 Oct29 ?        00:00:00 [kworker/17:1H]
+999       6537 15556  0 13:30 ?        00:00:00 postgres: kong kong 172.22.0.3(32884) idle
+root      6614     2  0 Oct31 ?        00:00:01 [kworker/27:0]
+root      7102     2  0 Oct31 ?        00:00:01 [kworker/u64:0]
+root      7182     2  0 Oct31 ?        00:00:01 [kworker/30:0]
+libvirt+  7243     1  0 Oct29 ?        00:00:01 /usr/sbin/dnsmasq --conf-file=/var/lib/libvirt/dnsmasq/default.conf --leasefile-ro
+root      7244  7243  0 Oct29 ?        00:00:00 /usr/sbin/dnsmasq --conf-file=/var/lib/libvirt/dnsmasq/default.conf --leasefile-ro
+root      7365     2  0 Oct29 ?        00:00:00 [cfg80211]
+root      7392     2  0 Oct31 ?        00:00:00 [kworker/14:0]
+root      7489     2  0 Oct31 ?        00:00:01 [kworker/31:0]
+libvirt+  7541     1  0 Oct29 ?        00:00:00 /usr/sbin/dnsmasq --conf-file=/var/lib/libvirt/dnsmasq/admin.conf --leasefile-ro -
+root      7542     2  0 Oct31 ?        00:00:00 [kworker/9:2]
+root      7720     2  0 13:33 ?        00:00:00 [kworker/u66:0]
+libvirt+  7881     1  0 Oct29 ?        00:00:00 /usr/sbin/dnsmasq --conf-file=/var/lib/libvirt/dnsmasq/public.conf --leasefile-ro 
+root      7909     1  0 Oct29 ?        00:00:00 /usr/sbin/virtlogd
+libvirt+  8045     1 11 Oct29 ?        08:16:09 qemu-system-x86_64 -enable-kvm -name Master -S -machine pc-i440fx-xenial,accel=kvm
+root      8048     2  0 Oct29 ?        00:02:56 [vhost-8045]
+root      8051     2  0 Oct29 ?        00:00:00 [kvm-pit/8045]
+libvirt+  8285     1 99 Oct29 ?        12-18:59:06 qemu-system-x86_64 -enable-kvm -name CN1 -S -machine pc-i440fx-xenial,accel=kvm
+root      8287     2  1 Oct29 ?        00:46:36 [vhost-8285]
+root      8288     2  0 Oct29 ?        00:00:00 [vhost-8285]
+root      8315     2  0 Oct29 ?        00:00:00 [kvm-pit/8285]
+root      8322     2  0 Oct29 ?        00:00:00 [kworker/21:1H]
+root      8418     2  0 Oct31 ?        00:00:04 [kworker/11:2]
+libvirt+  8621     1 99 Oct29 ?        3-20:12:10 qemu-system-x86_64 -enable-kvm -name Ctrl -S -machine pc-i440fx-xenial,accel=kvm
+root      8628     2  1 Oct29 ?        00:48:19 [vhost-8621]
+root      8629     2  1 Oct29 ?        00:55:50 [vhost-8621]
+root      8635     2  0 Oct29 ?        00:00:00 [kvm-pit/8621]
+root      8732     2  0 Oct29 ?        00:00:00 [kworker/22:1H]
+root      8733     2  0 Oct29 ?        00:00:00 [dio/sda1]
+ntustsc   8799  2587  0 Oct29 tty7     00:00:04 update-notifier
+root      9007     2  0 Oct29 ?        00:00:00 [kworker/20:1H]
+root      9157     2  0 Oct31 ?        00:00:01 [kworker/4:0]
+ntustsc   9255  2587  0 Oct29 tty7     00:00:01 /usr/lib/x86_64-linux-gnu/deja-dup/deja-dup-monitor
+root      9361  2434  0 Oct31 ?        00:00:02 docker-containerd-shim -namespace moby -workdir /var/lib/docker/containerd/daemon/
+root      9376     2  0 Oct31 ?        00:00:00 [kworker/23:0]
+nobody    9392  9361  3 Oct31 ?        00:41:52 /bin/prometheus --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/
+root      9501  2295  0 Oct29 ?        00:00:00 sshd: ntustsc [priv]
+root      9503  2295  0 Oct29 ?        00:00:00 sshd: ntustsc [priv]
+root      9505  2295  0 Oct29 ?        00:00:00 sshd: ntustsc [priv]
+root      9507  2295  0 Oct29 ?        00:00:00 sshd: ntustsc [priv]
+root      9539  2295  0 Oct29 ?        00:00:00 sshd: ntustsc [priv]
+ntustsc   9565  9501  0 Oct29 ?        00:00:01 sshd: ntustsc
+root      9610  2295  0 Oct29 ?        00:00:00 sshd: ntustsc [priv]
+ntustsc   9627  9503  0 Oct29 ?        00:00:01 sshd: ntustsc
+ntustsc   9651  9505  0 Oct29 ?        00:00:01 sshd: ntustsc
+ntustsc   9659  9507  0 Oct29 ?        00:00:01 sshd: ntustsc
+root      9660  2295  0 Oct29 ?        00:00:00 sshd: ntustsc [priv]
+root      9664  2310  0 Oct29 ?        00:00:00 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 11045 -container-ip 1
+ntustsc   9691  9539  0 Oct29 ?        00:00:01 sshd: ntustsc
+root      9710  2310  0 Oct29 ?        00:00:00 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 10123 -container-ip 1
+ntustsc   9723  9610  0 Oct29 ?        00:00:01 sshd: ntustsc
+root      9724  2310  0 Oct29 ?        00:00:00 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 10012 -container-ip 1
+root      9736  2310  0 Oct29 ?        00:00:00 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 10009 -container-ip 1
+root      9750  2310  0 Oct29 ?        00:00:00 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 10008 -container-ip 1
+root      9765  2310  0 Oct29 ?        00:00:00 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 10007 -container-ip 1
+root      9779  2310  0 Oct29 ?        00:00:00 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 10006 -container-ip 1
+ntustsc   9785  9660  0 Oct29 ?        00:00:01 sshd: ntustsc
+root      9793  2310  0 Oct29 ?        00:00:00 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 10005 -container-ip 1
+root      9806  2310  0 Oct29 ?        00:00:00 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 10004 -container-ip 1
+root      9819  2310  0 Oct29 ?        00:00:00 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 10003 -container-ip 1
+root      9832  2310  0 Oct29 ?        00:00:00 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 10002 -container-ip 1
+root      9851  2310  0 Oct29 ?        00:00:00 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 10001 -container-ip 1
+root      9865  2310  0 Oct29 ?        00:00:00 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 10000 -container-ip 1
+root      9879  2310  0 Oct29 ?        00:00:00 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 5420 -container-ip 17
+root      9891  2310  0 Oct29 ?        00:00:00 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 5417 -container-ip 17
+root      9904  2310  0 Oct29 ?        00:00:00 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 443 -container-ip 172
+root      9909     2  0 Oct29 ?        00:00:00 [kworker/23:1H]
+root      9919  2310  0 Oct29 ?        00:00:00 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 80 -container-ip 172.
+root      9925  2434  0 Oct29 ?        00:04:03 docker-containerd-shim -namespace moby -workdir /var/lib/docker/containerd/daemon/
+root      9944  9925  0 Oct29 ?        00:00:00 nginx: master process nginx -g daemon off;
+root      9992     2  0 Oct31 ?        00:00:01 [kworker/3:0]
+systemd+ 10037  9944  0 Oct29 ?        00:00:27 nginx: worker process
+systemd+ 10038  9944  0 Oct29 ?        00:00:20 nginx: worker process
+systemd+ 10039  9944  0 Oct29 ?        00:00:15 nginx: worker process
+systemd+ 10040  9944  0 Oct29 ?        00:00:18 nginx: worker process
+systemd+ 10041  9944  0 Oct29 ?        00:00:15 nginx: worker process
+systemd+ 10042  9944  0 Oct29 ?        00:00:16 nginx: worker process
+systemd+ 10043  9944  0 Oct29 ?        00:00:15 nginx: worker process
+systemd+ 10044  9944  0 Oct29 ?        00:00:25 nginx: worker process
+systemd+ 10045  9944  0 Oct29 ?        00:00:15 nginx: worker process
+systemd+ 10046  9944  0 Oct29 ?        00:00:15 nginx: worker process
+systemd+ 10047  9944  0 Oct29 ?        00:00:16 nginx: worker process
+systemd+ 10048  9944  0 Oct29 ?        00:00:29 nginx: worker process
+systemd+ 10049  9944  0 Oct29 ?        00:00:15 nginx: worker process
+systemd+ 10050  9944  0 Oct29 ?        00:00:15 nginx: worker process
+systemd+ 10051  9944  0 Oct29 ?        00:00:21 nginx: worker process
+systemd+ 10052  9944  0 Oct29 ?        00:00:16 nginx: worker process
+systemd+ 10053  9944  0 Oct29 ?        00:00:25 nginx: worker process
+systemd+ 10054  9944  0 Oct29 ?        00:00:16 nginx: worker process
+systemd+ 10055  9944  0 Oct29 ?        00:05:29 nginx: worker process
+systemd+ 10056  9944  0 Oct29 ?        00:00:38 nginx: worker process
+systemd+ 10057  9944  0 Oct29 ?        00:08:36 nginx: worker process
+systemd+ 10058  9944  0 Oct29 ?        00:00:27 nginx: worker process
+systemd+ 10059  9944  0 Oct29 ?        00:00:17 nginx: worker process
+systemd+ 10060  9944  0 Oct29 ?        00:00:17 nginx: worker process
+systemd+ 10061  9944  0 Oct29 ?        00:04:01 nginx: worker process
+systemd+ 10062  9944  0 Oct29 ?        00:00:55 nginx: worker process
+systemd+ 10063  9944  0 Oct29 ?        00:01:25 nginx: worker process
+systemd+ 10064  9944  0 Oct29 ?        00:02:05 nginx: worker process
+systemd+ 10065  9944  0 Oct29 ?        00:02:44 nginx: worker process
+systemd+ 10066  9944  0 Oct29 ?        00:14:39 nginx: worker process
+systemd+ 10067  9944  0 Oct29 ?        00:30:58 nginx: worker process
+systemd+ 10068  9944  0 Oct29 ?        00:15:48 nginx: worker process
+root     10952     2  0 Oct31 ?        00:00:01 [kworker/6:2]
+999      10957 15556  0 13:40 ?        00:00:00 postgres: kong kong 172.22.0.3(36440) idle
+ntustsc  11175     1  0 Oct30 tty7     00:00:14 /usr/bin/python3 /usr/bin/update-manager --no-update --no-focus-on-map
+ntustsc  11180     1  0 Oct30 tty7     00:00:00 /usr/lib/dconf/dconf-service
+root     11387     2  0 Oct31 ?        00:00:01 [kworker/15:0]
+root     11499     2  0 Oct31 ?        00:00:00 [kworker/3:2]
+root     11784  2295  0 Oct31 ?        00:00:00 sshd: ntustsc [priv]
+ntustsc  11837 11784  0 Oct31 ?        00:00:00 sshd: ntustsc
+root     12159     2  0 Oct31 ?        00:00:01 [kworker/2:1]
+root     12249     2  0 Oct31 ?        00:00:00 [kworker/16:0]
+999      12989 15556  0 13:45 ?        00:00:00 postgres: kong kong 172.22.0.3(38106) idle
+root     13144     2  0 Oct31 ?        00:00:00 [kworker/29:1]
+root     13487     2  0 00:59 ?        00:00:00 [kworker/8:0]
+root     13605     2  0 08:40 ?        00:00:00 [kworker/31:2]
+root     13759     2  0 Oct29 ?        00:00:00 [kworker/26:1H]
+root     14463     2  0 10:00 ?        00:00:00 [kworker/4:2]
+root     14563     2  0 Oct31 ?        00:00:00 [kworker/10:2]
+999      14672 15556  0 13:49 ?        00:00:00 postgres: kong kong 172.22.0.3(34666) idle
+999      14679 15556  0 13:49 ?        00:00:00 postgres: kong kong 172.22.0.3(34936) idle
+999      14680 15556  0 13:49 ?        00:00:00 postgres: kong kong 172.22.0.3(34996) idle
+999      14681 15556  0 13:49 ?        00:00:00 postgres: kong kong 172.22.0.3(34998) idle
+999      14682 15556  0 13:49 ?        00:00:00 postgres: kong kong 172.22.0.3(35000) idle
+999      14683 15556  0 13:49 ?        00:00:00 postgres: kong kong 172.22.0.3(35002) idle
+999      14684 15556  0 13:49 ?        00:00:00 postgres: kong kong 172.22.0.3(35004) idle
+999      14685 15556  0 13:49 ?        00:00:00 postgres: kong kong 172.22.0.3(35008) idle
+999      14686 15556  0 13:49 ?        00:00:00 postgres: kong kong 172.22.0.3(35006) idle
+999      14690 15556  0 13:49 ?        00:00:00 postgres: kong kong 172.22.0.3(35082) idle
+999      14691 15556  0 13:49 ?        00:00:00 postgres: kong kong 172.22.0.3(35084) idle
+999      14692 15556  0 13:49 ?        00:00:00 postgres: kong kong 172.22.0.3(35086) idle
+999      14693 15556  0 13:49 ?        00:00:00 postgres: kong kong 172.22.0.3(35088) idle
+999      14694 15556  0 13:49 ?        00:00:00 postgres: kong kong 172.22.0.3(35090) idle
+999      14695 15556  0 13:49 ?        00:00:00 postgres: kong kong 172.22.0.3(35126) idle
+999      14696 15556  0 13:49 ?        00:00:00 postgres: kong kong 172.22.0.3(35128) idle
+999      14697 15556  0 13:49 ?        00:00:00 postgres: kong kong 172.22.0.3(35130) idle
+999      14698 15556  0 13:49 ?        00:00:00 postgres: kong kong 172.22.0.3(35132) idle
+999      14699 15556  0 13:49 ?        00:00:00 postgres: kong kong 172.22.0.3(35134) idle
+999      14700 15556  0 13:49 ?        00:00:00 postgres: kong kong 172.22.0.3(35136) idle
+999      14701 15556  0 13:49 ?        00:00:00 postgres: kong kong 172.22.0.3(35138) idle
+999      14702 15556  0 13:49 ?        00:00:00 postgres: kong kong 172.22.0.3(35140) idle
+999      14703 15556  0 13:49 ?        00:00:00 postgres: kong kong 172.22.0.3(35210) idle
+999      14704 15556  0 13:49 ?        00:00:00 postgres: kong kong 172.22.0.3(35244) idle
+999      14705 15556  0 13:49 ?        00:00:00 postgres: kong kong 172.22.0.3(35246) idle
+999      14706 15556  0 13:49 ?        00:00:00 postgres: kong kong 172.22.0.3(35248) idle
+999      14707 15556  0 13:49 ?        00:00:00 postgres: kong kong 172.22.0.3(35336) idle
+root     14906     2  0 08:43 ?        00:00:00 [kworker/22:1]
+999      15015 15556  0 13:50 ?        00:00:00 postgres: kong kong 172.22.0.3(40314) idle
+ntustsc  15016  3955  0 13:50 pts/3    00:00:00 ps -ef
+root     15494  2310  0 Oct29 ?        00:00:00 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 5432 -container-ip 17
+root     15535  2434  0 Oct29 ?        00:03:05 docker-containerd-shim -namespace moby -workdir /var/lib/docker/containerd/daemon/
+999      15556 15535  0 Oct29 ?        00:01:35 postgres
+999      15662 15556  0 Oct29 ?        00:00:00 postgres: checkpointer process  
+999      15663 15556  0 Oct29 ?        00:00:02 postgres: writer process  
+999      15664 15556  0 Oct29 ?        00:00:02 postgres: wal writer process  
+999      15665 15556  0 Oct29 ?        00:00:01 postgres: autovacuum launcher process  
+999      15666 15556  0 Oct29 ?        00:00:16 postgres: stats collector process  
+root     15710  2310  0 Oct29 ?        00:00:00 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 8444 -container-ip 17
+root     15756  2310  0 Oct29 ?        00:00:00 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 8443 -container-ip 17
+root     15772  2310  0 Oct29 ?        00:00:00 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 8001 -container-ip 17
+root     15786  2310  0 Oct29 ?        00:19:07 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 11112 -container-ip 1
+root     15794  2434  0 Oct29 ?        00:01:44 docker-containerd-shim -namespace moby -workdir /var/lib/docker/containerd/daemon/
+root     15813 15794  0 Oct29 ?        00:00:00 nginx: master process /usr/local/openresty/nginx/sbin/nginx -p /usr/local/kong -c 
+root     15956  2310  0 Oct29 ?        00:00:00 /usr/bin/docker-proxy -proto tcp -host-ip 0.0.0.0 -host-port 11006 -container-ip 1
+root     16000  2434  0 Oct29 ?        00:00:10 docker-containerd-shim -namespace moby -workdir /var/lib/docker/containerd/daemon/
+root     16028 16000  0 Oct29 ?        00:00:00 /bin/sh ./docker/entrypoint.sh start --kong-url http://thekong:8001 --basic-auth n
+root     16115 16028  0 Oct29 ?        00:00:00 node ./bin/kong-dashboard.js start --kong-url http://thekong:8001 --basic-auth ntu
+nobody   16145 15813  0 Oct29 ?        00:00:34 nginx: worker process
+nobody   16146 15813  0 Oct29 ?        00:00:33 nginx: worker process
+nobody   16147 15813  0 Oct29 ?        00:00:33 nginx: worker process
+nobody   16148 15813  0 Oct29 ?        00:00:33 nginx: worker process
+nobody   16149 15813  0 Oct29 ?        00:00:33 nginx: worker process
+nobody   16150 15813  0 Oct29 ?        00:00:34 nginx: worker process
+nobody   16151 15813  0 Oct29 ?        00:00:33 nginx: worker process
+nobody   16152 15813  0 Oct29 ?        00:00:33 nginx: worker process
+nobody   16153 15813  0 Oct29 ?        00:00:33 nginx: worker process
+nobody   16154 15813  0 Oct29 ?        00:00:34 nginx: worker process
+nobody   16155 15813  0 Oct29 ?        00:00:34 nginx: worker process
+nobody   16156 15813  0 Oct29 ?        00:00:36 nginx: worker process
+nobody   16157 15813  0 Oct29 ?        00:00:38 nginx: worker process
+nobody   16158 15813  0 Oct29 ?        00:04:15 nginx: worker process
+nobody   16159 15813  0 Oct29 ?        00:00:34 nginx: worker process
+nobody   16160 15813  0 Oct29 ?        00:00:34 nginx: worker process
+nobody   16161 15813  0 Oct29 ?        00:00:34 nginx: worker process
+nobody   16162 15813  0 Oct29 ?        00:00:34 nginx: worker process
+nobody   16163 15813  0 Oct29 ?        00:00:34 nginx: worker process
+nobody   16164 15813  0 Oct29 ?        00:01:02 nginx: worker process
+nobody   16165 15813  0 Oct29 ?        00:00:34 nginx: worker process
+nobody   16166 15813  0 Oct29 ?        00:00:35 nginx: worker process
+nobody   16167 15813  0 Oct29 ?        00:00:34 nginx: worker process
+nobody   16168 15813  0 Oct29 ?        00:00:45 nginx: worker process
+nobody   16169 15813  0 Oct29 ?        00:00:34 nginx: worker process
+nobody   16170 15813  0 Oct29 ?        00:07:46 nginx: worker process
+nobody   16171 15813  0 Oct29 ?        00:00:34 nginx: worker process
+nobody   16172 15813  0 Oct29 ?        00:00:40 nginx: worker process
+nobody   16173 15813  0 Oct29 ?        00:02:09 nginx: worker process
+nobody   16174 15813  0 Oct29 ?        00:01:24 nginx: worker process
+nobody   16175 15813  0 Oct29 ?        00:00:51 nginx: worker process
+nobody   16176 15813  0 Oct29 ?        00:00:34 nginx: worker process
+root     16428     2  0 Oct29 ?        00:00:00 [kworker/19:1H]
+root     16674     2  0 Oct31 ?        00:00:00 [kworker/27:1]
+root     17060     2  0 Oct31 ?        00:00:00 [kworker/18:0]
+root     17188     2  0 08:49 ?        00:00:00 [kworker/0:1]
+root     17272     2  0 Oct31 ?        00:00:01 [kworker/16:1]
+root     18008     2  0 Oct31 ?        00:00:01 [kworker/24:1]
+root     18417     2  0 12:41 ?        00:00:00 [kworker/u65:0]
+root     18459     1  0 07:35 ?        00:00:00 /usr/sbin/cupsd -l
+root     18461     2  0 07:35 ?        00:00:00 [kworker/13:0]
+root     18463     2  0 07:35 ?        00:00:00 [kworker/30:1]
+root     18467     1  0 07:35 ?        00:00:00 /usr/sbin/cups-browsed
+root     18577     2  0 07:35 ?        00:00:00 [kworker/26:1]
+root     19689     2  0 05:04 ?        00:00:03 [kworker/12:0]
+root     19789     2  0 Oct29 ?        00:00:00 [kworker/29:1H]
+root     21352  2295  0 Oct30 ?        00:00:00 sshd: ntustsc [priv]
+ntustsc  21409 21352  0 Oct30 ?        00:00:00 sshd: ntustsc@pts/4
+ntustsc  21410 21409  0 Oct30 pts/4    00:00:00 -bash
+ntustsc  21422 21410  0 Oct30 pts/4    00:00:00 ssh ubuntu@172.16.0.133
+root     22201     2  0 03:54 ?        00:00:00 [kworker/19:1]
+root     22344     2  0 Oct31 ?        00:00:00 [kworker/26:2]
+root     23143     2  0 Oct31 ?        00:00:01 [kworker/19:2]
+root     23506     2  0 Oct31 ?        00:00:01 [kworker/25:0]
+root     23664     2  0 Oct31 ?        00:00:00 [kworker/28:1]
+root     24207     2  0 Oct31 ?        00:00:00 [kworker/7:1]
+root     24248     2  0 Oct31 ?        00:00:01 [kworker/14:1]
+root     24313     2  0 Oct31 ?        00:00:00 [kworker/13:2]
+root     24595     2  0 Oct31 ?        00:00:01 [kworker/8:1]
+root     25251     2  0 Oct31 ?        00:00:01 [kworker/18:2]
+root     26500     2  0 Oct29 ?        00:00:00 [kworker/31:1H]
+root     27104     2  0 Oct31 ?        00:00:01 [kworker/5:0]
+root     27263     2  0 Oct31 ?        00:00:00 [kworker/17:2]
+999      27391 15556  0 13:03 ?        00:00:00 postgres: kong kong 172.22.0.3(40520) idle
+root     29008     2  0 Oct31 ?        00:00:01 [kworker/1:1]
+root     29098     2  0 08:01 ?        00:00:02 [kworker/11:1]
+root     29284     2  0 Oct31 ?        00:00:00 [kworker/1:0]
+root     30179     2  0 06:47 ?        00:00:00 [kworker/2:0]
+root     30482     2  0 Oct31 ?        00:00:00 [kworker/15:2]
+root     30754     2  0 Oct31 ?        00:00:01 [kworker/28:0]
+root     32319     2  0 Oct31 ?        00:00:00 [kworker/24:0]
+root     32595     2  0 Oct31 ?        00:00:03 [kworker/12:1]
