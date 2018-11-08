@@ -26,6 +26,8 @@ const (
 	dblocal  = "172.16.0.132:27017"
 	dbpublic = "140.118.70.136:10003"
 
+	dbbackup = "140.118.122.103:27017"
+
 	weatherCollection = "weather"
 	localTimeZoneExt  = "+08:00"
 	c_weather         = "weather"
@@ -107,7 +109,7 @@ var session *mgo.Session
 func db_connect() {
 
 	dbInfo := &mgo.DialInfo{
-		Addrs:    strings.SplitN(dblocal, ",", -1),
+		Addrs:    strings.SplitN(dbbackup, ",", -1),
 		Database: "admin",
 		Username: "dontask",
 		Password: "idontknow",

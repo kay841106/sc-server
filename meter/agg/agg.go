@@ -25,6 +25,8 @@ const (
 	dblocal  = "172.16.0.132:27017"
 	dbpublic = "140.118.70.136:10003"
 
+	dbbackup = "140.118.122.103:27017"
+
 	db = "sc"
 	// c            = "testing"
 	c_lastreport = "lastreport"
@@ -399,6 +401,8 @@ type tempstruct struct {
 
 var session *mgo.Session
 
+var session2 *mgo.Session
+
 func checkDBStatus() bool {
 	err := session.Ping()
 	for err != nil {
@@ -461,7 +465,13 @@ func aggHour() {
 
 		var containerdevMan []interface{}
 
+		// // Backup DB
+		// session2 = db_connect2()
+
 		qu := session.DB(db)
+
+		// Mongo := session2.DB(db)
+
 		qu.C(c_devices).Find(nil).Distinct("MAC_Address", &containerdevMan)
 		// fmt.Println(containerdevMan)
 		for _, one := range containerdevMan {
@@ -527,6 +537,7 @@ func aggHour() {
 						fmt.Print(each)
 
 						qu.C(c_hour).Insert(each)
+						// Mongo.C(c_hour).Insert(each)
 						if err != nil {
 							fmt.Print(err)
 						}
@@ -543,6 +554,7 @@ func aggHour() {
 						fmt.Print(each)
 
 						qu.C(c_hour).Insert(each)
+						// Mongo.C(c_hour).Insert(each)
 						if err != nil {
 							fmt.Print(err)
 						}
@@ -567,7 +579,12 @@ func aggDay() {
 
 		var containerdevMan []interface{}
 
+		// // Backup DB
+		// session2 = db_connect2()
+
 		qu := session.DB(db)
+		// Mongo := session2.DB(db)
+
 		qu.C(c_devices).Find(nil).Distinct("MAC_Address", &containerdevMan)
 
 		for _, one := range containerdevMan {
@@ -590,6 +607,7 @@ func aggDay() {
 							each.ID = getObjectIDTwoArg(each.GWID, each.MACAddress, each.Timestamp.Unix())
 
 							qu.C(c_day).Insert(each)
+							// Mongo.C(c_day).Insert(each)
 							if err != nil {
 								fmt.Print(err)
 							}
@@ -611,6 +629,7 @@ func aggDay() {
 						fmt.Print(each)
 
 						qu.C(c_day).Insert(each)
+						// Mongo.C(c_day).Insert(each)
 						if err != nil {
 							fmt.Print(err)
 						}
@@ -635,7 +654,12 @@ func aggMonth() {
 
 		var containerdevMan []interface{}
 
+		// // Backup DB
+		// session2 = db_connect2()
+
 		qu := session.DB(db)
+
+		// Mongo := session2.DB(db)
 		qu.C(c_devices).Find(nil).Distinct("MAC_Address", &containerdevMan)
 
 		for _, one := range containerdevMan {
@@ -658,6 +682,7 @@ func aggMonth() {
 							each.ID = getObjectIDTwoArg(each.GWID, each.MACAddress, each.Timestamp.Unix())
 
 							qu.C(c_month).Insert(each)
+							// Mongo.C(c_month).Insert(each)
 							if err != nil {
 								fmt.Print(err)
 							}
@@ -679,6 +704,7 @@ func aggMonth() {
 						fmt.Print(each)
 
 						qu.C(c_month).Insert(each)
+						// Mongo.C(c_month).Insert(each)
 						if err != nil {
 							fmt.Print(err)
 						}
@@ -714,7 +740,7 @@ func SetTimeStampForMonth(theTime time.Time) time.Time {
 func init() {
 
 	dbInfo := &mgo.DialInfo{
-		Addrs:    strings.SplitN(dblocal, ",", -1),
+		Addrs:    strings.SplitN(dbpublic, ",", -1),
 		Database: "admin",
 		Username: "dontask",
 		Password: "idontknow",
@@ -723,9 +749,45 @@ func init() {
 	session, _ = mgo.DialWithInfo(dbInfo)
 }
 
+func db_connect() *mgo.Session {
+
+	dbInfo := &mgo.DialInfo{
+		Addrs:    strings.SplitN(dblocal, ",", -1),
+		Database: "admin",
+		Username: "dontask",
+		Password: "idontknow",
+		Timeout:  time.Second * 10,
+	}
+
+	sess, err := mgo.DialWithInfo(dbInfo)
+	if err != nil {
+		os.Exit(1)
+	}
+	return sess
+}
+
+// func db_connect2() *mgo.Session {
+
+// 	dbInfo := &mgo.DialInfo{
+// 		Addrs:    strings.SplitN(dblocal, ",", -1),
+// 		Database: "admin",
+// 		Username: "dontask",
+// 		Password: "idontknow",
+// 		Timeout:  time.Second * 10,
+// 	}
+
+// 	sess, err := mgo.DialWithInfo(dbInfo)
+// 	if err != nil {
+// 		os.Exit(1)
+// 	}
+// 	return sess
+// }
+
 func main() {
 
 	c := cron.New()
+	db_connect()
+	// db_connect2()
 
 	fmt.Print("start")
 

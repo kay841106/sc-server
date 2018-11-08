@@ -27,7 +27,8 @@ const (
 	dblocal   = "172.16.0.132:27017"
 	dbpublic  = "140.118.70.136:10003"
 	dbleoass  = "140.118.123.95:27017"
-	// c            = "testing"
+	dbbackup  = "140.118.122.103:27017"
+	// c            = "testing",
 	c_lastreport = "lastreport"
 	c_aemdra     = "aemdra"
 	c_cpm        = "cpm"
@@ -53,7 +54,7 @@ type session struct {
 }
 
 func (s *session) startSession() *session {
-	return &session{s.theSess.Copy()}
+	return &session{s.theSess.Clone()}
 }
 
 // var session *mgo.Session
@@ -665,6 +666,14 @@ func (s *session) aemdraPost(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				fmt.Println(err)
 			}
+			defer sess.Close()
+
+			// DB BACKUP
+			sess2 := db_connect2()
+			Mongo2 := sess2.DB(db)
+			err = Mongo2.C(c_aemdra).Insert(containerSnd)
+			err = Mongo2.C(c_gw_status).Update(bson.M{"GW_ID": containerSnd.GWID[0:8]}, bson.M{"$set": GWStatuscontainer})
+			err = Mongo2.C(c_lastreport).Update(bson.M{"MAC_Address": Lastreportcontainer.MACAddress}, bson.M{"$set": Lastreportcontainer})
 
 		}
 	}
@@ -822,6 +831,14 @@ func (s *session) cpmPost(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				fmt.Println(err)
 			}
+			defer sess.Close()
+
+			// DB BACKUP
+			sess2 := db_connect2()
+			Mongo2 := sess2.DB(db)
+			err = Mongo2.C(c_cpm).Insert(containerSnd)
+			err = Mongo2.C(c_gw_status).Update(bson.M{"GW_ID": containerSnd.GWID[0:8]}, bson.M{"$set": GWStatuscontainer})
+			err = Mongo2.C(c_lastreport).Update(bson.M{"MAC_Address": Lastreportcontainer.MACAddress}, bson.M{"$set": Lastreportcontainer})
 
 		}
 	}
@@ -831,12 +848,30 @@ func (s *session) cpmPost(w http.ResponseWriter, r *http.Request) {
 func db_connect() *mgo.Session {
 
 	dbInfo := &mgo.DialInfo{
-		Addrs:    strings.SplitN(dblocal, ",", -1),
+		Addrs:    strings.SplitN(dbpublic, ",", -1),
 		Database: "admin",
 		Username: "dontask",
 		Password: "idontknow",
 		Timeout:  time.Second * 10,
 	}
+
+	sess, err := mgo.DialWithInfo(dbInfo)
+	if err != nil {
+		os.Exit(1)
+	}
+	return sess
+}
+
+func db_connect2() *mgo.Session {
+
+	dbInfo := &mgo.DialInfo{
+		Addrs:    strings.SplitN(dbbackup, ",", -1),
+		Database: "admin",
+		Username: "dontask",
+		Password: "idontknow",
+		Timeout:  time.Second * 10,
+	}
+
 	sess, err := mgo.DialWithInfo(dbInfo)
 	if err != nil {
 		os.Exit(1)

@@ -26,6 +26,7 @@ import (
 const (
 	dblocal  = "172.16.0.132:27017"
 	dbpublic = "140.118.70.136:10003"
+	dbbackup = "140.118.122.103:27017"
 
 	db           = "sc"
 	c_lastreport = "lastreport"
@@ -42,7 +43,7 @@ var session *mgo.Session
 func dbConnect() {
 	var err error
 	dbInfo := &mgo.DialInfo{
-		Addrs:    strings.SplitN(dblocal, ",", -1),
+		Addrs:    strings.SplitN(dbpublic, ",", -1),
 		Database: "admin",
 		Username: "dontask",
 		Password: "idontknow",
@@ -69,6 +70,43 @@ type Metrics struct {
 	GET11 float64 `json:"ae_tot" bson:"ae_tot"`
 	GET12 float64 `json:"p_sum" bson:"p_sum"`
 	GET13 float64 `json:"pf_avg" bson:"pf_avg"`
+}
+
+type DSTwxTemplate struct {
+	Name        string      `json:"name,omitempty" bson:"name"`
+	Description string      `json:"description,omitempty" bson:"description"`
+	BaseType    string      `json:"baseType,omitempty" bson:"baseType"`
+	Ordinal     int         `json:"ordinal" bson:"ordinal"`
+	Aspects     interface{} `json:"aspects,omitempty" bson:"aspects"`
+}
+
+type device struct {
+	Rows []struct {
+		DevID      int    `json:"DevID" bson:"DevID"`
+		Floor      string `json:"Floor" bson:"Floor"`
+		GWID       string `json:"GWID" bson:"GWID"`
+		MGWID      string `json:"M_GWID" bson:"M_GWID"`
+		MMAC       string `json:"M_MAC" bson:"M_MAC"`
+		NUM        string `json:"NUM" bson:"NUM"`
+		Place      string `json:"Place" bson:"Place"`
+		Territory  string `json:"Territory" bson:"Territory"`
+		Type       string `json:"Type" bson:"Type"`
+		MACAddress string `json:"MAC_Address" bson:"MAC_Address"`
+	} `json:"rows"`
+	Datashape struct {
+		FieldDefinitions struct {
+			DevID      DSTwxTemplate `json:"DevID"`
+			Floor      DSTwxTemplate `json:"Floor"`
+			GWID       DSTwxTemplate `json:"GWID"`
+			MGWID      DSTwxTemplate `json:"M_GWID"`
+			MMAC       DSTwxTemplate `json:"M_MAC" `
+			NUM        DSTwxTemplate `json:"NUM" `
+			Place      DSTwxTemplate `json:"Place" `
+			Territory  DSTwxTemplate `json:"Territory" `
+			Type       DSTwxTemplate `json:"Type" `
+			MACAddress DSTwxTemplate `json:"MACAddress" `
+		} `json:"fieldDefinitions"`
+	} `json:"dataShape"`
 }
 
 type getlastreport struct {
@@ -908,6 +946,120 @@ func AddDev(w http.ResponseWriter, req *http.Request) {
 	// }
 }
 
+func meterDetail(w http.ResponseWriter, r *http.Request) {
+
+	zeros := 0
+	aspect := bson.M{}
+
+	sess := session.Clone()
+	vars := mux.Vars(r)
+	deviceID := vars["macID"]
+	fmt.Println(deviceID)
+
+	shit := "Please fill the MAC ID"
+	container := device{}
+
+	mongo := sess.DB(db).C(c_devices)
+
+	if deviceID == "" {
+		json.NewEncoder(w).Encode(shit)
+
+	}
+	err := mongo.Find(bson.M{"MAC_Address": deviceID}).All(&container.Rows)
+	// err := mongo.Find(bson.M{"GWID": bson.M{"$in": "/^meter_03/"}}).All(&container.Rows)
+	fmt.Println(err)
+
+	container.Datashape.FieldDefinitions.DevID.Ordinal = zeros
+	container.Datashape.FieldDefinitions.DevID.BaseType = `NUMBER`
+	container.Datashape.FieldDefinitions.DevID.Aspects = aspect
+	container.Datashape.FieldDefinitions.DevID.Name = `DevID`
+	container.Datashape.FieldDefinitions.DevID.Description = `DevID`
+
+	container.Datashape.FieldDefinitions.Floor.Ordinal = zeros
+	container.Datashape.FieldDefinitions.Floor.BaseType = `STRING`
+	container.Datashape.FieldDefinitions.Floor.Aspects = aspect
+	container.Datashape.FieldDefinitions.Floor.Name = `Floor`
+	container.Datashape.FieldDefinitions.Floor.Description = `Floor`
+
+	container.Datashape.FieldDefinitions.GWID.Ordinal = zeros
+	container.Datashape.FieldDefinitions.GWID.BaseType = `STRING`
+	container.Datashape.FieldDefinitions.GWID.Aspects = aspect
+	container.Datashape.FieldDefinitions.GWID.Name = `GWID`
+	container.Datashape.FieldDefinitions.GWID.Ordinal = zeros
+	container.Datashape.FieldDefinitions.GWID.Description = `GWID`
+
+	container.Datashape.FieldDefinitions.MGWID.Ordinal = zeros
+	container.Datashape.FieldDefinitions.MGWID.BaseType = `STRING`
+	container.Datashape.FieldDefinitions.MGWID.Aspects = aspect
+	container.Datashape.FieldDefinitions.MGWID.Name = `M_GWID`
+	container.Datashape.FieldDefinitions.MGWID.Description = `M_GWID`
+
+	container.Datashape.FieldDefinitions.MMAC.Ordinal = zeros
+	container.Datashape.FieldDefinitions.MMAC.BaseType = `STRING`
+	container.Datashape.FieldDefinitions.MMAC.Aspects = aspect
+	container.Datashape.FieldDefinitions.MMAC.Name = `M_MAC`
+	container.Datashape.FieldDefinitions.MMAC.Description = `M_MAC`
+
+	container.Datashape.FieldDefinitions.NUM.Ordinal = zeros
+	container.Datashape.FieldDefinitions.NUM.BaseType = `STRING`
+	container.Datashape.FieldDefinitions.NUM.Aspects = aspect
+	container.Datashape.FieldDefinitions.NUM.Name = `NUM`
+	container.Datashape.FieldDefinitions.NUM.Description = `NUM`
+
+	container.Datashape.FieldDefinitions.Place.Ordinal = zeros
+	container.Datashape.FieldDefinitions.Place.BaseType = `STRING`
+	container.Datashape.FieldDefinitions.Place.Aspects = aspect
+	container.Datashape.FieldDefinitions.Place.Name = `Place`
+	container.Datashape.FieldDefinitions.Place.Description = `Place`
+
+	container.Datashape.FieldDefinitions.Territory.Ordinal = zeros
+	container.Datashape.FieldDefinitions.Territory.BaseType = `STRING`
+	container.Datashape.FieldDefinitions.Territory.Aspects = aspect
+	container.Datashape.FieldDefinitions.Territory.Name = `Territory`
+	container.Datashape.FieldDefinitions.Territory.Description = `Territory`
+
+	container.Datashape.FieldDefinitions.Type.Ordinal = zeros
+	container.Datashape.FieldDefinitions.Type.BaseType = `STRING`
+	container.Datashape.FieldDefinitions.Type.Aspects = aspect
+	container.Datashape.FieldDefinitions.Type.Name = `Type`
+	container.Datashape.FieldDefinitions.Type.Description = `Type`
+
+	container.Datashape.FieldDefinitions.MACAddress.Ordinal = zeros
+	container.Datashape.FieldDefinitions.MACAddress.BaseType = `STRING`
+	container.Datashape.FieldDefinitions.MACAddress.Aspects = aspect
+	container.Datashape.FieldDefinitions.MACAddress.Name = `MAC_Address`
+	container.Datashape.FieldDefinitions.MACAddress.Description = `MAC_Address`
+
+	json.NewEncoder(w).Encode(container)
+
+}
+
+func test(w http.ResponseWriter, r *http.Request) {
+
+	// zeros := 0
+	// aspect := bson.M{}
+
+	sess := session.Clone()
+	// vars := mux.Vars(r)
+	// deviceID := vars["macID"]
+	// fmt.Println(deviceID)
+
+	// shit := "Please fill the MAC ID"
+	// container := device{}
+	var amam []interface{}
+	mongo := sess.DB(db).C(c_devices)
+
+	// if deviceID == "" {
+	// 	json.NewEncoder(w).Encode(shit)
+
+	// }
+	// err := mongo.Find(bson.M{"MAC_Address": deviceID}).All(&container.Rows)
+	// err := mongo.Find(bson.M{}).All(&amam)
+	err := mongo.Find(bson.M{"GWID": bson.M{"$regex": bson.RegEx{`^meter_05`, "i"}}}).All(&amam)
+	json.NewEncoder(w).Encode(amam)
+	fmt.Println(err)
+
+}
 func checkDBStatus() bool {
 	err := session.Ping()
 	for err != nil {
@@ -949,6 +1101,7 @@ func main() {
 	router.HandleFunc("/health", HealthCheckHandler).Methods("GET")
 	// additional API for query all buildings data
 	router.HandleFunc("/meter/lastreport/allbuilding", gopostlastreportAllBuilding).Methods("GET")
+	router.HandleFunc("/meter/meterdetail/{macID}", meterDetail).Methods("GET")
 
 	//Authorization
 	router.HandleFunc("/meter/auth/{user}", genAuth).Methods("GET")
@@ -970,6 +1123,8 @@ func main() {
 	router.HandleFunc("/space/state/id/{id}/name/{state}/arg/{argbv}", deviceACState).Methods("GET")
 	router.HandleFunc("/space/status/id/{id}", thedeviceStatusRes).Methods("GET")
 	router.HandleFunc("/space/cam/posX/{pos1}/posY/{pos2}", camTurn).Methods("GET")
+
+	router.HandleFunc("/test", test).Methods("GET")
 
 	log.Println(http.ListenAndServe(":8081", router))
 
