@@ -455,7 +455,7 @@ func getObjectIDTwoArg(GWID string, macID string, timestamp int64) bson.ObjectId
 
 func aggHour() {
 	// fmt.Println("ASU")
-
+	log.Println("== Hour running ==")
 	if checkDBStatus(); true {
 		// fmt.Println("Aaaaaaa")
 		var cont []aggHourStruct
@@ -473,6 +473,8 @@ func aggHour() {
 		// Mongo := session2.DB(db)
 
 		qu.C(c_devices).Find(nil).Distinct("MAC_Address", &containerdevMan)
+		// // DEBUG
+		// qu.C(c_devices).Find(bson.M{"MAC_Address": "aa:bb:02:03:01:01"}).Distinct("MAC_Address", &containerdevMan)
 		// fmt.Println(containerdevMan)
 		for _, one := range containerdevMan {
 
@@ -565,11 +567,11 @@ func aggHour() {
 			}
 		}
 	}
-
+	log.Println("== Hour finish ==")
 }
 
 func aggDay() {
-
+	log.Println("== Day running ==")
 	if checkDBStatus(); true {
 
 		var cont []aggHourStruct
@@ -585,7 +587,8 @@ func aggDay() {
 		qu := session.DB(db)
 		// Mongo := session2.DB(db)
 
-		qu.C(c_devices).Find(nil).Distinct("MAC_Address", &containerdevMan)
+		qu.C(c_devices).Find(bson.M{"MAC_Address": "aa:bb:02:03:01:01"}).Distinct("MAC_Address", &containerdevMan)
+		// qu.C(c_devices).Find(nil).Distinct("MAC_Address", &containerdevMan)
 
 		for _, one := range containerdevMan {
 
@@ -640,11 +643,11 @@ func aggDay() {
 			}
 		}
 	}
-
+	log.Println("== Day finish ==")
 }
 
 func aggMonth() {
-
+	log.Println("== Month running ==")
 	if checkDBStatus(); true {
 
 		var cont []aggHourStruct
@@ -715,7 +718,7 @@ func aggMonth() {
 			}
 		}
 	}
-
+	log.Println("== Month finish ==")
 }
 
 //SetTimeStampForHour set minute second to 0
@@ -740,7 +743,7 @@ func SetTimeStampForMonth(theTime time.Time) time.Time {
 func init() {
 
 	dbInfo := &mgo.DialInfo{
-		Addrs:    strings.SplitN(dbpublic, ",", -1),
+		Addrs:    strings.SplitN(dblocal, ",", -1),
 		Database: "admin",
 		Username: "dontask",
 		Password: "idontknow",
@@ -803,7 +806,7 @@ func main() {
 	// select {}
 
 	// // DEBUG
-	// aggMonth()
+	// aggDay()
 	// sig := make(chan os.Signal)
 	// signal.Notify(sig, os.Interrupt, os.Kill)
 	// <-sig

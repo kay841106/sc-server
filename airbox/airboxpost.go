@@ -142,7 +142,7 @@ func getObjectIDTwoArg(GWID string, macID string, timestamp int64) bson.ObjectId
 func airboxPost(w http.ResponseWriter, r *http.Request) {
 
 	dbInfo := &mgo.DialInfo{
-		Addrs:    strings.SplitN(dblocal, ",", -1),
+		Addrs:    strings.SplitN(dbpublic, ",", -1),
 		Database: "admin",
 		Username: "dontask",
 		Password: "idontknow",
@@ -179,7 +179,10 @@ func airboxPost(w http.ResponseWriter, r *http.Request) {
 		GET16:         containertemp.GET16,
 	}
 
-	Mongo.C(c_airboxraw).Insert(container2)
+	err := Mongo.C(c_airboxraw).Insert(container2)
+	if err != nil {
+		log.Println(err)
+	}
 	r.Body.Close()
 	// fmt.Print(container)
 	json.NewEncoder(w).Encode(&container2)

@@ -502,7 +502,7 @@ type postAgg struct {
 	MACAddress *string `json:"MAC_Address" bson:"MAC_Address"`
 }
 
-func gopostqueryHourly(w http.ResponseWriter, r *http.Request) {
+func GWGW23456gopostqueryHourly(w http.ResponseWriter, r *http.Request) {
 
 	headercontainer := postAgg{}
 
