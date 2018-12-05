@@ -13,13 +13,11 @@ import (
 	"strings"
 	"time"
 
-	"golang.org/x/net/http2"
+	"github.com/globalsign/mgo/bson"
+	// mgo "gopkg.in/mgo.v2"
+	// "gopkg.in/mgo.v2/bson"
 
-	// "github.com/globalsign/mgo/bson"
-	mgo "gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
-
-	// "github.com/globalsign/mgo"
+	"github.com/globalsign/mgo"
 
 	"github.com/gorilla/mux"
 )
@@ -363,19 +361,31 @@ func (s *session) GWAuth(gwid string) bool {
 
 	slice := []string{}
 
-	defer sess.Close()
-
 	Mongo := sess.DB(db)
-
+	defer sess.Close()
 	Mongo.C(c_devices).Find(bson.M{}).Distinct("GWID", &slice)
 
 	m := make(map[string]bool)
 	for i := 0; i < len(slice); i++ {
-		m[slice[i]] = true
+		if slice[i] != "" {
+			m[slice[i][0:8]] = true
+			// fmt.Println(m[slice[i][0:8]])
+		}
+
+		// fmt.Println(slice)
 	}
 
-	if _, ok := m[gwid]; ok {
-		return true
+	// // Error because node mac is not registered, will ignore >8 char
+	// if _, ok := m[gwid]; ok {
+	// 	return true
+	// }
+	// return false
+	if gwid != "" {
+
+		if _, ok := m[gwid[0:8]]; ok {
+			return true
+		}
+
 	}
 	return false
 }
@@ -386,10 +396,9 @@ func (s *session) MACAuth(macid string) bool {
 	// var i interface{}
 	// sess := session.Clone()
 	sess := s.startSession().theSess
-	defer sess.Close()
 
 	Mongo := sess.DB(db)
-
+	defer sess.Close()
 	Mongo.C(c_devices).Find(bson.M{}).Distinct("MAC_Address", &slice)
 	// fmt.Println(i)
 	m := make(map[string]bool)
@@ -510,14 +519,15 @@ func (s *session) aemdraPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// sess := session.Clone()
-	defer sess.Close()
+	// defer sess.Close()
 
 	Mongo := sess.DB(db) // mongo := client.DB(db).C(c)
 
+	defer sess.Close()
 	container := AEMDRARcv{}
 
 	json.NewDecoder(r.Body).Decode(&container)
-	defer r.Body.Close()
+	// defer r.Body.Close()
 
 	containerSnd := &AEMDRASnd{
 
@@ -614,6 +624,19 @@ func (s *session) aemdraPost(w http.ResponseWriter, r *http.Request) {
 	// fmt.Println("init:", time.Unix(container.TimestampUnix, 0).UTC(), "crc:", time.Unix(recalcUnix(container.TimestampUnix), 0).UTC())
 	if s.GWAuth(containerSnd.GWID) == true {
 		// fmt.Print(containerSnd.MACAddress)
+		GWStatuscontainer := gwstat{
+			Timestamp:     time.Now().UTC(),
+			TimestampUnix: time.Now().Unix(),
+			GWID:          containerSnd.GWID[0:8],
+			// Status:        statuscheck(containerSnd.TimestampUnix),
+		}
+		// update gwstatus
+		err = Mongo.C(c_gw_status).Update(bson.M{"GW_ID": containerSnd.GWID[0:8]}, bson.M{"$set": GWStatuscontainer})
+		if err != nil {
+			log.Println(err)
+			return
+		}
+
 		if s.MACAuth(containerSnd.MACAddress) == true {
 
 			// Mongo.C(c_lastreport).Upsert(bson.M{"MAC_Address": containerSnd.MACAddress}, containerSnd)
@@ -622,7 +645,7 @@ func (s *session) aemdraPost(w http.ResponseWriter, r *http.Request) {
 			// update cpm rawdata
 			err := Mongo.C(c_aemdra).Insert(containerSnd)
 			if err != nil {
-				fmt.Println(err)
+				log.Println(err)
 				// json.NewEncoder(w).Encode(err)
 
 			} else {
@@ -633,19 +656,6 @@ func (s *session) aemdraPost(w http.ResponseWriter, r *http.Request) {
 
 			// containerSnd.ID = bson.NewObjectId()
 			// update lastreport
-
-			GWStatuscontainer := gwstat{
-				Timestamp:     time.Now().UTC(),
-				TimestampUnix: time.Now().Unix(),
-				GWID:          containerSnd.GWID[0:8],
-				// Status:        statuscheck(containerSnd.TimestampUnix),
-			}
-			// update gwstatus
-			err = Mongo.C(c_gw_status).Update(bson.M{"GW_ID": containerSnd.GWID[0:8]}, bson.M{"$set": GWStatuscontainer})
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
 
 			getthemetrics := getmetrics{}
 
@@ -667,9 +677,9 @@ func (s *session) aemdraPost(w http.ResponseWriter, r *http.Request) {
 			Lastreportcontainer.Metrics.GET11 = Lastreportcontainer.Metrics.GET11 - getthemetrics.Metrics.getMtrcs
 			err = Mongo.C(c_lastreport).Update(bson.M{"MAC_Address": Lastreportcontainer.MACAddress}, bson.M{"$set": Lastreportcontainer})
 			if err != nil {
-				fmt.Println(err)
+				log.Println(err)
 			}
-			defer sess.Close()
+			// defer sess.Close()
 
 			// DB BACKUP
 			// sess2 := db_connect2()
@@ -682,10 +692,13 @@ func (s *session) aemdraPost(w http.ResponseWriter, r *http.Request) {
 			log.Println("MAC cannot found!")
 			json.NewEncoder(w).Encode("MAC cannot found!")
 		}
+
 	} else {
-		log.Println("GW cannot found!")
+		log.Println(container.GWID, "GW cannot found!")
 		json.NewEncoder(w).Encode("GW cannot found!")
+
 	}
+
 }
 
 func (s *session) cpmPost(w http.ResponseWriter, r *http.Request) {
@@ -711,11 +724,11 @@ func (s *session) cpmPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	Mongo := sess.DB(db)
-
+	defer sess.Close()
 	container := CPMRcv{}
 
 	json.NewDecoder(r.Body).Decode(&container)
-	defer r.Body.Close()
+	// defer r.Body.Close()
 
 	containerSnd := &CPMSnd{
 
@@ -795,30 +808,30 @@ func (s *session) cpmPost(w http.ResponseWriter, r *http.Request) {
 	// fmt.Println(containerSnd)
 	if s.GWAuth(containerSnd.GWID) == true {
 
+		GWStatuscontainer := gwstat{
+			Timestamp:     time.Now().UTC(),
+			TimestampUnix: time.Now().Unix(),
+			GWID:          containerSnd.GWID[0:8],
+		}
+
+		err = Mongo.C(c_gw_status).Update(bson.M{"GW_ID": containerSnd.GWID[0:8]}, bson.M{"$set": GWStatuscontainer})
+
+		if err != nil {
+			log.Println(err)
+			return
+		}
+
 		if s.MACAuth(containerSnd.MACAddress) == true {
 			// update cpm rawdata
 			err := Mongo.C(c_cpm).Insert(containerSnd)
 			if err != nil {
-				fmt.Println(err)
+				log.Println(err)
 				// json.NewEncoder(w).Encode(err)
 			} else {
 				log.Println(containerSnd.MACAddress, insertSuccess)
 
 			}
 			json.NewEncoder(w).Encode(containerSnd)
-
-			GWStatuscontainer := gwstat{
-				Timestamp:     time.Now().UTC(),
-				TimestampUnix: time.Now().Unix(),
-				GWID:          containerSnd.GWID[0:8],
-			}
-
-			err = Mongo.C(c_gw_status).Update(bson.M{"GW_ID": containerSnd.GWID[0:8]}, bson.M{"$set": GWStatuscontainer})
-
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
 
 			// declare the struct
 			getthemetrics := getmetrics{}
@@ -836,7 +849,6 @@ func (s *session) cpmPost(w http.ResponseWriter, r *http.Request) {
 			// get previous metric from db
 			err = Mongo.C(c_lastreport).Find(bson.M{"MAC_Address": Lastreportcontainer.MACAddress}).One(&getthemetrics)
 			if err != nil {
-
 				json.NewEncoder(w).Encode(err)
 			}
 
@@ -844,9 +856,9 @@ func (s *session) cpmPost(w http.ResponseWriter, r *http.Request) {
 			Lastreportcontainer.Metrics.GET11 = Lastreportcontainer.Metrics.GET11 - getthemetrics.Metrics.getMtrcs
 			err = Mongo.C(c_lastreport).Update(bson.M{"MAC_Address": Lastreportcontainer.MACAddress}, bson.M{"$set": Lastreportcontainer})
 			if err != nil {
-				fmt.Println(err)
+				log.Println(err)
 			}
-			defer sess.Close()
+			// defer sess.Close()
 
 			// DB BACKUP
 			// sess2 := db_connect2()
@@ -856,13 +868,16 @@ func (s *session) cpmPost(w http.ResponseWriter, r *http.Request) {
 			// err = Mongo2.C(c_lastreport).Update(bson.M{"MAC_Address": Lastreportcontainer.MACAddress}, bson.M{"$set": Lastreportcontainer})
 			// json.NewEncoder(w).Encode(containerSnd)
 		} else {
-			log.Println("MAC cannot found!")
+			log.Println(container.MACAddress, "MAC cannot found!")
 			json.NewEncoder(w).Encode("MAC cannot found!")
 		}
+
 	} else {
-		log.Println("GW cannot found!")
+		log.Println(container.GWID, "GW cannot found!")
 		json.NewEncoder(w).Encode("GW cannot found!")
+
 	}
+
 }
 
 func db_connect() *mgo.Session {
@@ -909,15 +924,16 @@ func main() {
 	router.HandleFunc("/meter/aemdra", v.aemdraPost).Methods("POST")
 	router.HandleFunc("/meter/cpm", v.cpmPost).Methods("POST")
 
-	srv := &http.Server{
-		Handler: router,
-		Addr:    ":8080",
-		// Good practice: enforce timeouts for servers you create!
-		WriteTimeout: 15 * time.Second,
-		ReadTimeout:  15 * time.Second,
-	}
-	http2.ConfigureServer(srv, nil)
-	// log.Println(http.ListenAndServe())
-	log.Println(srv.ListenAndServe())
+	// srv := &http.Server{
+	// 	Handler: router,
+	// 	Addr:    ":8080",
+	// 	// Good practice: enforce timeouts for servers you create!
+	// 	WriteTimeout: 15 * time.Second,
+	// 	ReadTimeout:  15 * time.Second,
+	// }
+	// http2.ConfigureServer(srv, nil)
+	log.Fatal(http.ListenAndServe(":8080", router))
+
+	// log.Println(srv.ListenAndServe())
 
 }

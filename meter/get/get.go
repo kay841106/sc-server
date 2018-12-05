@@ -28,10 +28,11 @@ const (
 	dbpublic = "140.118.70.136:10003"
 	dbbackup = "140.118.122.103:27017"
 
-	db           = "sc"
-	c_lastreport = "lastreport"
-	c_devices    = "devices"
-	c_gwtstat    = "gw_status"
+	db             = "sc"
+	c_lastreport   = "lastreport"
+	c_devices      = "devices"
+	c_gwtstat      = "gw_status"
+	c_offlineChart = "offline_chart"
 
 	c_hourly = "hour"
 	c_daily  = "day"
@@ -113,15 +114,17 @@ type getlastreport struct {
 	Timestamp     time.Time `json:"Timestamp" bson:"Timestamp"`
 	TimestampUnix int64     `json:"Timestamp_Unix" bson:"Timestamp_Unix"`
 	MACAddress    string    `json:"MAC_Address" bson:"MAC_Address"`
-	GWID          string    `json:"GW_ID" bson:"GW_ID"`
-	DevID         int       `json:"DevID" bson:"DevID"`
+	GWID          string    `json:"GWID" bson:"GWID"`
+	DevID         int       `json:"ID" bson:"ID"`
 	Floor         string    `json:"Floor" bson:"Floor"`
 	MGWID         string    `json:"M_GWID" bson:"M_GWID"`
 	MMAC          string    `json:"M_MAC" bson:"M_MAC"`
 	NUM           string    `json:"NUM" bson:"NUM"`
-	Place         string    `json:"Place" bson:"Place"`
-	Territory     string    `json:"Territory" bson:"Territory"`
-	Type          string    `json:"Type" bson:"Type"`
+	Place         string    `json:"PLACE" bson:"PLACE"`
+	Territory     string    `json:"TERRITORY" bson:"TERRITORY"`
+	Type          string    `json:"TYPE" bson:"TYPE"`
+	Mfloor        string    `json:"meter_floor" bson:"meter_floor"`
+	Mplace        string    `json:"meter_place" bson:"meter_place"`
 	Metrics       Metrics
 }
 
@@ -448,6 +451,69 @@ func gogetgwstat(w http.ResponseWriter, r *http.Request) {
 	// fmt.Println(container)
 }
 
+type offlineChart struct {
+	Timestamp     time.Time `json:"Timestamp" bson:"Timestamp"`
+	TimestampUnix int       `json:"Timestamp_Unix" bson:"Timestamp_Unix"`
+	MeterOffline  int       `json:"Meter_Offline" bson:"Meter_Offline"`
+	GWOffline     int       `json:"GW_Offline" bson:"GW_Offline"`
+}
+
+type postTime struct {
+	Start *string `json:"Start" bson:"Start"`
+	Stop  *string `json:"Stop" bson:"Stop"`
+}
+
+func SetTimeStampForLastDay(theTime time.Time) time.Time {
+	year, month, day := theTime.Date()
+	return time.Date(year, month, day, 23, 59, 59, 0, time.UTC)
+}
+
+func UtcToLocal(theTime time.Time) time.Time {
+	// year, month, day := theTime.Date()
+	// h, m, s := theTime.Clock()
+
+	// secondsEastOfUTC := int((8 * time.Hour).Seconds())
+	// beijing := time.FixedZone("Beijing Time", secondsEastOfUTC)
+	return theTime.Add(time.Hour * 16)
+}
+
+func gogetgofflinechart(w http.ResponseWriter, r *http.Request) {
+
+	headercontainer := postTime{}
+
+	// container := []offlineChart{}
+	json.NewDecoder(r.Body).Decode(&headercontainer)
+	fmt.Print(headercontainer)
+	if *headercontainer.Start != "" && *headercontainer.Stop != "" {
+
+		start, e := time.ParseInLocation("2006-01-02", *headercontainer.Start, time.Local)
+		stop, er := time.ParseInLocation("2006-01-02", *headercontainer.Stop, time.Local)
+
+		if e != nil || er != nil {
+			log.Println(e)
+			log.Println(er)
+		}
+
+		sess := session.Clone()
+		Mongo := sess.DB(db)
+		container := []offlineChart{}
+		var headercontainer2 []offlineChart
+		// headercontainer3 := []offlineChart{}
+
+		defer sess.Close()
+
+		Mongo.C(c_offlineChart).Find(bson.M{"Timestamp": bson.M{"$gte": start, "$lte": SetTimeStampForLastDay(stop)}}).All(&container)
+		for _, each := range container {
+			each.Timestamp = each.Timestamp.Add(time.Hour * 8)
+			headercontainer2 = append(headercontainer2, each)
+		}
+		// fmt.Println(container)
+		json.NewEncoder(w).Encode(headercontainer2)
+		log.Println("gogetgofflinechart")
+
+	}
+}
+
 func gogetgwdetail(w http.ResponseWriter, r *http.Request) {
 
 	container := []gwstat{}
@@ -502,7 +568,7 @@ type postAgg struct {
 	MACAddress *string `json:"MAC_Address" bson:"MAC_Address"`
 }
 
-func GWGW23456gopostqueryHourly(w http.ResponseWriter, r *http.Request) {
+func gopostqueryHourly(w http.ResponseWriter, r *http.Request) {
 
 	headercontainer := postAgg{}
 
@@ -1101,6 +1167,7 @@ func main() {
 	router.HandleFunc("/health", HealthCheckHandler).Methods("GET")
 	// additional API for query all buildings data
 	router.HandleFunc("/meter/lastreport/allbuilding", gopostlastreportAllBuilding).Methods("GET")
+	router.HandleFunc("/meter/offlinechart", gogetgofflinechart).Methods("POST")
 	router.HandleFunc("/meter/meterdetail/{macID}", meterDetail).Methods("GET")
 
 	//Authorization

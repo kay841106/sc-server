@@ -92,13 +92,19 @@ type thetime struct {
 }
 
 type realdata struct {
-	Town         string    `json:"town,omitempty" bson:"town"`
-	ElementName  string    `json:"WeatherElement,omitempty" bson:"WeatherElement"`
-	Startime     time.Time `json:"startTime,omitempty" bson:"startTime"`
-	EndTime      time.Time `json:"endTime,omitempty" bson:"endTime"`
-	ElementValue string    `json:"ElementValue,omitempty" bson:"ElementValue"`
+	maggie struct {
+		poolyug struct {
+			poolyfat struct {
+				ElementName  string    `json:"WeatherElement,omitempty" bson:"WeatherElement"`
+				Startime     time.Time `json:"startTime,omitempty" bson:"startTime"`
+				EndTime      time.Time `json:"endTime,omitempty" bson:"endTime"`
+				ElementValue string    `json:"ElementValue,omitempty" bson:"ElementValue"`
+			} `json:"0,omitempty"`
+		} `json:"records,omitempty"`
+	} `json:"result,omitempty"`
 }
 
+// realdata.maggie.poolyfat.Elem
 type elVal struct {
 	Value    string `json:"value,omitempty"`
 	Measures string `json:"measures,omitempty"`
