@@ -34,6 +34,7 @@ services:
        - /home/ubuntu/my-postgres.conf:/etc/postgresql/postgresql.conf
        - /var/lib/postgresql/data:/var/lib/postgresql/data
        
+
     healthcheck:
 #       test: ["CMD", "curl", "-f", "http://localhost:5432"]
        test: ["CMD-SHELL","pg_isready -U postgres"]
@@ -145,6 +146,7 @@ services:
   weather:
     image: avbee/weather
     restart: unless-stopped
+
     logging:
       driver: "json-file"
       options:
@@ -201,3 +203,9 @@ services:
         max-size: "200k"
         max-file: "10"
        
+=======
+
+  airboxpost:
+    image: avbee/airboxpost
+    restart: unless-stopped
+
