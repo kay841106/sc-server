@@ -8,10 +8,16 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
+	"os"
 	"strings"
 	"time"
 
+	colors "github.com/fatih/color"
 	"github.com/globalsign/mgo/bson"
+
+	// mgo "gopkg.in/mgo.v2"
+	// "gopkg.in/mgo.v2/bson"
 
 	"github.com/globalsign/mgo"
 
@@ -23,7 +29,9 @@ const (
 	db_airbox = "airbox"
 	dblocal   = "172.16.0.132:27017"
 	dbpublic  = "140.118.70.136:10003"
-	// c            = "testing"
+	dbleoass  = "140.118.123.95:27017"
+	dbbackup  = "140.118.122.103:27017"
+	// c            = "testing",
 	c_lastreport = "lastreport"
 	c_aemdra     = "aemdra"
 	c_cpm        = "cpm"
@@ -31,9 +39,28 @@ const (
 	c_devices    = "devices"
 
 	c_airboxraw = "airbox_raw"
+
+	insertSuccess = "OK"
 )
 
-var session *mgo.Session
+var bannr = `
+Program name : POST API
+
+maintainer   : avbee.lab@gmail.com
+
+Date         : 21/10/2018
+
+`
+
+type session struct {
+	theSess *mgo.Session
+}
+
+func (s *session) startSession() *session {
+	return &session{s.theSess.Clone()}
+}
+
+// var session *mgo.Session
 
 type dataInHourCPM struct {
 	datetime   time.Time
@@ -48,11 +75,6 @@ type dataInHourAEMDRA struct {
 	GWID       string               `bson:"GWID"`
 	Hours      []dataInMinuteAEMDRA `bson:"hours"`
 }
-
-// type dataInMinuteCPM struct {
-// 	datetime time.Time
-// 	minutes  []CPMSnd
-// }
 
 type dataInMinuteAEMDRA struct {
 	Datetime time.Time   `bson:"Timestamp"`
@@ -335,39 +357,51 @@ type getmetrics struct {
 	Metrics structmetrics `json:"metrics" bson:"metrics"`
 }
 
-func GWAuth(gwid string) bool {
+func (s *session) GWAuth(gwid string) bool {
+
+	sess := s.startSession().theSess
 
 	slice := []string{}
-	// var i []interface{}
-	sess := session.Clone()
-	defer sess.Close()
 
 	Mongo := sess.DB(db)
-
+	defer sess.Close()
 	Mongo.C(c_devices).Find(bson.M{}).Distinct("GWID", &slice)
-	// fmt.Println(slice)
+
 	m := make(map[string]bool)
 	for i := 0; i < len(slice); i++ {
-		m[slice[i]] = true
-	}
-	// for _,a:=range
-	// if contains()
+		if slice[i] != "" {
+			m[slice[i][0:8]] = true
+			// fmt.Println(m[slice[i][0:8]])
+		}
 
-	if _, ok := m[gwid]; ok {
-		return true
+		// fmt.Println(slice)
+	}
+
+	// // Error because node mac is not registered, will ignore >8 char
+	// if _, ok := m[gwid]; ok {
+	// 	return true
+	// }
+	// return false
+	if gwid != "" {
+
+		if _, ok := m[gwid[0:8]]; ok {
+			fmt.Print(gwid)
+			return true
+		}
+
 	}
 	return false
 }
 
-func MACAuth(macid string) bool {
+func (s *session) MACAuth(macid string) bool {
 
 	slice := []string{}
 	// var i interface{}
-	sess := session.Clone()
-	defer sess.Close()
+	// sess := session.Clone()
+	sess := s.startSession().theSess
 
 	Mongo := sess.DB(db)
-
+	defer sess.Close()
 	Mongo.C(c_devices).Find(bson.M{}).Distinct("MAC_Address", &slice)
 	// fmt.Println(i)
 	m := make(map[string]bool)
@@ -460,7 +494,7 @@ func getObjectIDTwoArg(GWID string, macID string, timestamp int64) bson.ObjectId
 	dst := hex.EncodeToString(b[:])
 	theid := bson.ObjectIdHex(dst)
 
-	fmt.Println(theid, uint32(timestamp))
+	// fmt.Println(theid, uint32(timestamp))
 	return theid
 
 }
@@ -469,26 +503,34 @@ func getObjectIDTwoArg(GWID string, macID string, timestamp int64) bson.ObjectId
 // 	return unixtime - (8 * time.Hour.Nanoseconds() / int64(time.Second))
 // }
 
-func aemdraPost(w http.ResponseWriter, r *http.Request) {
+func (s *session) aemdraPost(w http.ResponseWriter, r *http.Request) {
+	i := 60
 
-	sess := session.Clone()
-	defer sess.Close()
+	sess := s.startSession().theSess
+	err := sess.Ping()
+
+	// even without Ping, code can run well
+	for err != nil {
+		err = sess.Ping()
+		log.Println("Waiting for DB to Online .... ", i)
+		time.Sleep(time.Second * 5)
+		i--
+		if i <= 0 {
+			os.Exit(1)
+		}
+
+	}
+
+	// sess := session.Clone()
+	// defer sess.Close()
 
 	Mongo := sess.DB(db) // mongo := client.DB(db).C(c)
 
+	defer sess.Close()
 	container := AEMDRARcv{}
-	// updateData := bson.M{
 
-	// 		"Timestamp":   convertHour(container.TimestampUnix),
-	// 		"MAC_Address": container.MACAddress,
-	// 		"GW_ID":       container.GWID,
-	// 	},
-	// 	bson.M{
-	// 		"$inc": bson.M{
-	// 		},
-	// 	})
 	json.NewDecoder(r.Body).Decode(&container)
-	r.Body.Close()
+	// defer r.Body.Close()
 
 	containerSnd := &AEMDRASnd{
 
@@ -583,9 +625,24 @@ func aemdraPost(w http.ResponseWriter, r *http.Request) {
 		GET138: container.GET138,
 	}
 	// fmt.Println("init:", time.Unix(container.TimestampUnix, 0).UTC(), "crc:", time.Unix(recalcUnix(container.TimestampUnix), 0).UTC())
-	if GWAuth(containerSnd.GWID) == true {
-		fmt.Print(containerSnd.MACAddress)
-		if MACAuth(containerSnd.MACAddress) == true {
+	if s.GWAuth(containerSnd.GWID) == true {
+		// fmt.Print(containerSnd.MACAddress)
+		GWStatuscontainer := gwstat{
+			Timestamp:     time.Now().UTC(),
+			TimestampUnix: time.Now().Unix(),
+			GWID:          containerSnd.GWID[0:8],
+			// Status:        statuscheck(containerSnd.TimestampUnix),
+		}
+		// update gwstatus
+		err = Mongo.C(c_gw_status).Update(bson.M{"GW_ID": containerSnd.GWID[0:8]}, bson.M{"$set": GWStatuscontainer})
+		if err != nil {
+			mylog(container.GWID, container.MACAddress, "")
+			fmt.Println(err)
+
+			return
+		}
+
+		if s.MACAuth(containerSnd.MACAddress) == true {
 
 			// Mongo.C(c_lastreport).Upsert(bson.M{"MAC_Address": containerSnd.MACAddress}, containerSnd)
 
@@ -593,14 +650,19 @@ func aemdraPost(w http.ResponseWriter, r *http.Request) {
 			// update cpm rawdata
 			err := Mongo.C(c_aemdra).Insert(containerSnd)
 			if err != nil {
-				fmt.Println("false")
-				json.NewEncoder(w).Encode(err)
+				mylog(container.GWID, container.MACAddress, err.Error())
+
+				// json.NewEncoder(w).Encode(err)
+
+			} else {
+				log.Println(containerSnd.MACAddress, insertSuccess)
 			}
 
 			json.NewEncoder(w).Encode(containerSnd)
 
 			// containerSnd.ID = bson.NewObjectId()
 			// update lastreport
+
 			getthemetrics := getmetrics{}
 
 			Lastreportcontainer := aemdralastreport{
@@ -614,44 +676,68 @@ func aemdraPost(w http.ResponseWriter, r *http.Request) {
 
 			err = Mongo.C(c_lastreport).Find(bson.M{"MAC_Address": Lastreportcontainer.MACAddress}).One(&getthemetrics)
 			if err != nil {
-				fmt.Println("false")
+				// fmt.Println("false")
 				json.NewEncoder(w).Encode(err)
 			}
 
 			Lastreportcontainer.Metrics.GET11 = Lastreportcontainer.Metrics.GET11 - getthemetrics.Metrics.getMtrcs
 			err = Mongo.C(c_lastreport).Update(bson.M{"MAC_Address": Lastreportcontainer.MACAddress}, bson.M{"$set": Lastreportcontainer})
 			if err != nil {
-				fmt.Println(err)
-			}
+				mylog(container.GWID, container.MACAddress, err.Error())
 
-			GWStatuscontainer := gwstat{
-				Timestamp:     time.Now().UTC(),
-				TimestampUnix: time.Now().Unix(),
-				GWID:          containerSnd.GWID[0:8],
-				// Status:        statuscheck(containerSnd.TimestampUnix),
 			}
-			// update gwstatus
-			err = Mongo.C(c_gw_status).Update(bson.M{"GW_ID": containerSnd.GWID[0:8]}, bson.M{"$set": GWStatuscontainer})
-			if err != nil {
-				fmt.Println(err)
-			}
+			// defer sess.Close()
+
+			// DB BACKUP
+			// sess2 := db_connect2()
+			// Mongo2 := sess2.DB(db)
+			// err = Mongo2.C(c_aemdra).Insert(containerSnd)
+			// err = Mongo2.C(c_gw_status).Update(bson.M{"GW_ID": containerSnd.GWID[0:8]}, bson.M{"$set": GWStatuscontainer})
+			// err = Mongo2.C(c_lastreport).Update(bson.M{"MAC_Address": Lastreportcontainer.MACAddress}, bson.M{"$set": Lastreportcontainer})
+			// json.NewEncoder(w).Encode(containerSnd)
+		} else {
+
+			mylog(container.GWID, container.MACAddress, "MAC cannot found!")
+			json.NewEncoder(w).Encode(container.MACAddress + "  MAC cannot found!")
 		}
+
+	} else {
+		mylog(container.GWID, container.MACAddress, "MAC cannot found!")
+		json.NewEncoder(w).Encode(container.GWID + "  GW cannot found!")
+
 	}
 
 }
 
-func cpmPost(w http.ResponseWriter, r *http.Request) {
+func (s *session) cpmPost(w http.ResponseWriter, r *http.Request) {
+	i := 60
+	// bodyBytes, err2 := ioutil.ReadAll(r.Body)
+	// if err2 != nil {
+	// 	fmt.Print(err2)
+	// } else {
+	// 	fmt.Print(string(bodyBytes))
+	// }
+	sess := s.startSession().theSess
+	err := sess.Ping()
 
-	sess := session.Clone()
-	defer sess.Close()
+	for err != nil {
+		err = sess.Ping()
+		log.Println("Waiting for DB to Online .... ", i)
+		time.Sleep(time.Second * 5)
+		i--
+		if i <= 0 {
+			os.Exit(1)
+		}
+
+	}
 
 	Mongo := sess.DB(db)
-
-	container := CPMRcv{}
+	defer sess.Close()
+	container := &CPMRcv{}
 
 	json.NewDecoder(r.Body).Decode(&container)
-	r.Body.Close()
-	// fmt.Print(container)
+	// defer r.Body.Close()
+
 	containerSnd := &CPMSnd{
 
 		ID:            getObjectIDTwoArg(container.GWID, container.MACAddress, container.TimestampUnix),
@@ -694,8 +780,7 @@ func cpmPost(w http.ResponseWriter, r *http.Request) {
 		GET128:      container.GET128,
 		GET129:      container.GET129,
 	}
-	// fmt.Println(containerSnd.Timestamp)
-	// fmt.Println(GWAuth(containerSnd.GWID))
+
 	lastreportmetrics := cpmMetrics{
 		GET11:  container.GET11,
 		GET12:  container.GET12,
@@ -727,17 +812,34 @@ func cpmPost(w http.ResponseWriter, r *http.Request) {
 		GET128: container.GET128,
 		GET129: container.GET129,
 	}
-	// fmt.Println("init:", time.Unix(container.TimestampUnix, 0).UTC(), "crc:", time.Unix(recalcUnix(container.TimestampUnix), 0).UTC())
-	if GWAuth(containerSnd.GWID) == true {
-		// fmt.Print(containerSnd.MACAddress)
-		if MACAuth(containerSnd.MACAddress) == true {
+
+	// fmt.Println(containerSnd)
+	if s.GWAuth(containerSnd.GWID) == true {
+
+		GWStatuscontainer := gwstat{
+			Timestamp:     time.Now().UTC(),
+			TimestampUnix: time.Now().Unix(),
+			GWID:          containerSnd.GWID[0:8],
+		}
+
+		err = Mongo.C(c_gw_status).Update(bson.M{"GW_ID": containerSnd.GWID[0:8]}, bson.M{"$set": GWStatuscontainer})
+
+		if err != nil {
+			mylog(container.GWID, container.MACAddress, err.Error())
+			return
+		}
+
+		if s.MACAuth(containerSnd.MACAddress) == true {
 			// update cpm rawdata
 			err := Mongo.C(c_cpm).Insert(containerSnd)
+
 			if err != nil {
-				fmt.Println(err)
-				json.NewEncoder(w).Encode(err)
+				mylog(container.GWID, container.MACAddress, err.Error())
+
+				// json.NewEncoder(w).Encode(err)
+			} else {
+				log.Println(containerSnd.MACAddress, insertSuccess)
 			}
-			fmt.Print(containerSnd)
 			json.NewEncoder(w).Encode(containerSnd)
 
 			// declare the struct
@@ -748,16 +850,14 @@ func cpmPost(w http.ResponseWriter, r *http.Request) {
 				Timestamp:     time.Unix(containerSnd.TimestampUnix, 0).UTC(),
 				TimestampUnix: containerSnd.TimestampUnix,
 				GWID:          containerSnd.GWID[0:8],
-				// Status:        statuscheck(containerSnd.TimestampUnix),
+
 				MACAddress: containerSnd.MACAddress,
 				Metrics:    lastreportmetrics,
 			}
-			// fmt.Print(Lastreportcontainer)
 
 			// get previous metric from db
 			err = Mongo.C(c_lastreport).Find(bson.M{"MAC_Address": Lastreportcontainer.MACAddress}).One(&getthemetrics)
 			if err != nil {
-				fmt.Println("false")
 				json.NewEncoder(w).Encode(err)
 			}
 
@@ -765,48 +865,113 @@ func cpmPost(w http.ResponseWriter, r *http.Request) {
 			Lastreportcontainer.Metrics.GET11 = Lastreportcontainer.Metrics.GET11 - getthemetrics.Metrics.getMtrcs
 			err = Mongo.C(c_lastreport).Update(bson.M{"MAC_Address": Lastreportcontainer.MACAddress}, bson.M{"$set": Lastreportcontainer})
 			if err != nil {
+				mylog(container.GWID, container.MACAddress, "  ")
 				fmt.Println(err)
-			}
 
-			// fmt.Println("last ok")
-			GWStatuscontainer := gwstat{
-				Timestamp:     time.Now().UTC(),
-				TimestampUnix: time.Now().Unix(),
-				GWID:          containerSnd.GWID[0:8],
-				// Status:        statuscheck(containerSnd.TimestampUnix),
 			}
-			// update gwstatus
-			// containerSnd.ID = bson.NewObjectId()
+			// defer sess.Close()
 
-			err = Mongo.C(c_gw_status).Update(bson.M{"GW_ID": containerSnd.GWID[0:8]}, bson.M{"$set": GWStatuscontainer})
-			// fmt.Println(GWStatuscontainer)
-			if err != nil {
-				fmt.Println(err)
-				// fmt.Println(err, inf)
-			}
+			// DB BACKUP
+			// sess2 := db_connect2()
+			// Mongo2 := sess2.DB(db)
+			// err = Mongo2.C(c_cpm).Insert(containerSnd)
+			// err = Mongo2.C(c_gw_status).Update(bson.M{"GW_ID": containerSnd.GWID[0:8]}, bson.M{"$set": GWStatuscontainer})
+			// err = Mongo2.C(c_lastreport).Update(bson.M{"MAC_Address": Lastreportcontainer.MACAddress}, bson.M{"$set": Lastreportcontainer})
+			// json.NewEncoder(w).Encode(containerSnd)
+		} else {
+			mylog(container.GWID, container.MACAddress, "MAC cannot found!")
+			json.NewEncoder(w).Encode(container.MACAddress + " MAC cannot found!")
 		}
+
+	} else {
+		mylog(container.GWID, container.MACAddress, "MAC cannot found!")
+		json.NewEncoder(w).Encode(container.GWID + " GW cannot found!")
+
 	}
 
 }
 
-func init() {
+func db_connect() *mgo.Session {
+
+	inpEnv := getenvvar()
 
 	dbInfo := &mgo.DialInfo{
-		Addrs:    strings.SplitN(dblocal, ",", -1),
-		Database: "admin",
-		Username: "dontask",
-		Password: "idontknow",
-		Timeout:  time.Second * 60,
+		Addrs:    strings.SplitN(inpEnv.Mongo, ",", -1),
+		Database: inpEnv.Database,
+		Username: inpEnv.Username,
+		Password: inpEnv.Password,
+		Timeout:  time.Second * 10,
 	}
-	session, _ = mgo.DialWithInfo(dbInfo)
+
+	sess, err := mgo.DialWithInfo(dbInfo)
+	if err != nil {
+		os.Exit(1)
+	}
+	return sess
+}
+
+func mylog(x string, y string, z string) {
+	thelog := "GW: " + x + "|  MAC: " + y + "|  STATUS: " + colors.RedString(z)
+	log.Println(thelog)
+
+}
+
+type ENV struct {
+	Port     string
+	Mongo    string
+	Database string
+	Username string
+	Password string
+}
+
+// var mongo_url string = Getenv().Mongo
+// var database string = Getenv().Database
+// var username string = Getenv().Username
+// var password string = Getenv().Password
+
+func getenvvar() ENV {
+
+	theenv := ENV{}
+	theenv.Mongo = os.Getenv("MONGO_URL")
+	if theenv.Mongo == "" {
+		theenv.Mongo = "172.16.0.132:27017"
+	}
+	theenv.Database = os.Getenv("DB_AUTH")
+	if theenv.Database == "" {
+		theenv.Database = "admin"
+	}
+	theenv.Username = os.Getenv("USERNAME")
+	if theenv.Username == "" {
+		theenv.Username = "dontask"
+	}
+	theenv.Password = os.Getenv("PASS")
+	if theenv.Password == "" {
+		theenv.Password = "idontknow"
+	}
+
+	return theenv
 }
 
 func main() {
+	fmt.Print(bannr)
+	sess := db_connect()
+
+	v := session{sess}
 
 	router := mux.NewRouter()
-	router.HandleFunc("/meter/aemdra", aemdraPost).Methods("POST")
-	router.HandleFunc("/meter/cpm", cpmPost).Methods("POST")
+	router.HandleFunc("/meter/aemdra", v.aemdraPost).Methods("POST")
+	router.HandleFunc("/meter/cpm", v.cpmPost).Methods("POST")
 
-	log.Println(http.ListenAndServe(":8080", router))
+	// srv := &http.Server{
+	// 	Handler: router,
+	// 	Addr:    ":8080",
+	// 	// Good practice: enforce timeouts for servers you create!
+	// 	WriteTimeout: 15 * time.Second,
+	// 	ReadTimeout:  15 * time.Second,
+	// }
+	// http2.ConfigureServer(srv, nil)
+	log.Fatal(http.ListenAndServe(":8080", router))
+
+	// log.Println(srv.ListenAndServe())
 
 }

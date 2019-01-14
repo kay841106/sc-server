@@ -30,17 +30,16 @@ services:
     environment:
        - "POSTGRES_USER=kong"
        - "POSTGRES_DB=kong"
+    volumes:
+       - /home/ubuntu/my-postgres.conf:/etc/postgresql/postgresql.conf
+       - /var/lib/postgresql/data:/var/lib/postgresql/data
        
-### No conf file ###       
-#    volumes:
-#       - /home/ubuntu/my-postgres.conf:/etc/postgresql/postgresql.conf
-
-#    command: -c config_file=/etc/postgresql/postgresql.conf
 
     healthcheck:
-       test: ["CMD", "curl", "-f", "http://localhost:5432"]
-       interval: 1m30s
-       timeout: 10s
+#       test: ["CMD", "curl", "-f", "http://localhost:5432"]
+       test: ["CMD-SHELL","pg_isready -U postgres"]
+       interval: 10s
+       timeout: 5s
        retries: 3
 
 
@@ -48,7 +47,7 @@ services:
 #    image: cassandra:3
 #    ports:
 #       - 9042:9042
- 
+
 ### Migration should be done manually once ###
 #  kong-migration:
 #    image: kong:0.13
@@ -66,26 +65,25 @@ services:
     depends_on:
        - kong-database
 #       - kong-migration
-   
+    restart : unless-stopped
     environment:
        - "KONG_DATABASE=postgres"
        - "KONG_CASSANDRA_CONTACT_POINTS=kong-database"
        - "KONG_PG_HOST=kong-database"
        - "KONG_PROXY_ACCESS_LOG=/dev/stdout"
-       - "KONG_ADMIN_ACCESS_LOG=/dev/stdout"
-       - "KONG_PROXY_ERROR_LOG=/dev/stderr"
+      - "KONG_PROXY_ERROR_LOG=/dev/stderr"
        - "KONG_ADMIN_ERROR_LOG=/dev/stderr"
-       - "KONG_ADMIN_LISTEN=0.0.0.0:8001" 
+       - "KONG_ADMIN_LISTEN=0.0.0.0:8001"
        - "KONG_ADMIN_LISTEN_SSL=0.0.0.0:8444"
 
-    volumes:
-      - /opt/kong:/etc/kong
+#    volumes:
+#      - /opt/kong:/etc/kong
     ports:
        - 8000:8000
        - 8443:8443
        - 8001:8001
        - 8444:8444
-    links: 
+    links:
        - kong-database:kong-database
 
   kong-dashboard:
@@ -109,20 +107,105 @@ services:
 
   post:
     image: avbee/post
-    restart: unless-stopped
     ports:
       - 8880:8080
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+    deploy:
+      resources:
+        limits:
+          #cpus: '0.50'
+          memory: 50M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
  
   get:
     image: avbee/get
-    restart: unless-stopped
     ports:
       - 8881:8081
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+    deploy:
+      resources:
+        limits:
+          #cpus: '0.50'
+          memory: 50M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
 
   weather:
     image: avbee/weather
     restart: unless-stopped
 
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+    deploy:
+      resources:
+        limits:
+          #cpus: '0.50'
+          memory: 50M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
+
+  airboxpost:
+    image: avbee/airboxpost:0.9.0
+    restart: unless-stopped
+    ports:
+    - 8890:8090
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+
+    deploy:
+      resources:
+        limits:
+#          cpus: '0.50'
+          memory: 50M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
+
+
+  aggregate:
+    image: avbee/agg
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+
+
   airboxpost:
     image: avbee/airboxpost
     restart: unless-stopped
+    ports:
+    - 8890:8090
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+       
+=======
+
+  airboxpost:
+    image: avbee/airboxpost
+    restart: unless-stopped
+

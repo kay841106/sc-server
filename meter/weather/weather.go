@@ -1,6 +1,9 @@
 package main
 
 import (
+	"crypto/md5"
+	"encoding/binary"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -11,12 +14,19 @@ import (
 
 	"github.com/robfig/cron"
 
-	"github.com/globalsign/mgo"
+	// "github.com/globalsign/mgo"
+	// "github.com/globalsign/mgo/bson"
+
+	// change due to high cpu using globalsign
+	mgo "gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 const (
 	dblocal  = "172.16.0.132:27017"
 	dbpublic = "140.118.70.136:10003"
+
+	dbbackup = "140.118.122.103:27017"
 
 	weatherCollection = "weather"
 	localTimeZoneExt  = "+08:00"
@@ -82,13 +92,19 @@ type thetime struct {
 }
 
 type realdata struct {
-	Town         string    `json:"town,omitempty" bson:"town"`
-	ElementName  string    `json:"WeatherElement,omitempty" bson:"WeatherElement"`
-	Startime     time.Time `json:"startTime,omitempty" bson:"startTime"`
-	EndTime      time.Time `json:"endTime,omitempty" bson:"endTime"`
-	ElementValue string    `json:"ElementValue,omitempty" bson:"ElementValue"`
+	maggie struct {
+		poolyug struct {
+			poolyfat struct {
+				ElementName  string    `json:"WeatherElement,omitempty" bson:"WeatherElement"`
+				Startime     time.Time `json:"startTime,omitempty" bson:"startTime"`
+				EndTime      time.Time `json:"endTime,omitempty" bson:"endTime"`
+				ElementValue string    `json:"ElementValue,omitempty" bson:"ElementValue"`
+			} `json:"0,omitempty"`
+		} `json:"records,omitempty"`
+	} `json:"result,omitempty"`
 }
 
+// realdata.maggie.poolyfat.Elem
 type elVal struct {
 	Value    string `json:"value,omitempty"`
 	Measures string `json:"measures,omitempty"`
@@ -96,10 +112,10 @@ type elVal struct {
 
 var session *mgo.Session
 
-func init() {
+func db_connect() {
 
 	dbInfo := &mgo.DialInfo{
-		Addrs:    strings.SplitN(dblocal, ",", -1),
+		Addrs:    strings.SplitN(dbbackup, ",", -1),
 		Database: "admin",
 		Username: "dontask",
 		Password: "idontknow",
@@ -146,9 +162,8 @@ func getObjectIDTwoArg(GWID string, macID string, timestamp int64) bson.ObjectId
 
 }
 
-
 func getweather() {
-	// sess := session.Clone()
+	sess := session.Clone()
 	fmt.Println("hello")
 
 	cityID := "F-D0047-063"
@@ -205,6 +220,7 @@ func getweather() {
 }
 
 func main() {
+	db_connect()
 	fmt.Println(bannr)
 	c := cron.New()
 
