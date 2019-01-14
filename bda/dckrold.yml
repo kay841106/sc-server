@@ -30,18 +30,10 @@ services:
     environment:
        - "POSTGRES_USER=kong"
        - "POSTGRES_DB=kong"
-<<<<<<< HEAD
     volumes:
        - /home/ubuntu/my-postgres.conf:/etc/postgresql/postgresql.conf
        - /var/lib/postgresql/data:/var/lib/postgresql/data
        
-=======
-
-### No conf file ###       
-#    volumes:
-#       - /home/ubuntu/my-postgres.conf:/etc/postgresql/postgresql.conf
-
->>>>>>> 62b66d233a0c0a9e708d82f701a3d2a45e2f6aa2
     healthcheck:
 #       test: ["CMD", "curl", "-f", "http://localhost:5432"]
        test: ["CMD-SHELL","pg_isready -U postgres"]
@@ -114,22 +106,14 @@ services:
 
   post:
     image: avbee/post
-<<<<<<< HEAD
     ports:
       - 8880:8080
     restart: unless-stopped
-=======
-    restart: unless-stopped
-    ports:
-      - 8880:8080
-      
->>>>>>> 62b66d233a0c0a9e708d82f701a3d2a45e2f6aa2
     logging:
       driver: "json-file"
       options:
         max-size: "200k"
         max-file: "10"
-<<<<<<< HEAD
     deploy:
       resources:
         limits:
@@ -144,27 +128,11 @@ services:
     ports:
       - 8881:8081
     restart: unless-stopped
-=======
-
-  get:
-    image: avbee/get
-    restart: unless-stopped
-    ports:
-      - 8881:8081
-      
     logging:
       driver: "json-file"
       options:
         max-size: "200k"
         max-file: "10"
-      
->>>>>>> 62b66d233a0c0a9e708d82f701a3d2a45e2f6aa2
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "200k"
-        max-file: "10"
-<<<<<<< HEAD
     deploy:
       resources:
         limits:
@@ -173,13 +141,10 @@ services:
         reservations:
           cpus: '0.25'
           memory: 20M
-=======
->>>>>>> 62b66d233a0c0a9e708d82f701a3d2a45e2f6aa2
 
   weather:
     image: avbee/weather
     restart: unless-stopped
-<<<<<<< HEAD
     logging:
       driver: "json-file"
       options:
@@ -224,8 +189,6 @@ services:
         max-size: "200k"
         max-file: "10"
 
-=======
->>>>>>> 62b66d233a0c0a9e708d82f701a3d2a45e2f6aa2
 
   airboxpost:
     image: avbee/airboxpost
