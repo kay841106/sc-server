@@ -1,0 +1,33 @@
+func Getenv() ENV {
+        //fmt.Println(&quot;Number:&quot;, number) //Why this error?
+
+        mongo_url := os.Getenv("MONGO_URL")
+        if mongo_url == "" {
+                mongo_url = "140.118.70.136:10003"
+        }
+        database := os.Getenv("DATABASE")
+        if database == "" {
+                database = "admin"
+        }
+        username := os.Getenv("USERNAME")
+        if username == "" {
+                username = "dontask"
+        }
+        password := os.Getenv("PASSWORD")
+        if password == "" {
+                password = "idontknow"
+        }
+
+        port := os.Getenv("EXPORTER_PORT")
+        if port == "" {
+                port = ":7777"
+        }
+
+        env := ENV{}
+        env.Port = port
+        env.Mongo = mongo_url
+        env.Database = database
+        env.Username = username
+        env.Password = password
+        return env
+}

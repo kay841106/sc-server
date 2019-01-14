@@ -13,7 +13,9 @@ import (
 	"strings"
 	"time"
 
+	colors "github.com/fatih/color"
 	"github.com/globalsign/mgo/bson"
+
 	// mgo "gopkg.in/mgo.v2"
 	// "gopkg.in/mgo.v2/bson"
 
@@ -383,6 +385,7 @@ func (s *session) GWAuth(gwid string) bool {
 	if gwid != "" {
 
 		if _, ok := m[gwid[0:8]]; ok {
+			fmt.Print(gwid)
 			return true
 		}
 
@@ -633,7 +636,9 @@ func (s *session) aemdraPost(w http.ResponseWriter, r *http.Request) {
 		// update gwstatus
 		err = Mongo.C(c_gw_status).Update(bson.M{"GW_ID": containerSnd.GWID[0:8]}, bson.M{"$set": GWStatuscontainer})
 		if err != nil {
-			log.Println(err)
+			mylog(container.GWID, container.MACAddress, "")
+			fmt.Println(err)
+
 			return
 		}
 
@@ -645,7 +650,8 @@ func (s *session) aemdraPost(w http.ResponseWriter, r *http.Request) {
 			// update cpm rawdata
 			err := Mongo.C(c_aemdra).Insert(containerSnd)
 			if err != nil {
-				log.Println(err)
+				mylog(container.GWID, container.MACAddress, err.Error())
+
 				// json.NewEncoder(w).Encode(err)
 
 			} else {
@@ -677,7 +683,8 @@ func (s *session) aemdraPost(w http.ResponseWriter, r *http.Request) {
 			Lastreportcontainer.Metrics.GET11 = Lastreportcontainer.Metrics.GET11 - getthemetrics.Metrics.getMtrcs
 			err = Mongo.C(c_lastreport).Update(bson.M{"MAC_Address": Lastreportcontainer.MACAddress}, bson.M{"$set": Lastreportcontainer})
 			if err != nil {
-				log.Println(err)
+				mylog(container.GWID, container.MACAddress, err.Error())
+
 			}
 			// defer sess.Close()
 
@@ -689,13 +696,14 @@ func (s *session) aemdraPost(w http.ResponseWriter, r *http.Request) {
 			// err = Mongo2.C(c_lastreport).Update(bson.M{"MAC_Address": Lastreportcontainer.MACAddress}, bson.M{"$set": Lastreportcontainer})
 			// json.NewEncoder(w).Encode(containerSnd)
 		} else {
-			log.Println("MAC cannot found!")
-			json.NewEncoder(w).Encode("MAC cannot found!")
+
+			mylog(container.GWID, container.MACAddress, "MAC cannot found!")
+			json.NewEncoder(w).Encode(container.MACAddress + "  MAC cannot found!")
 		}
 
 	} else {
-		log.Println(container.GWID, "GW cannot found!")
-		json.NewEncoder(w).Encode("GW cannot found!")
+		mylog(container.GWID, container.MACAddress, "MAC cannot found!")
+		json.NewEncoder(w).Encode(container.GWID + "  GW cannot found!")
 
 	}
 
@@ -725,7 +733,7 @@ func (s *session) cpmPost(w http.ResponseWriter, r *http.Request) {
 
 	Mongo := sess.DB(db)
 	defer sess.Close()
-	container := CPMRcv{}
+	container := &CPMRcv{}
 
 	json.NewDecoder(r.Body).Decode(&container)
 	// defer r.Body.Close()
@@ -817,19 +825,20 @@ func (s *session) cpmPost(w http.ResponseWriter, r *http.Request) {
 		err = Mongo.C(c_gw_status).Update(bson.M{"GW_ID": containerSnd.GWID[0:8]}, bson.M{"$set": GWStatuscontainer})
 
 		if err != nil {
-			log.Println(err)
+			mylog(container.GWID, container.MACAddress, err.Error())
 			return
 		}
 
 		if s.MACAuth(containerSnd.MACAddress) == true {
 			// update cpm rawdata
 			err := Mongo.C(c_cpm).Insert(containerSnd)
+
 			if err != nil {
-				log.Println(err)
+				mylog(container.GWID, container.MACAddress, err.Error())
+
 				// json.NewEncoder(w).Encode(err)
 			} else {
 				log.Println(containerSnd.MACAddress, insertSuccess)
-
 			}
 			json.NewEncoder(w).Encode(containerSnd)
 
@@ -856,7 +865,9 @@ func (s *session) cpmPost(w http.ResponseWriter, r *http.Request) {
 			Lastreportcontainer.Metrics.GET11 = Lastreportcontainer.Metrics.GET11 - getthemetrics.Metrics.getMtrcs
 			err = Mongo.C(c_lastreport).Update(bson.M{"MAC_Address": Lastreportcontainer.MACAddress}, bson.M{"$set": Lastreportcontainer})
 			if err != nil {
-				log.Println(err)
+				mylog(container.GWID, container.MACAddress, "  ")
+				fmt.Println(err)
+
 			}
 			// defer sess.Close()
 
@@ -868,13 +879,13 @@ func (s *session) cpmPost(w http.ResponseWriter, r *http.Request) {
 			// err = Mongo2.C(c_lastreport).Update(bson.M{"MAC_Address": Lastreportcontainer.MACAddress}, bson.M{"$set": Lastreportcontainer})
 			// json.NewEncoder(w).Encode(containerSnd)
 		} else {
-			log.Println(container.MACAddress, "MAC cannot found!")
-			json.NewEncoder(w).Encode("MAC cannot found!")
+			mylog(container.GWID, container.MACAddress, "MAC cannot found!")
+			json.NewEncoder(w).Encode(container.MACAddress + " MAC cannot found!")
 		}
 
 	} else {
-		log.Println(container.GWID, "GW cannot found!")
-		json.NewEncoder(w).Encode("GW cannot found!")
+		mylog(container.GWID, container.MACAddress, "MAC cannot found!")
+		json.NewEncoder(w).Encode(container.GWID + " GW cannot found!")
 
 	}
 
@@ -882,11 +893,13 @@ func (s *session) cpmPost(w http.ResponseWriter, r *http.Request) {
 
 func db_connect() *mgo.Session {
 
+	inpEnv := getenvvar()
+
 	dbInfo := &mgo.DialInfo{
-		Addrs:    strings.SplitN(dblocal, ",", -1),
-		Database: "admin",
-		Username: "dontask",
-		Password: "idontknow",
+		Addrs:    strings.SplitN(inpEnv.Mongo, ",", -1),
+		Database: inpEnv.Database,
+		Username: inpEnv.Username,
+		Password: inpEnv.Password,
 		Timeout:  time.Second * 10,
 	}
 
@@ -897,22 +910,47 @@ func db_connect() *mgo.Session {
 	return sess
 }
 
-// func db_connect2() *mgo.Session {
+func mylog(x string, y string, z string) {
+	thelog := "GW: " + x + "|  MAC: " + y + "|  STATUS: " + colors.RedString(z)
+	log.Println(thelog)
 
-// 	dbInfo := &mgo.DialInfo{
-// 		Addrs:    strings.SplitN(dbbackup, ",", -1),
-// 		Database: "admin",
-// 		Username: "dontask",
-// 		Password: "idontknow",
-// 		Timeout:  time.Second * 10,
-// 	}
+}
 
-// 	sess, err := mgo.DialWithInfo(dbInfo)
-// 	if err != nil {
-// 		os.Exit(1)
-// 	}
-// 	return sess
-// }
+type ENV struct {
+	Port     string
+	Mongo    string
+	Database string
+	Username string
+	Password string
+}
+
+// var mongo_url string = Getenv().Mongo
+// var database string = Getenv().Database
+// var username string = Getenv().Username
+// var password string = Getenv().Password
+
+func getenvvar() ENV {
+
+	theenv := ENV{}
+	theenv.Mongo = os.Getenv("MONGO_URL")
+	if theenv.Mongo == "" {
+		theenv.Mongo = "172.16.0.132:27017"
+	}
+	theenv.Database = os.Getenv("DB_AUTH")
+	if theenv.Database == "" {
+		theenv.Database = "admin"
+	}
+	theenv.Username = os.Getenv("USERNAME")
+	if theenv.Username == "" {
+		theenv.Username = "dontask"
+	}
+	theenv.Password = os.Getenv("PASS")
+	if theenv.Password == "" {
+		theenv.Password = "idontknow"
+	}
+
+	return theenv
+}
 
 func main() {
 	fmt.Print(bannr)

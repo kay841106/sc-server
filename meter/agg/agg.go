@@ -481,7 +481,7 @@ func (s *session) aggHour() {
 		// // Backup DB
 		// session2 = db_connect2()
 
-		qu := s.startSession().theSess.DB(db)
+		qu := s.startSession().theSess.Clone().DB(db)
 
 		// Mongo := session2.DB(db)
 
@@ -579,6 +579,7 @@ func (s *session) aggHour() {
 
 			}
 		}
+		qu.Session.Close()
 	}
 	log.Println("== Hour finish ==")
 }
@@ -597,10 +598,11 @@ func (s *session) aggDay() {
 		// // Backup DB
 		// session2 = db_connect2()
 
-		qu := s.startSession().theSess.DB(db)
+		qu := s.startSession().theSess.Clone().DB(db)
+		// defer qu.Session.Close()
 		// Mongo := session2.DB(db)
 
-		qu.C(c_devices).Find(bson.M{"MAC_Address": "aa:bb:02:03:01:01"}).Distinct("MAC_Address", &containerdevMan)
+		qu.C(c_devices).Find(nil).Distinct("MAC_Address", &containerdevMan)
 		// qu.C(c_devices).Find(nil).Distinct("MAC_Address", &containerdevMan)
 
 		for _, one := range containerdevMan {
@@ -655,6 +657,7 @@ func (s *session) aggDay() {
 
 			}
 		}
+		qu.Session.Close()
 	}
 	log.Println("== Day finish ==")
 }
@@ -673,8 +676,8 @@ func (s *session) aggMonth() {
 		// // Backup DB
 		// session2 = db_connect2()
 
-		qu := s.startSession().theSess.DB(db)
-
+		qu := s.startSession().theSess.Clone().DB(db)
+		// defer qu.Session.Close()
 		// Mongo := session2.DB(db)
 		qu.C(c_devices).Find(nil).Distinct("MAC_Address", &containerdevMan)
 
@@ -730,6 +733,7 @@ func (s *session) aggMonth() {
 
 			}
 		}
+		qu.Session.Close()
 	}
 	log.Println("== Month finish ==")
 }
@@ -812,6 +816,7 @@ func (s *session) downtime() {
 	if s.checkDBStatus(); true {
 		// fmt.Println("SS")
 		qu := s.startSession().theSess.DB(db)
+
 		container := gwstatus{}
 		container2 := gwdowntime{}
 		container3 := meterdowntime{}
@@ -860,6 +865,7 @@ func (s *session) downtime() {
 
 		// if
 		// qu.C(c_downtime)
+		qu.Session.Close()
 
 	}
 }
@@ -1102,6 +1108,7 @@ func (s *session) AirboxHour() {
 
 			}
 		}
+		qu.Session.Close()
 	}
 	log.Println("== Hour finish ==")
 }
@@ -1198,13 +1205,10 @@ func db_connect() *mgo.Session {
 func main() {
 
 	c := cron.New()
-	// db_connect()
-	// // db_connect2()
+
 	sess := db_connect()
 
 	v := session{sess}
-
-	// fmt.Print("start")
 
 	c.AddFunc("@hourly", v.aggHour)
 	c.AddFunc("@daily", v.aggDay)
@@ -1218,10 +1222,9 @@ func main() {
 	fmt.Println("end")
 	signal.Notify(sig, os.Interrupt, os.Kill)
 	<-sig
-	// // // select {}
 
 	// // DEBUG
-	// v.meterOnlineChart()
+	// v.aggMonth()
 	// // v.downtime()
 	// sig := make(chan os.Signal)
 	// signal.Notify(sig, os.Interrupt, os.Kill)

@@ -210,6 +210,7 @@ func main() {
 	v := session{sess}
 	router := mux.NewRouter()
 
+	// AIRBOX
 	router.HandleFunc("/airbox/last", v.airboxLastReport).Methods("GET")
 	router.HandleFunc("/airbox/oneday", v.airboxOneDayData).Methods("POST")
 	router.HandleFunc("/airbox/hourly", v.airboxHour).Methods("POST")

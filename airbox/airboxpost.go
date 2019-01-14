@@ -141,22 +141,22 @@ func getObjectIDTwoArg(GWID string, macID string, timestamp int64) bson.ObjectId
 }
 
 type getmetrics struct {
-	Timestamp     time.Time   `json:"Timestamp" bson:"Timestamp"`
-	TimestampUnix int64       `json:"Timestamp_Unix"  bson:"Timestamp_Unix"`
-	MACAddress    string      `json:"MAC_Address" bson:"MAC_Address"`
-	GWID          string      `json:"GW_ID" bson:"GW_ID"`
-	Temp          float64     `json:"Temp" bson:"Temp"`
-	Humidity      int         `json:"Humidity" bson:"Humidity"`
-	PM25          int         `json:"PM2_5" bson:"PM2_5"`
-	CO            interface{} `json:"CO" bson:"CO"`
-	CO2           interface{} `json:"CO2" bson:"CO2"`
-	Noise         interface{} `json:"Noise" bson:"Noise"`
+	Timestamp     time.Time `json:"Timestamp" bson:"Timestamp"`
+	TimestampUnix int64     `json:"Timestamp_Unix"  bson:"Timestamp_Unix"`
+	MACAddress    string    `json:"MAC_Address" bson:"MAC_Address"`
+	GWID          *string   `json:"GW_ID" bson:"GW_ID"`
+	GET11         *float64  `json:"Temp" bson:"Temp"`
+	GET12         *float64  `json:"Humidity" bson:"Humidity"`
+	GET13         *float64  `json:"PM2_5" bson:"PM2_5"`
+	GET14         *float64  `json:"CO" bson:"CO"`
+	GET15         *float64  `json:"CO2" bson:"CO2"`
+	GET16         *float64  `json:"Noise" bson:"Noise"`
 }
 
 func airboxPost(w http.ResponseWriter, r *http.Request) {
 
 	dbInfo := &mgo.DialInfo{
-		Addrs:    strings.SplitN(dbpublic, ",", -1),
+		Addrs:    strings.SplitN(dblocal, ",", -1),
 		Database: "admin",
 		Username: "dontask",
 		Password: "idontknow",
@@ -197,61 +197,12 @@ func airboxPost(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 
-	// // declare the struct
-	// getthemetrics := getmetrics{}
+	container3 := getmetrics{
 
-	// // update lastreport
-	// Lastreportcontainer := getmetrics{
-	// 	Timestamp:     containertemp,
-	// 	TimestampUnix: containerSnd.TimestampUnix,
-	// 	GWID:          containerSnd.GWID[0:8],
-
-	// 	MACAddress: containerSnd.MACAddress,
-	// 	Metrics:    lastreportmetrics,
-	// }
-
-	_, err = Mongo.C(c_airboxlast).Upsert(bson.M{"MAC_Address": container2.MACAddress}, bson.M{"$set": container2})
-	if err != nil {
-		log.Println(err)
-	}
-	r.Body.Close()
-	// fmt.Print(container)
-	json.NewEncoder(w).Encode(&container2)
-}
-
-func airboxGet(w http.ResponseWriter, r *http.Request) {
-
-	dbInfo := &mgo.DialInfo{
-		Addrs:    strings.SplitN(dblocal, ",", -1),
-		Database: "admin",
-		Username: "dontask",
-		Password: "idontknow",
-		Timeout:  time.Minute * 15,
-	}
-	sess, _ := mgo.DialWithInfo(dbInfo)
-
-	// sess := session.Clone()
-
-	Mongo := sess.DB(db_airbox)
-	defer sess.Close()
-	// container := airboxRcv{}
-	containertemp := airboxSnd{}
-	json.NewDecoder(r.Body).Decode(&containertemp)
-
-	fmt.Print(containertemp)
-	// fmt.Println(reflect.DeepEqual(container, containertemp))
-	fmt.Println(r.Header)
-
-	err := Mongo.C(c_airboxraw).Find(bson.M{}).All(&containertemp)
-
-	container2 := airboxSnd{
-		ID:            getObjectIDTwoArg(containertemp.MACAddress, containertemp.MACAddress, containertemp.TimestampUnix),
 		Timestamp:     time.Unix(containertemp.TimestampUnix, 0).UTC(),
 		TimestampUnix: containertemp.TimestampUnix,
 		MACAddress:    containertemp.MACAddress,
 		GWID:          containertemp.GWID,
-		CPURate:       containertemp.CPURate,
-		StorageRate:   containertemp.StorageRate,
 		GET11:         containertemp.GET11,
 		GET12:         containertemp.GET12,
 		GET13:         containertemp.GET13,
@@ -259,6 +210,8 @@ func airboxGet(w http.ResponseWriter, r *http.Request) {
 		GET15:         containertemp.GET15,
 		GET16:         containertemp.GET16,
 	}
+	// _, err = Mongo.C(c_airboxlast).Upsert(bson.M{"MAC_Address": container2.MACAddress}, bson.M{"$set": container2})
+	err = Mongo.C(c_airboxlast).Update(bson.M{"MAC_Address": container2.MACAddress}, bson.M{"$set": container3})
 
 	if err != nil {
 		log.Println(err)
@@ -267,21 +220,6 @@ func airboxGet(w http.ResponseWriter, r *http.Request) {
 	// fmt.Print(container)
 	json.NewEncoder(w).Encode(&container2)
 }
-
-// }
-
-// func db_connect() *Session {
-
-// 	dbInfo := &mgo.DialInfo{
-// 		Addrs:    strings.SplitN(dblocal, ",", -1),
-// 		Database: "admin",
-// 		Username: "dontask",
-// 		Password: "idontknow",
-// 		Timeout:  time.Second * 120,
-// 	}
-// 	session, _ = mgo.DialWithInfo(dbInfo)
-// 	return session
-// }
 
 func main() {
 	// db_connect()

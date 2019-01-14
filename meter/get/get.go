@@ -23,12 +23,22 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+var bannr = `
+Program name : GET API
+
+maintainer   : avbee.lab@gmail.com
+
+Date         : 13/01/2019
+
+`
+
 const (
 	dblocal  = "172.16.0.132:27017"
 	dbpublic = "140.118.70.136:10003"
 	dbbackup = "140.118.122.103:27017"
 
 	db             = "sc"
+	c_rawdata      = "rawdata"
 	c_lastreport   = "lastreport"
 	c_devices      = "devices"
 	c_gwtstat      = "gw_status"
@@ -42,17 +52,20 @@ const (
 var session *mgo.Session
 
 func dbConnect() {
+
 	var err error
+
+	inpEnv := getenvvar()
+
 	dbInfo := &mgo.DialInfo{
-		Addrs:    strings.SplitN(dbpublic, ",", -1),
-		Database: "admin",
-		Username: "dontask",
-		Password: "idontknow",
+		Addrs:    strings.SplitN(inpEnv.Mongo, ",", -1),
+		Database: inpEnv.Database,
+		Username: inpEnv.Username,
+		Password: inpEnv.Password,
 		Timeout:  time.Second * 10,
 	}
 
 	session, err = mgo.DialWithInfo(dbInfo)
-
 	if err != nil {
 		os.Exit(1)
 	}
@@ -83,29 +96,39 @@ type DSTwxTemplate struct {
 
 type device struct {
 	Rows []struct {
-		DevID      int    `json:"DevID" bson:"DevID"`
-		Floor      string `json:"Floor" bson:"Floor"`
-		GWID       string `json:"GWID" bson:"GWID"`
-		MGWID      string `json:"M_GWID" bson:"M_GWID"`
-		MMAC       string `json:"M_MAC" bson:"M_MAC"`
-		NUM        string `json:"NUM" bson:"NUM"`
-		Place      string `json:"Place" bson:"Place"`
-		Territory  string `json:"Territory" bson:"Territory"`
-		Type       string `json:"Type" bson:"Type"`
-		MACAddress string `json:"MAC_Address" bson:"MAC_Address"`
+		MACAddress   string `json:"MAC_Address" bson:"MAC_Address"`
+		DevID        int    `json:"DevID" bson:"DevID"`
+		Floor        string `json:"FLOOR" bson:"FLOOR"`
+		GWID         string `json:"GWID" bson:"GWID"`
+		MGWID        string `json:"M_GWID" bson:"M_GWID"`
+		MMAC         string `json:"M_MAC" bson:"M_MAC"`
+		NUM          string `json:"NUM" bson:"NUM"`
+		Place        string `json:"PLACE" bson:"PLACE"`
+		Territory    string `json:"TERRITORY" bson:"TERRITORY"`
+		Type         string `json:"TYPE" bson:"TYPE"`
+		MeterFloor   string `json:"meter_floor" bson:"meter_floor"`
+		MeterPlace   string `json:"meter_place" bson:"meter_place"`
+		NodePlace    string `json:"node_place" bson:"node_place"`
+		Group        int    `json:"Group" bson:"Group"`
+		MeterPlaceEn string `json:"meter_place_en" bson:"meter_place_en"`
 	} `json:"rows"`
 	Datashape struct {
 		FieldDefinitions struct {
-			DevID      DSTwxTemplate `json:"DevID"`
-			Floor      DSTwxTemplate `json:"Floor"`
-			GWID       DSTwxTemplate `json:"GWID"`
-			MGWID      DSTwxTemplate `json:"M_GWID"`
-			MMAC       DSTwxTemplate `json:"M_MAC" `
-			NUM        DSTwxTemplate `json:"NUM" `
-			Place      DSTwxTemplate `json:"Place" `
-			Territory  DSTwxTemplate `json:"Territory" `
-			Type       DSTwxTemplate `json:"Type" `
-			MACAddress DSTwxTemplate `json:"MACAddress" `
+			MACAddress   DSTwxTemplate `json:"MAC_Address"`
+			DevID        DSTwxTemplate `json:"DevID"`
+			Floor        DSTwxTemplate `json:"FLOOR"`
+			GWID         DSTwxTemplate `json:"GWID"`
+			MGWID        DSTwxTemplate `json:"M_GWID"`
+			MMAC         DSTwxTemplate `json:"M_MAC" `
+			NUM          DSTwxTemplate `json:"NUM" `
+			Place        DSTwxTemplate `json:"PLACE" `
+			Territory    DSTwxTemplate `json:"TERRITORY" `
+			Type         DSTwxTemplate `json:"TYPE" `
+			MeterFloor   DSTwxTemplate `json:"meter_floor" `
+			MeterPlace   DSTwxTemplate `json:"meter_place" `
+			NodePlace    DSTwxTemplate `json:"node_place" `
+			Group        DSTwxTemplate `json:"Group" `
+			MeterPlaceEn DSTwxTemplate `json:"meter_place_en" `
 		} `json:"fieldDefinitions"`
 	} `json:"dataShape"`
 }
@@ -116,10 +139,9 @@ type getlastreport struct {
 	MACAddress    string    `json:"MAC_Address" bson:"MAC_Address"`
 	GWID          string    `json:"GWID" bson:"GWID"`
 	DevID         int       `json:"ID" bson:"ID"`
-	Floor         string    `json:"Floor" bson:"Floor"`
+	Floor         string    `json:"FLOOR" bson:"FLOOR"`
 	MGWID         string    `json:"M_GWID" bson:"M_GWID"`
 	MMAC          string    `json:"M_MAC" bson:"M_MAC"`
-	NUM           string    `json:"NUM" bson:"NUM"`
 	Place         string    `json:"PLACE" bson:"PLACE"`
 	Territory     string    `json:"TERRITORY" bson:"TERRITORY"`
 	Type          string    `json:"TYPE" bson:"TYPE"`
@@ -196,22 +218,26 @@ func gogetlastreport(w http.ResponseWriter, r *http.Request) {
 	defer sess.Close()
 
 	Mongo := sess.DB(db).C(c_lastreport)
-	Mongo.Find(bson.M{}).All(&container)
+	Mongo.Find(bson.M{}).Sort("-Timestamp_Unix").All(&container)
 	json.NewEncoder(w).Encode(container)
 	// fmt.Println(container)
 }
 
 type devices struct {
-	MACAddress string `json:"MAC_Address" bson:"MAC_Address"`
-	DevID      int    `json:"DevID" bson:"DevID"`
-	Floor      string `json:"Floor" bson:"Floor"`
-	GWID       string `json:"GWID" bson:"GWID"`
-	MGWID      string `json:"M_GWID" bson:"M_GWID"`
-	MMAC       string `json:"M_MAC" bson:"M_MAC"`
-	NUM        string `json:"NUM" bson:"NUM"`
-	Place      string `json:"Place" bson:"Place"`
-	Territory  string `json:"Territory" bson:"Territory"`
-	Type       string `json:"Type" bson:"Type"`
+	MACAddress   string `json:"MAC_Address" bson:"MAC_Address"`
+	DevID        int    `json:"DevID" bson:"DevID"`
+	Floor        string `json:"FLOOR" bson:"FLOOR"`
+	GWID         string `json:"GWID" bson:"GWID"`
+	MGWID        string `json:"M_GWID" bson:"M_GWID"`
+	MMAC         string `json:"M_MAC" bson:"M_MAC"`
+	NUM          string `json:"NUM" bson:"NUM"`
+	Place        string `json:"PLACE" bson:"PLACE"`
+	Territory    string `json:"TERRITORY" bson:"TERRITORY"`
+	Type         string `json:"TYPE" bson:"TYPE"`
+	MeterPlace   string `json:"meter_place" bson:"meter_place"`
+	NodePlace    string `json:"node_place" bson:"node_place"`
+	Group        int    `json:"Group" bson:"Group"`
+	MeterPlaceEn string `json:"meter_place_en" bson:"meter_place_en"`
 }
 
 func gogetDevices(w http.ResponseWriter, r *http.Request) {
@@ -452,10 +478,11 @@ func gogetgwstat(w http.ResponseWriter, r *http.Request) {
 }
 
 type offlineChart struct {
-	Timestamp     time.Time `json:"Timestamp" bson:"Timestamp"`
-	TimestampUnix int       `json:"Timestamp_Unix" bson:"Timestamp_Unix"`
-	MeterOffline  int       `json:"Meter_Offline" bson:"Meter_Offline"`
-	GWOffline     int       `json:"GW_Offline" bson:"GW_Offline"`
+	Timestamp         time.Time `json:"Timestamp" bson:"Timestamp"`
+	TimestampUnix     int       `json:"Timestamp_Unix" bson:"Timestamp_Unix"`
+	MeterOffline      int       `json:"Meter_Offline" bson:"Meter_Offline"`
+	GWOffline         int       `json:"GW_Offline" bson:"GW_Offline"`
+	TimestampInString string    `json:"TimestampInString,omitempty" bson:"TimestampInString,omitempty"`
 }
 
 type postTime struct {
@@ -464,8 +491,9 @@ type postTime struct {
 }
 
 func SetTimeStampForLastDay(theTime time.Time) time.Time {
-	year, month, day := theTime.Date()
-	return time.Date(year, month, day, 23, 59, 59, 0, time.UTC)
+	// year, month, day := theTime.Date()
+	return theTime.Add(24 * time.Hour)
+	// return time.Date(year, month, day, 23, 59, 59, 0, time.UTC)
 }
 
 func UtcToLocal(theTime time.Time) time.Time {
@@ -483,17 +511,66 @@ func gogetgofflinechart(w http.ResponseWriter, r *http.Request) {
 
 	// container := []offlineChart{}
 	json.NewDecoder(r.Body).Decode(&headercontainer)
-	fmt.Print(headercontainer)
+	fmt.Print(*headercontainer.Start, *headercontainer.Stop)
 	if *headercontainer.Start != "" && *headercontainer.Stop != "" {
 
-		start, e := time.ParseInLocation("2006-01-02", *headercontainer.Start, time.Local)
-		stop, er := time.ParseInLocation("2006-01-02", *headercontainer.Stop, time.Local)
+		start, e := time.ParseInLocation("2006-01-02", *headercontainer.Start, time.UTC)
+		// stop, er := time.ParseInLocation("2006-01-02", *headercontainer.Stop, time.UTC)
+		start = start.Add(time.Hour * -8).UTC()
+		// stop = stop.Add(time.Hour * 16).UTC()
+		stop := time.Now()
+		if stop.Sub(start) < time.Hour*24 {
+			if e != nil {
+				log.Println(e)
+			}
+			sess := session.Clone()
+			Mongo := sess.DB(db)
+			container := []offlineChart{}
+			var headercontainer2 []offlineChart
+			// headercontainer3 := []offlineChart{}
 
+			defer sess.Close()
+			//
+			Mongo.C(c_offlineChart).Find(bson.M{"Timestamp": bson.M{"$gte": start, "$lte": (stop)}}).All(&container)
+			for _, each := range container {
+				temptime := each.Timestamp
+				year, month, day := temptime.Date()
+
+				h := temptime.Hour()
+				each.TimestampInString = strconv.Itoa(year) + "-" + strconv.Itoa(int(month)) + "-" + strconv.Itoa(day) + " " + strconv.Itoa(h)
+
+				headercontainer2 = append(headercontainer2, each)
+
+			}
+			fmt.Println(container)
+			json.NewEncoder(w).Encode(headercontainer2)
+			log.Println("gogetgofflinechart")
+
+		} else {
+			json.NewEncoder(w).Encode("More than 24 hours")
+			log.Println("More than 24 hours")
+		}
+	}
+}
+
+func gogetgofflinechartMonth(w http.ResponseWriter, r *http.Request) {
+
+	headercontainer := postTime{}
+
+	// container := []offlineChart{}
+	json.NewDecoder(r.Body).Decode(&headercontainer)
+	fmt.Print(*headercontainer.Start, *headercontainer.Stop)
+	if *headercontainer.Start != "" && *headercontainer.Stop != "" {
+
+		start, e := time.ParseInLocation("2006-01-02", *headercontainer.Start, time.UTC)
+		stop, er := time.ParseInLocation("2006-01-02", *headercontainer.Stop, time.UTC)
+		start.AddDate(0, 1, 0)
+		start = start.Add(time.Hour * -8).UTC()
+		stop = stop.Add(time.Hour * 16).UTC()
 		if e != nil || er != nil {
 			log.Println(e)
 			log.Println(er)
 		}
-
 		sess := session.Clone()
 		Mongo := sess.DB(db)
 		container := []offlineChart{}
@@ -501,15 +578,21 @@ func gogetgofflinechart(w http.ResponseWriter, r *http.Request) {
 		// headercontainer3 := []offlineChart{}
 
 		defer sess.Close()
-
-		Mongo.C(c_offlineChart).Find(bson.M{"Timestamp": bson.M{"$gte": start, "$lte": SetTimeStampForLastDay(stop)}}).All(&container)
+		//
+		Mongo.C(c_offlineChart).Find(bson.M{"Timestamp": bson.M{"$gte": start, "$lte": (stop)}}).All(&container)
 		for _, each := range container {
-			each.Timestamp = each.Timestamp.Add(time.Hour * 8)
+			temptime := each.Timestamp
+			year, month, day := temptime.Date()
+
+			h := temptime.Hour()
+			each.TimestampInString = strconv.Itoa(year) + "-" + strconv.Itoa(int(month)) + "-" + strconv.Itoa(day) + " " + strconv.Itoa(h)
+
 			headercontainer2 = append(headercontainer2, each)
+
 		}
-		// fmt.Println(container)
+		fmt.Println(container)
 		json.NewEncoder(w).Encode(headercontainer2)
-		log.Println("gogetgofflinechart")
+		log.Println("gogetgofflinechartMonth")
 
 	}
 }
@@ -831,14 +914,14 @@ type addDeviceList struct {
 	Timestamp_changes time.Time `json:"Timestamp_Changes" bson:"Timestamp_Changes"`
 	Userchanges       *string   `json:"user" bson:"user"`
 	DevID             *int      `json:"DevID" bson:"DevID"`
-	Floor             *string   `json:"Floor" bson:"Floor"`
+	Floor             *string   `json:"FLOOR" bson:"FLOOR"`
 	GWID              *string   `json:"GWID" bson:"GWID"`
 	MGWID             *string   `json:"M_GWID" bson:"M_GWID"`
 	MMAC              *string   `json:"M_MAC" bson:"M_MAC"`
 	NUM               *string   `json:"NUM" bson:"NUM"`
-	Place             *string   `json:"Place" bson:"Place"`
-	Territory         *string   `json:"Territory" bson:"Territory"`
-	Type              *string   `json:"Type" bson:"Type"`
+	Place             *string   `json:"PLACE" bson:"PLACE"`
+	Territory         *string   `json:"TERRITORY" bson:"TERRITORY"`
+	Type              *string   `json:"TYPE" bson:"TYPE"`
 	MACAddress        *string   `json:"MAC_Address" bson:"MAC_Address"`
 }
 
@@ -1035,6 +1118,12 @@ func meterDetail(w http.ResponseWriter, r *http.Request) {
 	// err := mongo.Find(bson.M{"GWID": bson.M{"$in": "/^meter_03/"}}).All(&container.Rows)
 	fmt.Println(err)
 
+	container.Datashape.FieldDefinitions.MACAddress.Ordinal = zeros
+	container.Datashape.FieldDefinitions.MACAddress.BaseType = `STRING`
+	container.Datashape.FieldDefinitions.MACAddress.Aspects = aspect
+	container.Datashape.FieldDefinitions.MACAddress.Name = `MAC_Address`
+	container.Datashape.FieldDefinitions.MACAddress.Description = `MAC_Address`
+
 	container.Datashape.FieldDefinitions.DevID.Ordinal = zeros
 	container.Datashape.FieldDefinitions.DevID.BaseType = `NUMBER`
 	container.Datashape.FieldDefinitions.DevID.Aspects = aspect
@@ -1044,8 +1133,8 @@ func meterDetail(w http.ResponseWriter, r *http.Request) {
 	container.Datashape.FieldDefinitions.Floor.Ordinal = zeros
 	container.Datashape.FieldDefinitions.Floor.BaseType = `STRING`
 	container.Datashape.FieldDefinitions.Floor.Aspects = aspect
-	container.Datashape.FieldDefinitions.Floor.Name = `Floor`
-	container.Datashape.FieldDefinitions.Floor.Description = `Floor`
+	container.Datashape.FieldDefinitions.Floor.Name = `FLOOR`
+	container.Datashape.FieldDefinitions.Floor.Description = `FLOOR`
 
 	container.Datashape.FieldDefinitions.GWID.Ordinal = zeros
 	container.Datashape.FieldDefinitions.GWID.BaseType = `STRING`
@@ -1075,30 +1164,158 @@ func meterDetail(w http.ResponseWriter, r *http.Request) {
 	container.Datashape.FieldDefinitions.Place.Ordinal = zeros
 	container.Datashape.FieldDefinitions.Place.BaseType = `STRING`
 	container.Datashape.FieldDefinitions.Place.Aspects = aspect
-	container.Datashape.FieldDefinitions.Place.Name = `Place`
-	container.Datashape.FieldDefinitions.Place.Description = `Place`
+	container.Datashape.FieldDefinitions.Place.Name = `PLACE`
+	container.Datashape.FieldDefinitions.Place.Description = `PLACE`
 
 	container.Datashape.FieldDefinitions.Territory.Ordinal = zeros
 	container.Datashape.FieldDefinitions.Territory.BaseType = `STRING`
 	container.Datashape.FieldDefinitions.Territory.Aspects = aspect
-	container.Datashape.FieldDefinitions.Territory.Name = `Territory`
-	container.Datashape.FieldDefinitions.Territory.Description = `Territory`
+	container.Datashape.FieldDefinitions.Territory.Name = `TERRITORY`
+	container.Datashape.FieldDefinitions.Territory.Description = `TERRITORY`
 
 	container.Datashape.FieldDefinitions.Type.Ordinal = zeros
 	container.Datashape.FieldDefinitions.Type.BaseType = `STRING`
 	container.Datashape.FieldDefinitions.Type.Aspects = aspect
-	container.Datashape.FieldDefinitions.Type.Name = `Type`
-	container.Datashape.FieldDefinitions.Type.Description = `Type`
+	container.Datashape.FieldDefinitions.Type.Name = `TYPE`
+	container.Datashape.FieldDefinitions.Type.Description = `TYPE`
 
-	container.Datashape.FieldDefinitions.MACAddress.Ordinal = zeros
-	container.Datashape.FieldDefinitions.MACAddress.BaseType = `STRING`
-	container.Datashape.FieldDefinitions.MACAddress.Aspects = aspect
-	container.Datashape.FieldDefinitions.MACAddress.Name = `MAC_Address`
-	container.Datashape.FieldDefinitions.MACAddress.Description = `MAC_Address`
+	container.Datashape.FieldDefinitions.Group.Ordinal = zeros
+	container.Datashape.FieldDefinitions.Group.BaseType = `STRING`
+	container.Datashape.FieldDefinitions.Group.Aspects = aspect
+	container.Datashape.FieldDefinitions.Group.Name = `Group`
+	container.Datashape.FieldDefinitions.Group.Description = `Group`
+
+	container.Datashape.FieldDefinitions.MeterFloor.Ordinal = zeros
+	container.Datashape.FieldDefinitions.MeterFloor.BaseType = `STRING`
+	container.Datashape.FieldDefinitions.MeterFloor.Aspects = aspect
+	container.Datashape.FieldDefinitions.MeterFloor.Name = `meter_floor`
+	container.Datashape.FieldDefinitions.MeterFloor.Description = `meter_floor`
+
+	container.Datashape.FieldDefinitions.MeterPlace.Ordinal = zeros
+	container.Datashape.FieldDefinitions.MeterPlace.BaseType = `STRING`
+	container.Datashape.FieldDefinitions.MeterPlace.Aspects = aspect
+	container.Datashape.FieldDefinitions.MeterPlace.Name = `meter_place`
+	container.Datashape.FieldDefinitions.MeterPlace.Description = `meter_place`
+
+	container.Datashape.FieldDefinitions.NodePlace.Ordinal = zeros
+	container.Datashape.FieldDefinitions.NodePlace.BaseType = `STRING`
+	container.Datashape.FieldDefinitions.NodePlace.Aspects = aspect
+	container.Datashape.FieldDefinitions.NodePlace.Name = `node_place`
+	container.Datashape.FieldDefinitions.NodePlace.Description = `node_place`
+
+	container.Datashape.FieldDefinitions.MeterPlaceEn.Ordinal = zeros
+	container.Datashape.FieldDefinitions.MeterPlaceEn.BaseType = `STRING`
+	container.Datashape.FieldDefinitions.MeterPlaceEn.Aspects = aspect
+	container.Datashape.FieldDefinitions.MeterPlaceEn.Name = `meter_place_en`
+	container.Datashape.FieldDefinitions.MeterPlaceEn.Description = `meter_place_en`
 
 	json.NewEncoder(w).Encode(container)
 
 }
+
+type structMeterOneDayData struct {
+	Type       string `json:"Type" bson:"Type"`
+	MACAddress string `json:"MAC_Address" bson:"MAC_Address"`
+}
+
+func pipeMeterOneDayData(start time.Time, stop time.Time, devID string) []bson.M {
+	pipeline := []bson.M{
+		bson.M{
+			"$match": bson.M{
+				"MAC_Address": devID,
+				"Timestamp": bson.M{
+					"$gt":  start,
+					"$lte": stop},
+			}}}
+
+	pipeline = append(pipeline, bson.M{
+
+		"$group": bson.M{
+			"_id": bson.M{
+				"MAC_Address": "$MAC_Address",
+				"GW_ID":       "$GW_ID",
+				// "Hour":        bson.M{"$hour": "$Timestamp"},
+				"Year": bson.M{"$year": "$Timestamp"},
+				"day":  bson.M{"$dayOfYear": "$Timestamp"},
+			},
+			"Timestamp": bson.M{"$last": "$Timestamp"},
+
+			// // Below is wrong aggregation. This is used if query data from rawdata collection. Get MAX and MIN
+			"max_val": bson.M{"$max": "$ae_tot"},
+			"min_val": bson.M{"$min": "$ae_tot"},
+
+			// "ae_tot": bson.M{"$subtract": []bson.M{bson.M{"$last": "$ae_tot"}, bson.M{"$first": "$ae_tot"}}},
+			"pf_avg": bson.M{"$avg": "$pf_avg"},
+			"p_sum":  bson.M{"$avg": "$p_sum"},
+		},
+	})
+
+	pipeline = append(pipeline, bson.M{
+		"$project": bson.M{
+			"_id": 0,
+
+			"MAC_Address": "$_id.MAC_Address",
+			"GW_ID":       "$_id.GW_ID",
+
+			"Timestamp": 1,
+
+			"pf_avg": 1,
+			"p_sum":  1,
+			// "ae_tot": 1,
+			// "min_val": 1,
+			// // Below is wrong aggregation. This is used if query data from rawdata collection. Get MAX and MIN
+			"ae_tot": bson.M{"$subtract": []interface{}{"$max_val", "$min_val"}},
+		},
+	})
+
+	pipeline = append(pipeline, bson.M{
+		"$sort": bson.M{
+			"Timestamp": 1},
+	})
+
+	return pipeline
+}
+
+func submeterOneDayData(w http.ResponseWriter, r *http.Request) {
+
+	// sess := sessiheadercontainer := structMeterOneDayData{}on.Clone()
+	headercontainer := structMeterOneDayData{}
+	json.NewDecoder(r.Body).Decode(&headercontainer)
+	fmt.Println(&headercontainer)
+
+	if headercontainer.Type == "cpm" {
+		meterOneDayData(headercontainer.MACAddress, "cpm", w, r)
+	} else if headercontainer.Type == "aemdra" {
+		meterOneDayData(headercontainer.MACAddress, "aemdra", w, r)
+	} else {
+		return
+	}
+
+}
+
+func meterOneDayData(MACAddress string, collname string, w http.ResponseWriter, r *http.Request) {
+	sess := session.Clone()
+
+	Mongo := sess.DB(db).C(collname)
+	defer sess.Close()
+
+	// start, e := time.ParseInLocation("2006-01-02T15", *headercontainer.Start, time.Local)
+	tick := time.Now().Format("2006-01-02")
+	start, _ := time.Parse("2006-01-02", tick)
+
+	stop := time.Now().UTC()
+	fmt.Print(start, stop)
+
+	var container []interface{}
+	// container := []interface{}
+	Mongo.Pipe(pipeMeterOneDayData(start, stop, MACAddress)).All(&container)
+	// fmt.Print(errr)
+	// Mongo.Find(bson.M{"MAC_Address": *headercontainer.MACAddress, "Timestamp": bson.M{"$gte": start, "$lte": stop}}).All(&container)
+	json.NewEncoder(w).Encode(container)
+}
+
+// 	}
+// }
 
 func test(w http.ResponseWriter, r *http.Request) {
 
@@ -1153,12 +1370,44 @@ func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+type ENV struct {
+	Port     string
+	Mongo    string
+	Database string
+	Username string
+	Password string
+}
+
+func getenvvar() ENV {
+
+	theenv := ENV{}
+	theenv.Mongo = os.Getenv("MONGO_URL")
+	if theenv.Mongo == "" {
+		theenv.Mongo = "172.16.0.132:27017"
+	}
+	theenv.Database = os.Getenv("DB_AUTH")
+	if theenv.Database == "" {
+		theenv.Database = "admin"
+	}
+	theenv.Username = os.Getenv("USERNAME")
+	if theenv.Username == "" {
+		theenv.Username = "dontask"
+	}
+	theenv.Password = os.Getenv("PASS")
+	if theenv.Password == "" {
+		theenv.Password = "idontknow"
+	}
+
+	return theenv
+}
+
 // ```
 // MAIN
 // ```
 
 func main() {
 
+	fmt.Println(bannr)
 	dbConnect()
 	// auth.GenAuth()
 	router := mux.NewRouter()
@@ -1168,6 +1417,7 @@ func main() {
 	// additional API for query all buildings data
 	router.HandleFunc("/meter/lastreport/allbuilding", gopostlastreportAllBuilding).Methods("GET")
 	router.HandleFunc("/meter/offlinechart", gogetgofflinechart).Methods("POST")
+	router.HandleFunc("/meter/offlinechartMonth", gogetgofflinechartMonth).Methods("POST")
 	router.HandleFunc("/meter/meterdetail/{macID}", meterDetail).Methods("GET")
 
 	//Authorization
@@ -1192,6 +1442,7 @@ func main() {
 	router.HandleFunc("/space/cam/posX/{pos1}/posY/{pos2}", camTurn).Methods("GET")
 
 	router.HandleFunc("/test", test).Methods("GET")
+	router.HandleFunc("/meter/oneDayData", submeterOneDayData).Methods("POST")
 
 	log.Println(http.ListenAndServe(":8081", router))
 
